@@ -7,9 +7,9 @@ import { AlertStatusBadge, riskTone } from '@/components/shared'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { demoCustomer, demoModelInputs } from '@/data/demo-scenarios'
+// MOCK CŨ: import { demoCustomer, demoModelInputs } from '@/data/demo-scenarios'
 import type { OpsDecision } from '@/data/types'
-import { getCaseTimeline, getOpsAlert, postDecision } from '@/lib/api'
+import { getCaseTimeline, getOpsAlert, getOpsDashboard, getSessionCustomer, postDecision } from '@/lib/api'
 import { formatDateTime, formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { DesktopShell } from '@/shell/DesktopShell'
@@ -38,7 +38,10 @@ export function CaseDetailPage() {
   const [submitting, setSubmitting] = useState(false)
 
   const { data: alert, isPending } = useQuery({ queryKey: ['ops-alert', id], queryFn: () => getOpsAlert(id) })
-  const timeline = getCaseTimeline(id)
+  // Trước đây getCaseTimeline bỏ qua id và trả thẳng dữ liệu demo, không gọi mạng.
+  const { data: timeline = [] } = useQuery({ queryKey: ['case-timeline', id], queryFn: () => getCaseTimeline(id) })
+  const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
+  const { data: dashboard } = useQuery({ queryKey: ['ops-dashboard'], queryFn: getOpsDashboard })
 
   async function decide(decision: OpsDecision) {
     if (!alert || submitting) return
@@ -124,10 +127,10 @@ export function CaseDetailPage() {
                 </span>
                 <span>
                   <span className="block text-[15px] font-semibold">{alert.customer}</span>
-                  <span className="block text-xs text-muted">{demoCustomer.maskedAccount} · KH từ 2019 · Phân khúc Lương</span>
+                  <span className="block text-xs text-muted">{customer?.maskedAccount ?? '••••'} · KH từ 2019 · Phân khúc Lương</span>
                 </span>
               </span>
-              <InfoRow label="Số dư hiện tại" value={formatVnd(demoCustomer.balance)} />
+              <InfoRow label="Số dư hiện tại" value={formatVnd(customer?.balance ?? 0)} />
               <InfoRow label="Mức chuyển TB" value="9.400.000 ₫" />
               <InfoRow label="Cảnh báo 90 ngày" value="1 (58/100)" />
             </div>
@@ -182,7 +185,7 @@ export function CaseDetailPage() {
               <div className="border-t border-divider pt-3">
                 <span className="text-xs font-semibold uppercase tracking-[.04em] text-muted">Dữ liệu đầu vào mô hình</span>
                 <span className="mt-2 flex flex-wrap gap-1.5">
-                  {demoModelInputs.map((inp) => (
+                  {(dashboard?.modelInputs ?? []).map((inp) => (
                     <span key={inp} className="rounded-full border border-line bg-app px-2.5 py-1 text-xs">
                       {inp}
                     </span>

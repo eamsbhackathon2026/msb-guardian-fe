@@ -5,8 +5,8 @@ import { CircleAlert, Flag, LoaderCircle, ShieldAlert, ShieldCheck, X } from 'lu
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
-import { demoBeneficiary, demoScamAmount } from '@/data/demo-scenarios'
-import { assessRisk } from '@/lib/api'
+// MOCK CŨ: import { demoBeneficiary, demoScamAmount } from '@/data/demo-scenarios'
+import { assessRisk, getPendingTransfer } from '@/lib/api'
 import { formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame, usePhoneContainer } from '@/shell/MobileFrame'
@@ -31,6 +31,7 @@ function AnalyzingState() {
 }
 
 function ProtectedState({ onDone }: { onDone: () => void }) {
+  const { data: transfer } = useQuery({ queryKey: ['transfer-pending'], queryFn: getPendingTransfer })
   return (
     <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-1 flex-col items-center justify-center gap-4 px-8">
       <motion.span
@@ -43,7 +44,7 @@ function ProtectedState({ onDone }: { onDone: () => void }) {
       </motion.span>
       <span className="text-center text-[22px] font-semibold leading-7">Bạn đã được bảo vệ</span>
       <span className="text-center text-sm leading-5 text-muted">Giao dịch đã được huỷ. Số tiền được giữ lại an toàn trong tài khoản của bạn:</span>
-      <span className="text-[32px] font-bold text-success">{formatVnd(demoScamAmount)}</span>
+      <span className="text-[32px] font-bold text-success">{formatVnd(transfer?.amount ?? 0)}</span>
       <span className="text-center text-[13px] text-muted">Chúng tôi đã ghi nhận tài khoản đáng ngờ và chia sẻ (ẩn danh) tới hệ thống cảnh báo cộng đồng.</span>
       <Button className="mt-2 w-full" onClick={onDone}>
         Về Trung tâm an toàn
@@ -60,9 +61,15 @@ function ScamAlertInner() {
   const [understood, setUnderstood] = useState(false)
   const [phase, setPhase] = useState<'alert' | 'protected'>('alert')
 
+  // Số tiền và người nhận đến từ gateway, không còn là hằng số trong bundle.
+  const { data: transfer } = useQuery({ queryKey: ['transfer-pending'], queryFn: getPendingTransfer })
+
+  // Chỉ chấm điểm sau khi biết số tiền. Trong lúc chờ, isPending vẫn đúng nên
+  // màn "Đang phân tích giao dịch..." hiển thị liền mạch qua cả hai lời gọi.
   const { data: assessment, isPending } = useQuery({
-    queryKey: ['risk-assess'],
-    queryFn: () => assessRisk({ amount: demoScamAmount }),
+    queryKey: ['risk-assess', transfer?.amount],
+    queryFn: () => assessRisk({ amount: transfer!.amount }),
+    enabled: transfer !== undefined,
   })
 
   const topSignals = assessment?.signals.slice(0, 3) ?? []
@@ -114,14 +121,14 @@ function ScamAlertInner() {
         <div className="flex w-full items-center justify-between rounded-card bg-surface p-4 shadow-card">
           <span className="flex flex-col gap-0.5">
             <span className="text-[13px] text-muted">Chuyển đến</span>
-            <span className="text-[15px] font-semibold">{demoBeneficiary.holderName}</span>
+            <span className="text-[15px] font-semibold">{transfer?.beneficiary.holderName ?? '…'}</span>
             <span className="text-[13px] text-muted">
-              {demoBeneficiary.bankName} · {demoBeneficiary.accountNo}
+              {transfer?.beneficiary.bankName ?? '…'} · {transfer?.beneficiary.accountNo ?? ''}
             </span>
           </span>
           <span className="flex flex-col items-end gap-0.5">
             <span className="text-[13px] text-muted">Số tiền</span>
-            <span className="text-xl font-bold">{formatVnd(demoScamAmount)}</span>
+            <span className="text-xl font-bold">{formatVnd(transfer?.amount ?? 0)}</span>
           </span>
         </div>
 

@@ -17,9 +17,9 @@ import {
 import { AlertStatusBadge, RiskScoreCell, useCountUp } from '@/components/shared'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { demoHourlyAlerts, demoOpsDeltas, demoScenarioCounts } from '@/data/demo-scenarios'
+// MOCK CŨ: import { demoHourlyAlerts, demoOpsDeltas, demoScenarioCounts } from '@/data/demo-scenarios'
 import type { AlertStatus, OpsMetrics } from '@/data/types'
-import { getOpsAlerts, getOpsMetrics } from '@/lib/api'
+import { getOpsAlerts, getOpsDashboard, getOpsMetrics } from '@/lib/api'
 import { formatTime, formatVnd, formatVndCompact } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { DesktopShell } from '@/shell/DesktopShell'
@@ -36,14 +36,16 @@ const statusFilters: { key: AlertStatus | 'all'; label: string }[] = [
 
 function KpiTile({ label, value, format, deltaKey, metrics }: { label: string; value: number; format: (n: number) => string; deltaKey: keyof OpsMetrics; metrics: boolean }) {
   const animated = useCountUp(value, 1_200, metrics)
-  const delta = demoOpsDeltas[deltaKey]
+  // Cùng queryKey với OpsDashboardPage nên bốn ô KPI dùng chung một lời gọi.
+  const { data: dashboard } = useQuery({ queryKey: ['ops-dashboard'], queryFn: getOpsDashboard })
+  const delta = dashboard?.deltas[deltaKey]
   return (
     <div className="flex flex-col gap-1 rounded-card bg-surface p-5 shadow-card">
       <span className="text-[13px] text-muted">{label}</span>
       <span className="text-[28px] font-bold leading-9">{format(animated)}</span>
-      <span className={delta.up ? 'flex items-center gap-1 text-xs font-semibold text-success-deep' : 'flex items-center gap-1 text-xs font-semibold text-danger'}>
+      <span className={delta?.up === false ? 'flex items-center gap-1 text-xs font-semibold text-danger' : 'flex items-center gap-1 text-xs font-semibold text-success-deep'}>
         <ArrowUpRight size={14} strokeWidth={2} />
-        {delta.valueLabel}
+        {delta?.valueLabel ?? ''}
       </span>
     </div>
   )
@@ -57,6 +59,7 @@ export function OpsDashboardPage() {
 
   const { data: metrics } = useQuery({ queryKey: ['ops-metrics'], queryFn: getOpsMetrics })
   const { data: alerts, isPending: alertsPending } = useQuery({ queryKey: ['ops-alerts'], queryFn: getOpsAlerts })
+  const { data: dashboard } = useQuery({ queryKey: ['ops-dashboard'], queryFn: getOpsDashboard })
 
   const rows = useMemo(() => {
     const list = (alerts ?? []).map((a) => ({ ...a, status: overrides[a.id] ?? a.status }))
@@ -68,7 +71,10 @@ export function OpsDashboardPage() {
     })
   }, [alerts, overrides, search, statusFilter])
 
-  const scenarioData = useMemo(() => [...demoScenarioCounts].sort((a, b) => b.count - a.count), [])
+  const scenarioData = useMemo(
+    () => [...(dashboard?.scenarioCounts ?? [])].sort((a, b) => b.count - a.count),
+    [dashboard],
+  )
 
   return (
     <DesktopShell>
@@ -99,7 +105,7 @@ export function OpsDashboardPage() {
             <span className="text-[15px] font-semibold">Cảnh báo theo giờ</span>
             <span className="text-xs text-muted">24 giờ qua · đỉnh 16 cảnh báo lúc 09h</span>
             <ResponsiveContainer width="100%" height={190}>
-              <AreaChart data={demoHourlyAlerts} margin={{ top: 8, right: 8, bottom: 0, left: -8 }}>
+              <AreaChart data={dashboard?.hourlyAlerts ?? []} margin={{ top: 8, right: 8, bottom: 0, left: -8 }}>
                 <defs>
                   <linearGradient id="alertFill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="var(--msb-primary)" stopOpacity={0.22} />

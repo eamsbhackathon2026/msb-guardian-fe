@@ -3,9 +3,10 @@ import { motion } from 'framer-motion'
 import { Send, Sparkles, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
-import { demoChatSuggestions } from '@/data/demo-scenarios'
+import { useQuery } from '@tanstack/react-query'
+// MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
 import type { ChatChart, ChatMessage } from '@/data/types'
-import { streamChat } from '@/lib/api'
+import { getChatSuggestions, streamChat } from '@/lib/api'
 import { formatVnd } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 
@@ -53,6 +54,9 @@ function makeMessage(role: ChatMessage['role'], content: string, chart?: ChatCha
 
 export function CopilotChatPage() {
   const navigate = useNavigate()
+  // Gợi ý câu hỏi lấy từ gateway. Khi chưa tải xong thì không hiện chip nào,
+  // thay vì hiện danh sách cứng rồi nhảy sang danh sách khác.
+  const { data: suggestions = [] } = useQuery({ queryKey: ['chat-suggestions'], queryFn: getChatSuggestions })
   const [messages, setMessages] = useState<ChatMessage[]>([
     makeMessage('assistant', 'Chào Minh Anh 👋 Tôi có thể trả lời về chi tiêu, dòng tiền và tiết kiệm của bạn.'),
   ])
@@ -144,7 +148,7 @@ export function CopilotChatPage() {
         )}
         {showChips && (
           <div className="flex max-w-[320px] flex-col gap-2 self-start pl-9">
-            {demoChatSuggestions.map((q) => (
+            {suggestions.map((q) => (
               <button
                 key={q}
                 type="button"

@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Switch } from '@/components/ui/switch'
-import { demoSafetyCenter } from '@/data/demo-scenarios'
+import { useQuery } from '@tanstack/react-query'
+// MOCK CŨ: import { demoSafetyCenter } from '@/data/demo-scenarios'
 import type { SafetyHistoryItem } from '@/data/types'
+import { getSafetyCenter } from '@/lib/api'
 import { formatDate, formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { BottomNav } from '@/shell/BottomNav'
@@ -54,9 +56,23 @@ export function SafetyCenterPage() {
 
 function SafetyCenterInner() {
   const container = usePhoneContainer()
-  const { protections, toggleProtection } = useGuardianStore()
+  const { protections, toggleProtection, hydrateProtections } = useGuardianStore()
   const [selected, setSelected] = useState<SafetyHistoryItem | null>(null)
-  const data = demoSafetyCenter
+  const { data } = useQuery({ queryKey: ['safety-center'], queryFn: getSafetyCenter })
+
+  // Store giữ trạng thái bật/tắt trong phiên; giá trị ban đầu do gateway quyết định.
+  useEffect(() => {
+    if (data) hydrateProtections(data.protections)
+  }, [data, hydrateProtections])
+
+  if (!data) {
+    return (
+      <>
+        <MobileHeader title="Trung tâm an toàn" backTo="/" />
+        <div className="flex min-h-0 flex-1 items-center justify-center text-[15px] text-muted">Đang tải…</div>
+      </>
+    )
+  }
 
   const stats = [
     { label: 'Đã chặn', value: data.blockedCount, tone: 'text-danger' },

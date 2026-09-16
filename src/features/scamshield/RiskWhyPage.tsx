@@ -3,8 +3,10 @@ import { PhoneCall, ShieldQuestion } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { demoBeneficiaryTimeline, demoRiskAssessment, demoSimilarScenario } from '@/data/demo-scenarios'
+import { useQuery } from '@tanstack/react-query'
+// MOCK CŨ: import { demoBeneficiaryTimeline, demoRiskAssessment, demoSimilarScenario } from '@/data/demo-scenarios'
 import type { TimelineEvent } from '@/data/types'
+import { getRiskExplain } from '@/lib/api'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
 
@@ -18,7 +20,21 @@ function toneColor(tone: TimelineEvent['tone']): string {
 
 export function RiskWhyPage() {
   const navigate = useNavigate()
-  const { score, signals, recommendations } = demoRiskAssessment
+  const { data } = useQuery({ queryKey: ['risk-explain'], queryFn: getRiskExplain })
+
+  // Chờ đủ dữ liệu rồi mới vẽ: hiện điểm 0 rồi nhảy lên 87 trông như lỗi.
+  if (!data) {
+    return (
+      <MobileFrame>
+        <MobileHeader title="Vì sao chúng tôi cảnh báo" backTo="/transfer/review" />
+        <div className="flex min-h-0 flex-1 items-center justify-center text-[15px] text-muted">Đang tải…</div>
+      </MobileFrame>
+    )
+  }
+
+  const { score, signals, recommendations } = data.assessment
+  const beneficiaryTimeline = data.beneficiaryTimeline
+  const similarScenario = data.similarScenario
 
   return (
     <MobileFrame>
@@ -79,13 +95,13 @@ export function RiskWhyPage() {
         <div className="flex flex-col gap-3 rounded-card bg-surface p-4 shadow-card">
           <span className="text-[15px] font-semibold">Hành vi tài khoản người nhận</span>
           <div className="flex flex-col">
-            {demoBeneficiaryTimeline.map((event, i) => (
+            {beneficiaryTimeline.map((event, i) => (
               <div key={event.id} className="grid grid-cols-[16px_1fr] gap-x-3">
                 <span className="flex flex-col items-center">
                   <span className="mt-1 block h-2.5 w-2.5 flex-none rounded-full" style={{ background: toneColor(event.tone) }} />
-                  {i < demoBeneficiaryTimeline.length - 1 && <span className="w-[2px] flex-1 bg-divider" />}
+                  {i < beneficiaryTimeline.length - 1 && <span className="w-[2px] flex-1 bg-divider" />}
                 </span>
-                <span className={i < demoBeneficiaryTimeline.length - 1 ? 'pb-4' : ''}>
+                <span className={i < beneficiaryTimeline.length - 1 ? 'pb-4' : ''}>
                   <span className="block text-xs text-muted">{event.time}</span>
                   <span className="block text-sm font-medium leading-5">{event.label}</span>
                   {event.detail && <span className="block text-xs leading-4 text-muted">{event.detail}</span>}
@@ -99,10 +115,10 @@ export function RiskWhyPage() {
         <div className="flex flex-col gap-2 rounded-card bg-surface p-4 shadow-card">
           <span className="flex items-center justify-between gap-2">
             <span className="text-[15px] font-semibold">Kịch bản lừa đảo tương tự</span>
-            <Badge variant="danger">{demoSimilarScenario.name}</Badge>
+            <Badge variant="danger">{similarScenario.name}</Badge>
           </span>
-          <span className="text-sm leading-5 text-ink">{demoSimilarScenario.description}</span>
-          <span className="text-xs text-muted">{demoSimilarScenario.reportedCases.toLocaleString('vi-VN')} vụ đã ghi nhận trong 6 tháng gần nhất</span>
+          <span className="text-sm leading-5 text-ink">{similarScenario.description}</span>
+          <span className="text-xs text-muted">{similarScenario.reportedCases.toLocaleString('vi-VN')} vụ đã ghi nhận trong 6 tháng gần nhất</span>
         </div>
 
         {/* Bạn nên làm gì */}

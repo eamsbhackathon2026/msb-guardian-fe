@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, ChevronDown, Eye, EyeOff, Headphones, QrCode, ScanFace, ShieldCheck, UserRoundPlus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { demoCustomer } from '@/data/demo-scenarios'
+import { useQuery } from '@tanstack/react-query'
+// MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
+import { getSessionCustomer } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { MobileFrame } from '@/shell/MobileFrame'
 
@@ -58,6 +60,7 @@ function LoginSplash() {
 export function LoginPage() {
   const navigate = useNavigate()
   const login = useAuthStore((s) => s.login)
+  const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
 
   const [splash, setSplash] = useState(false)
   const [password, setPassword] = useState('')
@@ -130,7 +133,7 @@ export function LoginPage() {
           <div className="flex items-center justify-between">
             <span>
               <span className="block text-[13px] leading-[18px] text-white/85">Chào buổi sáng,</span>
-              <span className="block text-xl font-semibold leading-7 text-white">{demoCustomer.name}</span>
+              <span className="block text-xl font-semibold leading-7 text-white">{customer?.name ?? '…'}</span>
             </span>
             <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/20 text-white">
               <UserRoundPlus size={20} strokeWidth={1.6} />

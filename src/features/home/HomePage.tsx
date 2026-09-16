@@ -25,7 +25,9 @@ import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
-import { demoCustomer } from '@/data/demo-scenarios'
+import { useQuery } from '@tanstack/react-query'
+// MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
+import { getSessionCustomer } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
@@ -70,6 +72,7 @@ function QuickAction({ icon, label, onClick }: { icon: React.ReactNode; label: s
 
 /** Sheet Cài đặt — chứa thông tin phiên và nút Đăng xuất */
 function SettingsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
   const container = usePhoneContainer()
   const navigate = useNavigate()
   const logout = useAuthStore((s) => s.logout)
@@ -88,8 +91,8 @@ function SettingsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o
           <div className="flex items-center gap-3 rounded-card bg-app p-4">
             <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-orange-soft text-[15px] font-semibold text-primary">MA</span>
             <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-semibold">{demoCustomer.name}</span>
-              <span className="block text-[13px] text-muted">Tài khoản thanh toán {demoCustomer.maskedAccount}</span>
+              <span className="block text-[15px] font-semibold">{customer?.name ?? '…'}</span>
+              <span className="block text-[13px] text-muted">Tài khoản thanh toán {customer?.maskedAccount ?? '••••'}</span>
             </span>
             <Badge variant="soft">M-FIRST GOLD</Badge>
           </div>
@@ -108,6 +111,8 @@ function SettingsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o
 
 export function HomePage() {
   const navigate = useNavigate()
+  // Cùng queryKey với SettingsSheet nên chỉ có một lời gọi mạng cho cả hai.
+  const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
   const { balanceHidden, toggleBalance } = useGuardianStore()
   const [botBubble, setBotBubble] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -153,10 +158,10 @@ export function HomePage() {
           <div className="mx-0 h-px bg-divider" />
           <div className="flex items-end justify-between px-4 pb-4 pt-3">
             <span className="flex flex-col gap-0.5">
-              <span className="text-[13px] leading-[18px] tracking-[.02em] text-muted">Tài khoản thanh toán {demoCustomer.maskedAccount}</span>
+              <span className="text-[13px] leading-[18px] tracking-[.02em] text-muted">Tài khoản thanh toán {customer?.maskedAccount ?? '••••'}</span>
               <span className="flex items-baseline gap-2">
                 <span className="text-[26px] font-bold leading-8 tracking-[.02em]">
-                  {balanceHidden ? '•••••••' : formatVnd(demoCustomer.balance).replace(' ₫', '')}
+                  {balanceHidden ? '•••••••' : formatVnd(customer?.balance ?? 0).replace(' ₫', '')}
                 </span>
                 <span className="text-[17px] font-medium text-muted">VND</span>
               </span>

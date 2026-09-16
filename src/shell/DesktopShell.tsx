@@ -1,17 +1,25 @@
 import type { ReactNode } from 'react'
 import { Briefcase, FileText, History, LayoutGrid, LineChart, Search, TriangleAlert } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
-import { demoOpsAlerts } from '@/data/demo-scenarios'
+import { useQuery } from '@tanstack/react-query'
+// MOCK CŨ: import { demoOpsAlerts } from '@/data/demo-scenarios'
+import { getOpsAlerts } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
-const menu = [
+/**
+ * Menu phải dựng trong component vì mục "Cảnh báo" cần id của cảnh báo đầu tiên
+ * và số lượng cảnh báo — hai giá trị nay đến từ gateway chứ không còn là hằng số.
+ */
+function buildMenu(firstAlertId: string | undefined, alertCount: number) {
+  return [
   { key: 'overview', label: 'Tổng quan', icon: LayoutGrid, to: '/ops' },
-  { key: 'alerts', label: 'Cảnh báo', icon: TriangleAlert, to: `/ops/alerts/${demoOpsAlerts[0].id}`, badge: String(demoOpsAlerts.length) },
+  { key: 'alerts', label: 'Cảnh báo', icon: TriangleAlert, to: firstAlertId ? `/ops/alerts/${firstAlertId}` : '/ops', badge: alertCount ? String(alertCount) : undefined },
   { key: 'cases', label: 'Case', icon: Briefcase, to: '/ops' },
   { key: 'scenarios', label: 'Kịch bản lừa đảo', icon: FileText, to: '/ops' },
   { key: 'models', label: 'Mô hình & ngưỡng', icon: LineChart, to: '/ops' },
   { key: 'audit', label: 'Nhật ký quyết định AI', icon: History, to: '/ops' },
-]
+  ]
+}
 
 function SystemStatus() {
   const rows = [
@@ -38,6 +46,9 @@ function SystemStatus() {
 export function DesktopShell({ children, breadcrumb }: { children: ReactNode; breadcrumb?: ReactNode }) {
   const location = useLocation()
   const activeKey = location.pathname.startsWith('/ops/alerts') ? 'alerts' : 'overview'
+  // Dùng chung queryKey với OpsDashboardPage nên react-query trả cache, không gọi thêm lần nào.
+  const { data: alerts } = useQuery({ queryKey: ['ops-alerts'], queryFn: getOpsAlerts })
+  const menu = buildMenu(alerts?.[0]?.id, alerts?.length ?? 0)
   return (
     <div className="flex min-h-screen bg-app">
       {/* Sidebar tối màu */}

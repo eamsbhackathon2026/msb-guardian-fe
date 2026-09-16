@@ -164,3 +164,25 @@ export interface CaseTimelineStep {
 }
 
 export type OpsDecision = 'confirmed' | 'dismissed' | 'investigating'
+
+/* ---- Payload gộp theo màn hình, do guardian-gateway phục vụ ---- */
+
+export interface PendingTransfer {
+  amount: number
+  beneficiary: Beneficiary
+}
+
+export interface RiskExplain {
+  assessment: RiskAssessment
+  beneficiaryTimeline: TimelineEvent[]
+  similarScenario: SimilarScenario
+}
+
+export type OpsDeltas = Record<keyof OpsMetrics, KpiDelta>
+
+export interface OpsDashboard {
+  deltas: OpsDeltas
+  hourlyAlerts: HourlyAlertPoint[]
+  scenarioCounts: ScenarioCount[]
+  modelInputs: string[]
+}
