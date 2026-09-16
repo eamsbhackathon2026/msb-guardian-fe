@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Bell,
@@ -10,11 +10,14 @@ import {
   Headphones,
   HandCoins,
   Home,
+  Languages,
   LayoutGrid,
+  Lock,
   LogOut,
   Mail,
   MapPin,
   MessageSquareText,
+  Palette,
   PhoneCall,
   PhoneOff,
   PiggyBank,
@@ -37,7 +40,7 @@ import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
 import { getHomeContent, getSessionCustomer } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
-import { formatVnd } from '@/lib/format'
+import { formatVnd, fullAccountNumber, timeGreeting } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame, usePhoneContainer } from '@/shell/MobileFrame'
 
@@ -272,7 +275,7 @@ function NotificationsSheet({ open, onOpenChange }: { open: boolean; onOpenChang
   )
 }
 
-/** Sheet Cài đặt — chứa thông tin phiên và nút Đăng xuất */
+/** Sheet Cài đặt — tone cam sáng theo bố cục setup.jpg */
 function SettingsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
   const { data: home } = useQuery({ queryKey: ['home-content'], queryFn: getHomeContent })
@@ -286,26 +289,83 @@ function SettingsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o
     navigate('/login', { replace: true })
   }
 
+  const menu = [
+    { key: 'security', icon: Lock, label: 'Bảo mật' },
+    { key: 'limits', icon: Wallet, label: 'Tài khoản và hạn mức' },
+    { key: 'noti', icon: Bell, label: 'Thông báo' },
+    { key: 'theme', icon: Palette, label: 'Giao diện' },
+    { key: 'lang', icon: Languages, label: 'Ngôn ngữ', flag: true },
+  ]
+  const row = 'flex w-full cursor-pointer items-center gap-3.5 px-4 py-3 text-left'
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent container={container}>
-        <div className="flex flex-col gap-4">
-          <SheetTitle className="text-lg font-semibold">Cài đặt</SheetTitle>
-          <div className="flex items-center gap-3 rounded-card bg-app p-4">
-            <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-orange-soft text-[15px] font-semibold text-primary">MA</span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-semibold">{customer?.name ?? '…'}</span>
-              <span className="block text-[13px] text-muted">Tài khoản thanh toán {customer?.maskedAccount ?? '••••'}</span>
+      <SheetContent container={container} className="bg-[#ffe3ce]">
+        <div className="flex flex-col gap-3.5">
+          <SheetTitle className="text-lg font-semibold text-ink">Cài đặt</SheetTitle>
+
+          {/* Hồ sơ: avatar cam + tên + hạng khách hàng */}
+          <button
+            type="button"
+            className="flex cursor-pointer items-center gap-3.5 rounded-card p-4 text-left shadow-card"
+            style={{ background: 'linear-gradient(135deg, #ff9a4d 0%, #f05a28 55%, #e04a1a 100%)' }}
+          >
+            <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full border-2 border-white/80 bg-white">
+              <img src="/assets/icon-logo-msb.png" alt="MSB" className="h-5 w-auto" />
             </span>
-            <Badge variant="soft">{home?.productTier ?? ""}</Badge>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[16px] font-bold uppercase tracking-[.02em] text-white">{customer?.name ?? '…'}</span>
+              <span className="block text-[12px] leading-[17px] text-white/90">Tài khoản thanh toán {fullAccountNumber(customer?.maskedAccount)}</span>
+              <span className="block text-[13px] font-semibold tracking-[.12em] text-[#ffe1b0]">{home?.productTier ?? ''}</span>
+            </span>
+            <ChevronRight size={20} strokeWidth={1.8} className="flex-none text-white/85" />
+          </button>
+
+          {/* Nhóm cài đặt chính */}
+          <div className="flex flex-col rounded-card bg-surface shadow-card">
+            {menu.map((item, i) => {
+              const Icon = item.icon
+              return (
+                <Fragment key={item.key}>
+                  {i > 0 && <div className="mx-4 h-px bg-divider" />}
+                  <button type="button" className={row}>
+                    <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
+                      <Icon size={19} strokeWidth={1.7} />
+                    </span>
+                    <span className="flex-1 text-[15px] font-medium text-ink">{item.label}</span>
+                    {item.flag && (
+                      <span className="flex h-[18px] w-[26px] flex-none items-center justify-center rounded-[4px] bg-[#da251d]">
+                        <Star size={10} strokeWidth={0} fill="#ffcd00" />
+                      </span>
+                    )}
+                    <ChevronRight size={18} strokeWidth={1.8} className="flex-none text-muted" />
+                  </button>
+                </Fragment>
+              )
+            })}
           </div>
-          <span className="text-[13px] leading-5 text-muted">
-            Phiên đăng nhập được bảo vệ bởi Scam Shield. Đăng xuất sẽ đưa bạn về màn hình đăng nhập.
-          </span>
-          <Button variant="outline" className="w-full font-semibold text-danger" onClick={handleLogout}>
-            <LogOut size={18} strokeWidth={1.8} />
-            Đăng xuất
-          </Button>
+
+          <button
+            type="button"
+            onClick={() => {
+              onOpenChange(false)
+              navigate('/support')
+            }}
+            className={`${row} rounded-card bg-surface shadow-card`}
+          >
+            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
+              <Headphones size={19} strokeWidth={1.7} />
+            </span>
+            <span className="flex-1 text-[15px] font-medium text-ink">Trung tâm hỗ trợ</span>
+            <ChevronRight size={18} strokeWidth={1.8} className="flex-none text-muted" />
+          </button>
+
+          <button type="button" onClick={handleLogout} className={`${row} rounded-card bg-surface shadow-card`}>
+            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
+              <LogOut size={19} strokeWidth={1.7} />
+            </span>
+            <span className="flex-1 text-[15px] font-medium text-ink">Đăng xuất</span>
+          </button>
         </div>
       </SheetContent>
     </Sheet>
@@ -353,6 +413,12 @@ export function HomePage() {
 
       {/* Nội dung cuộn */}
       <div className="no-scrollbar relative z-[5] flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-[110px] pt-4">
+        {/* Lời chào + tên người dùng sau khi đăng nhập thành công */}
+        <motion.div custom={0} variants={blockVariants} initial="hidden" animate="show" className="flex flex-col px-1 pb-0.5">
+          <span className="text-[13px] leading-[18px] text-white/85">{timeGreeting()},</span>
+          <span className="text-xl font-bold leading-7 text-white">{customer?.name ?? home?.customerName ?? '…'}</span>
+        </motion.div>
+
         {/* Card tài khoản M-FIRST GOLD */}
         <motion.div custom={0} variants={blockVariants} initial="hidden" animate="show" className="flex flex-col rounded-card bg-surface shadow-raised">
           <div className="flex items-center gap-3 px-4 py-3.5">
@@ -365,7 +431,7 @@ export function HomePage() {
           <div className="mx-0 h-px bg-divider" />
           <div className="flex items-end justify-between px-4 pb-4 pt-3">
             <span className="flex flex-col gap-0.5">
-              <span className="text-[13px] leading-[18px] tracking-[.02em] text-muted">Tài khoản thanh toán {customer?.maskedAccount ?? '••••'}</span>
+              <span className="text-[13px] leading-[18px] tracking-[.02em] text-muted">Tài khoản thanh toán {fullAccountNumber(customer?.maskedAccount)}</span>
               <span className="flex items-baseline gap-2">
                 <span className="text-[26px] font-bold leading-8 tracking-[.02em]">
                   {balanceHidden ? '•••••••' : formatVnd(customer?.balance ?? 0).replace(' ₫', '')}

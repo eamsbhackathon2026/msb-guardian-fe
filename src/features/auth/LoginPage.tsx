@@ -1,22 +1,39 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, ChevronDown, Eye, EyeOff, Headphones, QrCode, ScanFace, ShieldCheck, UserRoundPlus } from 'lucide-react'
+import { Bell, ChevronDown, Eye, EyeOff, Headphones, QrCode, ScanFace, ShieldCheck, UserRound } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
 import { getHomeContent, login as apiLogin } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
+import { timeGreeting } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 
 const DEMO_USERNAME = 'kh100008'
 const DEMO_PASSWORD = '123456'
 const SPLASH_MS = 1_900
+/** Nhớ tên đăng nhập giữa các phiên: có tên → chỉ hỏi mật khẩu, chưa có → hỏi cả user + mật khẩu */
+const REMEMBER_KEY = 'msb-remembered-user'
 
 /** Nguyên do đăng nhập thất bại → câu tiếng Việt hiển thị dưới ô mật khẩu. */
 function reasonLabel(reason?: string): string {
   if (reason === 'locked') return 'Tài khoản đã bị khoá do nhập sai nhiều lần'
   if (reason === 'disabled') return 'Tài khoản đã bị vô hiệu hoá'
   return 'Mật khẩu không đúng'
+}
+
+/** Icon đổi người dùng (người + hai mũi tên qua lại) — theo mẫu login.jpg */
+function SwitchUserIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9.5" cy="8" r="3.6" />
+      <path d="M3.5 19.5c.5-3.3 3-5.6 6-5.6 1.2 0 2.3.3 3.2.9" />
+      <path d="M15.3 14.6h5.4" />
+      <path d="M18.9 12.8l1.8 1.8-1.8 1.8" />
+      <path d="M20.7 19.2h-5.4" />
+      <path d="M17.1 17.4l-1.8 1.8 1.8 1.8" />
+    </svg>
+  )
 }
 
 /** Icon chuyển tiền kiểu MSB (mũi tên chéo trong vòng tròn) */
@@ -29,7 +46,7 @@ function TransferIcon({ size = 24 }: { size?: number }) {
   )
 }
 
-const glassCard = 'rounded-[18px] border border-white/25 bg-white/15 backdrop-blur-xl'
+const glassCard = 'rounded-[18px] border border-white/25 bg-white/10 backdrop-blur-md'
 
 /**
  * Splash chuyển cảnh: giữ nguyên màn login phía sau (phủ mờ nhẹ),
@@ -78,15 +95,19 @@ export function LoginPage() {
   const { data: home } = useQuery({ queryKey: ['home-content'], queryFn: getHomeContent })
 
   const [splash, setSplash] = useState(false)
+  const [rememberedUser, setRememberedUser] = useState<string | null>(() => localStorage.getItem(REMEMBER_KEY))
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [focused, setFocused] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const firstLogin = !rememberedUser
 
-  // Hiệu ứng nhập mật khẩu: tự gõ từng ký tự khi màn hình mở
+  // Hiệu ứng nhập mật khẩu: tự gõ từng ký tự — chỉ khi đã nhớ user (đăng nhập lần 2 trở đi)
   useEffect(() => {
+    if (firstLogin) return
     let i = 0
     let interval: ReturnType<typeof setInterval>
     const start = setTimeout(() => {
@@ -100,11 +121,19 @@ export function LoginPage() {
       clearTimeout(start)
       clearInterval(interval)
     }
-  }, [])
+  }, [firstLogin])
 
   /** Lối tắt demo (Chuyển tiền / QR): vào thẳng bằng phiên demo, không xác thực. */
   function signIn(to = '/') {
     if (splash) return
+    if (firstLogin) {
+      const name = username.trim()
+      if (!name || !password) return
+      localStorage.setItem(REMEMBER_KEY, name)
+      setRememberedUser(name)
+    } else if (!password) {
+      return
+    }
     setSplash(true)
     setTimeout(() => {
       authLogin(null)
@@ -113,19 +142,25 @@ export function LoginPage() {
   }
 
   /** Nút "Đăng nhập": xác thực thật với identity-service qua gateway.
-   *  Sai mật khẩu → hiện thông báo, không vào. Gateway không gọi được → rơi về
-   *  đăng nhập demo để buổi trình bày không bị chặn (cùng triết lý guardedCall). */
+   *  Lần đầu dùng tên vừa nhập, các lần sau dùng tên đã nhớ; đăng nhập
+   *  thành công mới lưu tên vào localStorage. Sai mật khẩu → hiện thông báo,
+   *  không vào. Gateway không gọi được → rơi về đăng nhập demo để buổi
+   *  trình bày không bị chặn (cùng triết lý guardedCall). */
   async function signInWithPassword() {
     if (splash || submitting) return
+    const name = firstLogin ? username.trim() : (rememberedUser ?? DEMO_USERNAME)
+    if (!name || !password) return
     setError(null)
     setSubmitting(true)
     try {
-      const res = await apiLogin(DEMO_USERNAME, password)
+      const res = await apiLogin(name, password)
       if (!res.authenticated) {
         setSubmitting(false)
         setError(reasonLabel(res.reason))
         return
       }
+      localStorage.setItem(REMEMBER_KEY, name)
+      setRememberedUser(name)
       setSubmitting(false)
       setSplash(true)
       setTimeout(() => {
@@ -137,6 +172,15 @@ export function LoginPage() {
       setSubmitting(false)
       signIn('/')
     }
+  }
+
+  function switchUser() {
+    localStorage.removeItem(REMEMBER_KEY)
+    setRememberedUser(null)
+    setUsername('')
+    setPassword('')
+    setShowPassword(false)
+    setError(null)
   }
 
   return (
@@ -175,15 +219,51 @@ export function LoginPage() {
         className="relative z-10 flex flex-none flex-col gap-3 px-4 pb-8"
       >
         <div className={`${glassCard} flex flex-col gap-3 p-4`}>
-          <div className="flex items-center justify-between">
-            <span>
-              <span className="block text-[13px] leading-[18px] text-white/85">{home ? `${home.greeting},` : ''}</span>
-              <span className="block text-xl font-semibold leading-7 text-white">{home?.customerName ?? '…'}</span>
+          <div className="flex items-start justify-between gap-3">
+            <span className="min-w-0 flex-1">
+              <span className="block text-[13px] leading-[18px] text-white/85">
+                {firstLogin ? 'Chào mừng đến với MSB,' : `${timeGreeting()},`}
+              </span>
+              {firstLogin ? (
+                <span className="block text-xl font-semibold leading-7 text-white">Đăng nhập lần đầu</span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <span className="text-xl font-semibold leading-7 text-white">{home?.customerName ?? rememberedUser}</span>
+                  <button
+                    type="button"
+                    aria-label="Đổi người dùng"
+                    onClick={switchUser}
+                    className="flex h-8 w-8 flex-none cursor-pointer items-center justify-center text-white/85 hover:text-white active:scale-95"
+                  >
+                    <SwitchUserIcon size={21} />
+                  </button>
+                </span>
+              )}
             </span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/20 text-white">
-              <UserRoundPlus size={20} strokeWidth={1.6} />
+            <span className="flex h-[52px] w-[52px] flex-none items-center justify-center rounded-[10px] bg-white">
+              <QrCode size={38} strokeWidth={1.4} className="text-[#15242c]" />
             </span>
           </div>
+
+          {/* Ô tên đăng nhập — chỉ hiện ở lần đăng nhập đầu */}
+          {firstLogin && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="flex h-12 items-center gap-2.5 rounded-btn border border-white/20 bg-black/30 px-3.5"
+            >
+              <UserRound size={18} strokeWidth={1.7} className="flex-none text-white/70" />
+              <input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoFocus
+                aria-label="Tên đăng nhập"
+                placeholder="Tên đăng nhập"
+                className="min-w-0 flex-1 bg-transparent text-[15px] font-medium text-white outline-none placeholder:text-white/50"
+              />
+            </motion.div>
+          )}
 
           {/* Ô mật khẩu: gõ thật được, chấm hiện dần, mắt để xem mật khẩu */}
           <div
@@ -267,7 +347,13 @@ export function LoginPage() {
           </button>
 
           <div className="flex items-center justify-between text-[13px] font-medium text-white/85">
-            <span>Đổi người dùng</span>
+            {firstLogin ? (
+              <span>Đăng ký tài khoản</span>
+            ) : (
+              <button type="button" onClick={switchUser} className="cursor-pointer text-white/85 hover:text-white">
+                Đổi người dùng
+              </button>
+            )}
             <span className="font-semibold text-gold">Quên mật khẩu?</span>
           </div>
         </div>
