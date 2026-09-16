@@ -19,6 +19,7 @@ import type {
   CustomerAction,
   HomeContent,
   OpsSession,
+  QuarterlyReport,
   TransferActionResult,
   ChatChart,
   CopilotOverview,
@@ -68,6 +69,16 @@ export function getCopilotOverview(): Promise<CopilotOverview> {
 
 export function getCopilotIntro(): Promise<CopilotIntro> {
   return fetchJson<CopilotIntro>('/api/copilot/intro')
+}
+
+/**
+ * Thu chi theo quý, phân rã theo nhóm chi tiêu.
+ *
+ * Cùng endpoint mà agent gọi như một tool, nên số trên màn hình và số agent nói
+ * ra luôn khớp nhau.
+ */
+export function getQuarterlyReport(quarters = 4): Promise<QuarterlyReport> {
+  return fetchJson<QuarterlyReport>(`/api/copilot/quarters?quarters=${quarters}`)
 }
 
 export interface ChatStreamResult {

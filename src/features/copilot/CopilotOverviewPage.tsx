@@ -6,7 +6,7 @@ import { Cell, Pie, PieChart } from 'recharts'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { CopilotOverview, Insight, SpendingCategory } from '@/data/types'
-import { getCopilotOverview } from '@/lib/api'
+import { getCopilotOverview, getQuarterlyReport } from '@/lib/api'
 import { formatPct, formatVnd } from '@/lib/format'
 import { BottomNav } from '@/shell/BottomNav'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -126,6 +126,73 @@ function OverviewSkeleton() {
   )
 }
 
+/**
+ * Thu chi theo quý, phân rã theo nhóm chi tiêu.
+ *
+ * Quý thay vì tháng vì một tháng lẻ có thể chỉ vài giao dịch, còn xu hướng theo
+ * quý thì đọc được. Mỗi nhóm kèm mức đổi so với chính nó ở quý liền trước —
+ * `null` nghĩa là chưa có mốc so sánh, khác hẳn 0 nghĩa là không đổi, nên hai
+ * trường hợp này hiển thị khác nhau.
+ */
+function QuarterlyBreakdown() {
+  const { data } = useQuery({ queryKey: ['copilot-quarters'], queryFn: () => getQuarterlyReport(4) })
+  if (!data || data.quarters.length === 0) return null
+
+  // Quý mới nhất đứng đầu: người xem quan tâm hiện tại trước, quá khứ sau.
+  const quarters = [...data.quarters].reverse()
+
+  return (
+    <div className="flex flex-col gap-2 rounded-card bg-surface px-4 py-3 shadow-card">
+      <span className="flex items-baseline justify-between">
+        <span className="text-[15px] font-semibold">Chi tiêu theo quý</span>
+        <span className="text-xs text-muted">{quarters.length} quý gần nhất</span>
+      </span>
+
+      {quarters.map((q) => (
+        <div key={q.period} className="flex flex-col gap-1.5 border-t border-divider pt-2.5 first:border-0 first:pt-0">
+          <span className="flex items-baseline justify-between">
+            <span className="text-[13px] font-semibold">{q.label}</span>
+            <span className="text-[13px] font-semibold">{formatVnd(q.expense)}</span>
+          </span>
+          <span className="flex items-baseline justify-between text-[11px] text-muted">
+            <span>{q.count} giao dịch</span>
+            <span>Thu {formatVnd(q.income)} · Dư {formatVnd(q.net)}</span>
+          </span>
+
+          {q.byCategory.map((c) => (
+            <span key={c.category} className="flex items-center gap-2">
+              <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-app">
+                <span className="block h-full rounded-full bg-primary" style={{ width: `${c.pct}%` }} />
+              </span>
+              <span className="w-[108px] flex-none text-[11px] text-muted">{c.labelVi}</span>
+              <span className="w-[86px] flex-none text-right text-[11px] font-medium">{formatVnd(c.amount)}</span>
+              <span
+                className={
+                  c.deltaVsPrevPct === null
+                    ? 'w-[58px] flex-none text-right text-[11px] text-muted'
+                    : c.deltaVsPrevPct > 0
+                      ? 'w-[58px] flex-none text-right text-[11px] font-medium text-danger'
+                      : 'w-[58px] flex-none text-right text-[11px] font-medium text-success-deep'
+                }
+              >
+                {c.deltaVsPrevPct === null ? '—' : `${c.deltaVsPrevPct > 0 ? '+' : ''}${Math.round(c.deltaVsPrevPct)}%`}
+              </span>
+            </span>
+          ))}
+        </div>
+      ))}
+
+      {data.categoryTotals.length > 0 && (
+        <span className="border-t border-divider pt-2 text-[11px] leading-4 text-muted">
+          Cả {quarters.length} quý, nhóm lớn nhất là{' '}
+          <b className="text-ink">{data.categoryTotals[0].labelVi}</b> với{' '}
+          {formatVnd(data.categoryTotals[0].amount)} ({data.categoryTotals[0].pct}%).
+        </span>
+      )}
+    </div>
+  )
+}
+
 export function CopilotOverviewPage() {
   const navigate = useNavigate()
   const { data, isPending } = useQuery({ queryKey: ['copilot-overview'], queryFn: getCopilotOverview })
@@ -148,6 +215,7 @@ export function CopilotOverviewPage() {
                 <CategoryRow key={cat.key} cat={cat} index={i} />
               ))}
             </div>
+            <QuarterlyBreakdown />
             {data.insights.map((insight) => (
               <InsightCard key={insight.id} insight={insight} />
             ))}

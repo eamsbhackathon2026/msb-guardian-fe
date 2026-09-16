@@ -275,3 +275,37 @@ export interface TransferActionResult {
   caseStatus: AlertStatus
   message: string
 }
+
+/* ---- Thống kê theo quý ---- */
+
+export interface QuarterCategory {
+  category: string
+  labelVi: string
+  amount: number
+  pct: number
+  rank: number
+  /** null khi chưa có quý trước để so — khác hẳn 0 nghĩa là không đổi */
+  deltaVsPrevPct: number | null
+}
+
+export interface QuarterSummary {
+  period: string
+  label: string
+  income: number
+  expense: number
+  net: number
+  count: number
+  byCategory: QuarterCategory[]
+}
+
+export interface CategoryTotal {
+  category: string
+  labelVi: string
+  amount: number
+  pct: number
+}
+
+export interface QuarterlyReport {
+  quarters: QuarterSummary[]
+  categoryTotals: CategoryTotal[]
+}
