@@ -61,8 +61,10 @@ metadata:
   labels:
     app: msb-guardian-fe
 spec:
-  # ClusterIP giống 5 service backend: vào bằng port-forward, không mở ra Internet.
-  type: ClusterIP
+  # NodePort chứ không ClusterIP: ALB của VNG định tuyến tới node port và từ chối
+  # backend ClusterIP. Ingress "guardian" trong repo msb-finance-platform trỏ tới
+  # Service này; đổi lại ClusterIP là trang công khai ngừng hoạt động.
+  type: NodePort
   selector:
     app: msb-guardian-fe
   ports:
