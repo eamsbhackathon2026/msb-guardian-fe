@@ -22,11 +22,13 @@ spec:
           # CI thay :latest bằng commit SHA lúc deploy.
           image: vcr.vngcloud.vn/114544-ea-hackathon/msb-guardian-fe:latest
           imagePullPolicy: IfNotPresent
-          # Bỏ comment khi đã có gateway phục vụ /api/copilot, /api/risk, /api/ops.
-          # Chưa có thì để trống: app chạy bằng demo mode, không gọi mạng.
-          # env:
-          #   - name: API_UPSTREAM
-          #     value: "http://guardian-gateway"
+          env:
+            # guardian-gateway phục vụ đúng 7 endpoint FE gọi dưới /api/*.
+            # nginx phân giải tên này NGAY LÚC KHỞI ĐỘNG, nên Service
+            # guardian-gateway phải tồn tại trước khi pod FE lên — thiếu DNS là
+            # nginx không start được chứ không phải chỉ lỗi lúc gọi.
+            - name: API_UPSTREAM
+              value: "http://guardian-gateway"
           ports:
             - containerPort: 8080
           readinessProbe:
