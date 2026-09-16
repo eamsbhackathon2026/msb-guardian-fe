@@ -27,6 +27,8 @@ npm run preview  # chạy bản build
 | `/ops` | Ops Dashboard — Giám sát Scam Shield | Desktop |
 | `/ops/alerts/ALT-4092` | Chi tiết case | Desktop |
 
+**Đăng nhập/đăng xuất:** các màn khách hàng yêu cầu đăng nhập — chưa có phiên sẽ tự chuyển về `/login`; phiên giữ qua reload (localStorage); Đăng xuất nằm trong pill nav **Cài đặt** trên Home. Riêng `/ops` là màn nội bộ, không qua đăng nhập khách hàng.
+
 **Luồng demo chính:** `/login` → "Đăng nhập" → Home → bấm "Chuyển tiền" → màn phân tích ~2s → Cảnh báo 87/100 → "Vì sao chúng tôi cảnh báo?" → quay lại → "Huỷ giao dịch" → màn đã bảo vệ → Trung tâm an toàn. Bot AI nổi trên Home dẫn sang Financial Copilot. Sau đó mở `/ops` cho phần vận hành.
 
 ## Demo mode

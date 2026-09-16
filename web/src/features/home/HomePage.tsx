@@ -10,6 +10,7 @@ import {
   HandCoins,
   Home,
   LayoutGrid,
+  LogOut,
   MessageSquareText,
   PiggyBank,
   QrCode,
@@ -22,10 +23,13 @@ import {
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { demoCustomer } from '@/data/demo-scenarios'
+import { useAuthStore } from '@/lib/auth'
 import { formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
-import { MobileFrame } from '@/shell/MobileFrame'
+import { MobileFrame, usePhoneContainer } from '@/shell/MobileFrame'
 
 /** Icon chuyển tiền kiểu MSB (mũi tên chéo trong vòng tròn) */
 function TransferIcon({ size = 30 }: { size?: number }) {
@@ -64,10 +68,49 @@ function QuickAction({ icon, label, onClick }: { icon: React.ReactNode; label: s
   )
 }
 
+/** Sheet Cài đặt — chứa thông tin phiên và nút Đăng xuất */
+function SettingsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const container = usePhoneContainer()
+  const navigate = useNavigate()
+  const logout = useAuthStore((s) => s.logout)
+
+  function handleLogout() {
+    logout()
+    onOpenChange(false)
+    navigate('/login', { replace: true })
+  }
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent container={container}>
+        <div className="flex flex-col gap-4">
+          <SheetTitle className="text-lg font-semibold">Cài đặt</SheetTitle>
+          <div className="flex items-center gap-3 rounded-card bg-app p-4">
+            <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-orange-soft text-[15px] font-semibold text-primary">MA</span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-semibold">{demoCustomer.name}</span>
+              <span className="block text-[13px] text-muted">Tài khoản thanh toán {demoCustomer.maskedAccount}</span>
+            </span>
+            <Badge variant="soft">M-FIRST GOLD</Badge>
+          </div>
+          <span className="text-[13px] leading-5 text-muted">
+            Phiên đăng nhập được bảo vệ bởi Scam Shield. Đăng xuất sẽ đưa bạn về màn hình đăng nhập.
+          </span>
+          <Button variant="outline" className="w-full font-semibold text-danger" onClick={handleLogout}>
+            <LogOut size={18} strokeWidth={1.8} />
+            Đăng xuất
+          </Button>
+        </div>
+      </SheetContent>
+    </Sheet>
+  )
+}
+
 export function HomePage() {
   const navigate = useNavigate()
   const { balanceHidden, toggleBalance } = useGuardianStore()
   const [botBubble, setBotBubble] = useState(true)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
     <MobileFrame statusBar="light" indicator="dark">
@@ -221,11 +264,13 @@ export function HomePage() {
           <CreditCard size={20} strokeWidth={1.6} />
           <span className="text-[13px] font-medium">Tài khoản</span>
         </button>
-        <button type="button" className="flex h-12 cursor-pointer items-center justify-center gap-2 text-muted">
+        <button type="button" onClick={() => setSettingsOpen(true)} className="flex h-12 cursor-pointer items-center justify-center gap-2 text-muted">
           <Settings size={21} strokeWidth={1.6} />
           <span className="text-[13px] font-medium">Cài đặt</span>
         </button>
       </div>
+
+      <SettingsSheet open={settingsOpen} onOpenChange={setSettingsOpen} />
     </MobileFrame>
   )
 }

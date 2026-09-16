@@ -1,8 +1,13 @@
-import { motion } from 'framer-motion'
-import { Bell, ChevronDown, Eye, Headphones, QrCode, ScanFace, UserRoundPlus } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Bell, ChevronDown, Eye, EyeOff, Headphones, QrCode, ScanFace, ShieldCheck, UserRoundPlus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { demoCustomer } from '@/data/demo-scenarios'
+import { useAuthStore } from '@/lib/auth'
 import { MobileFrame } from '@/shell/MobileFrame'
+
+const DEMO_PASSWORD = '123456'
+const SPLASH_MS = 1_900
 
 /** Icon chuyển tiền kiểu MSB (mũi tên chéo trong vòng tròn) */
 function TransferIcon({ size = 24 }: { size?: number }) {
@@ -16,8 +21,76 @@ function TransferIcon({ size = 24 }: { size?: number }) {
 
 const glassCard = 'rounded-[18px] border border-white/25 bg-white/15 backdrop-blur-xl'
 
+/** Splash chuyển cảnh: logo MSB đỏ xoay vòng trên nền trắng trước khi vào app */
+function LoginSplash() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.25 }}
+      className="absolute inset-0 z-[35] flex flex-col items-center justify-center gap-6 bg-surface"
+    >
+      <motion.div
+        animate={{ rotateY: 360 }}
+        transition={{ duration: 1.15, repeat: Infinity, ease: 'linear' }}
+        style={{
+          width: 148,
+          height: 44,
+          background: 'var(--msb-brand-red)',
+          WebkitMaskImage: 'url(/assets/msb-logo-white.png)',
+          maskImage: 'url(/assets/msb-logo-white.png)',
+          WebkitMaskSize: 'contain',
+          maskSize: 'contain',
+          WebkitMaskRepeat: 'no-repeat',
+          maskRepeat: 'no-repeat',
+          WebkitMaskPosition: 'center',
+          maskPosition: 'center',
+        }}
+      />
+      <span className="flex items-center gap-2 text-[13px] text-muted">
+        <ShieldCheck size={15} strokeWidth={1.7} className="text-success" />
+        Đăng nhập an toàn cùng Scam Shield…
+      </span>
+    </motion.div>
+  )
+}
+
 export function LoginPage() {
   const navigate = useNavigate()
+  const login = useAuthStore((s) => s.login)
+
+  const [splash, setSplash] = useState(false)
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Hiệu ứng nhập mật khẩu: tự gõ từng ký tự khi màn hình mở
+  useEffect(() => {
+    let i = 0
+    let interval: ReturnType<typeof setInterval>
+    const start = setTimeout(() => {
+      interval = setInterval(() => {
+        i += 1
+        setPassword(DEMO_PASSWORD.slice(0, i))
+        if (i >= DEMO_PASSWORD.length) clearInterval(interval)
+      }, 150)
+    }, 700)
+    return () => {
+      clearTimeout(start)
+      clearInterval(interval)
+    }
+  }, [])
+
+  function signIn(to = '/') {
+    if (splash) return
+    setSplash(true)
+    setTimeout(() => {
+      login()
+      navigate(to)
+    }, SPLASH_MS)
+  }
+
   return (
     <MobileFrame
       statusBar="light"
@@ -64,22 +137,62 @@ export function LoginPage() {
             </span>
           </div>
 
-          {/* Ô mật khẩu: 6 chấm + caret vàng */}
-          <div className="flex h-12 items-center gap-2.5 rounded-btn border border-white/20 bg-black/30 px-3.5">
-            <span className="flex flex-1 items-center gap-[7px]">
-              {Array.from({ length: 6 }, (_, i) => (
-                <span key={i} className="block h-2 w-2 rounded-full bg-white" />
-              ))}
-              <motion.span animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1.1, repeat: Infinity }} className="ml-0.5 block h-5 w-[1.5px] bg-gold" />
-            </span>
+          {/* Ô mật khẩu: gõ thật được, chấm hiện dần, mắt để xem mật khẩu */}
+          <div
+            className="relative flex h-12 cursor-text items-center gap-2.5 rounded-btn border border-white/20 bg-black/30 px-3.5"
+            onClick={() => inputRef.current?.focus()}
+          >
+            <input
+              ref={inputRef}
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              aria-label="Mật khẩu"
+              className={
+                showPassword
+                  ? 'min-w-0 flex-1 bg-transparent text-[15px] font-semibold tracking-[.2em] text-white outline-none'
+                  : 'pointer-events-none absolute inset-0 opacity-0'
+              }
+            />
+            {!showPassword && (
+              <span className="flex min-w-0 flex-1 items-center gap-[7px]">
+                <AnimatePresence>
+                  {password.split('').map((_, i) => (
+                    <motion.span
+                      key={i}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 520, damping: 24 }}
+                      className="block h-2 w-2 rounded-full bg-white"
+                    />
+                  ))}
+                </AnimatePresence>
+                {(focused || password.length < DEMO_PASSWORD.length) && (
+                  <motion.span animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1.1, repeat: Infinity }} className="ml-0.5 block h-5 w-[1.5px] bg-gold" />
+                )}
+              </span>
+            )}
             <span className="text-xs text-white/70">Mật khẩu</span>
-            <Eye size={20} strokeWidth={1.6} className="text-white/80" />
+            <button
+              type="button"
+              aria-label={showPassword ? 'Ẩn mật khẩu' : 'Xem mật khẩu'}
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowPassword((v) => !v)
+              }}
+              className="flex h-9 w-9 flex-none cursor-pointer items-center justify-center text-white/80 hover:text-white"
+            >
+              {showPassword ? <EyeOff size={20} strokeWidth={1.6} /> : <Eye size={20} strokeWidth={1.6} />}
+            </button>
           </div>
 
           <button
             type="button"
-            onClick={() => navigate('/')}
-            className="flex h-12 cursor-pointer items-center justify-center gap-2.5 rounded-btn text-base font-semibold"
+            onClick={() => signIn('/')}
+            className="flex h-12 cursor-pointer items-center justify-center gap-2.5 rounded-btn text-base font-semibold active:scale-[.98]"
             style={{ background: 'var(--msb-gradient-gold)', color: 'var(--msb-gold-ink)' }}
           >
             <ScanFace size={20} strokeWidth={1.7} />
@@ -94,11 +207,11 @@ export function LoginPage() {
 
         {/* 3 tiện ích nhanh */}
         <div className={`${glassCard} grid grid-cols-3 py-3.5`}>
-          <button type="button" onClick={() => navigate('/')} className="flex cursor-pointer flex-col items-center gap-[7px] text-white">
+          <button type="button" onClick={() => signIn('/transfer/review')} className="flex cursor-pointer flex-col items-center gap-[7px] text-white">
             <TransferIcon />
             <span className="text-xs font-medium leading-4">Chuyển tiền</span>
           </button>
-          <button type="button" className="flex cursor-pointer flex-col items-center gap-[7px] border-x border-white/20 text-white">
+          <button type="button" onClick={() => signIn('/')} className="flex cursor-pointer flex-col items-center gap-[7px] border-x border-white/20 text-white">
             <QrCode size={24} strokeWidth={1.5} />
             <span className="text-xs font-medium leading-4">Quét QR</span>
           </button>
@@ -117,6 +230,9 @@ export function LoginPage() {
           Hotline 24/7 <span className="font-semibold text-gold">1800 6083</span> · Phiên bản 9.2.1
         </div>
       </motion.div>
+
+      {/* Splash logo MSB đỏ xoay vòng */}
+      <AnimatePresence>{splash && <LoginSplash />}</AnimatePresence>
     </MobileFrame>
   )
 }
