@@ -2,6 +2,7 @@ import type { ReactElement } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/auth'
 import { LoginPage } from '@/features/auth/LoginPage'
+import { SupportPage } from '@/features/support/SupportPage'
 import { HomePage } from '@/features/home/HomePage'
 import { CopilotOverviewPage } from '@/features/copilot/CopilotOverviewPage'
 import { CopilotChatPage } from '@/features/copilot/CopilotChatPage'
@@ -19,6 +20,8 @@ function RequireAuth({ children }: { children: ReactElement }) {
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  // Hỗ trợ vào được từ màn đăng nhập nên không cần auth
+  { path: '/support', element: <SupportPage /> },
   { path: '/', element: <RequireAuth><HomePage /></RequireAuth> },
   { path: '/copilot', element: <RequireAuth><CopilotOverviewPage /></RequireAuth> },
   { path: '/copilot/chat', element: <RequireAuth><CopilotChatPage /></RequireAuth> },

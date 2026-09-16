@@ -23,34 +23,41 @@ function TransferIcon({ size = 24 }: { size?: number }) {
 
 const glassCard = 'rounded-[18px] border border-white/25 bg-white/15 backdrop-blur-xl'
 
-/** Splash chuyển cảnh: logo MSB đỏ xoay vòng trên nền trắng trước khi vào app */
+/**
+ * Splash chuyển cảnh: giữ nguyên màn login phía sau (phủ mờ nhẹ),
+ * chữ M của logo MSB nổi lên giữa, vòng tròn mờ xoay quanh.
+ */
 function LoginSplash() {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="absolute inset-0 z-[35] flex flex-col items-center justify-center gap-6 bg-surface"
+      className="absolute inset-0 z-[35] flex flex-col items-center justify-center gap-6 bg-black/25 backdrop-blur-[2px]"
     >
+      {/* Logo M nổi (PNG nền trong suốt), vòng mờ bán kính ~1cm xoay quanh */}
       <motion.div
-        animate={{ rotateY: 360 }}
-        transition={{ duration: 1.15, repeat: Infinity, ease: 'linear' }}
-        style={{
-          width: 148,
-          height: 44,
-          background: 'var(--msb-brand-red)',
-          WebkitMaskImage: 'url(/assets/msb-logo-white.png)',
-          maskImage: 'url(/assets/msb-logo-white.png)',
-          WebkitMaskSize: 'contain',
-          maskSize: 'contain',
-          WebkitMaskRepeat: 'no-repeat',
-          maskRepeat: 'no-repeat',
-          WebkitMaskPosition: 'center',
-          maskPosition: 'center',
-        }}
-      />
-      <span className="flex items-center gap-2 text-[13px] text-muted">
-        <ShieldCheck size={15} strokeWidth={1.7} className="text-success" />
+        initial={{ scale: 0.3, opacity: 0, y: 26 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 250, damping: 17 }}
+        className="relative flex h-[76px] w-[76px] items-center justify-center"
+      >
+        <motion.span
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
+          className="absolute inset-0 rounded-full border-[3px] border-white/25 border-t-white/90"
+        />
+        <motion.img
+          src="/assets/icon-logo-msb.png"
+          alt="MSB"
+          animate={{ y: [0, -3, 0] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+          className="h-8 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,.35)]"
+        />
+      </motion.div>
+      <span className="flex items-center gap-2 text-[13px] text-white/85">
+        <ShieldCheck size={15} strokeWidth={1.7} className="text-success-bright" />
         Đăng nhập an toàn cùng Scam Shield…
       </span>
     </motion.div>
@@ -218,7 +225,7 @@ export function LoginPage() {
             <QrCode size={24} strokeWidth={1.5} />
             <span className="text-xs font-medium leading-4">Quét QR</span>
           </button>
-          <button type="button" className="flex cursor-pointer flex-col items-center gap-[7px] text-white">
+          <button type="button" onClick={() => navigate('/support')} className="flex cursor-pointer flex-col items-center gap-[7px] text-white">
             <Headphones size={24} strokeWidth={1.5} />
             <span className="text-xs font-medium leading-4">Hỗ trợ</span>
           </button>
