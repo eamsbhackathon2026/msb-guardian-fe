@@ -65,7 +65,7 @@ function SpendingTable({ table }: { table: ChatTable }) {
           {table.rows.map((row, i) => (
             <tr key={row.label} className={i % 2 ? 'bg-black/[0.025]' : ''}>
               <td className="px-3 py-1.5 text-ink">{row.label}</td>
-              <td className="px-1 py-1.5 text-right tabular-nums text-ink">{formatVnd(row.amount)}</td>
+              <td className="whitespace-nowrap px-1 py-1.5 text-right tabular-nums text-ink">{formatVnd(row.amount)}</td>
               <td className="px-1 py-1.5 text-right tabular-nums text-muted">{row.pct}%</td>
               <td className="px-3 py-1.5 text-right font-medium tabular-nums">
                 <TrendBadge pct={row.trendPct} />
@@ -76,7 +76,7 @@ function SpendingTable({ table }: { table: ChatTable }) {
         <tfoot>
           <tr className="border-t border-line font-semibold">
             <td className="px-3 py-2 text-ink">{table.totalLabel}</td>
-            <td className="px-1 py-2 text-right tabular-nums text-ink">{formatVnd(table.totalAmount)}</td>
+            <td className="whitespace-nowrap px-1 py-2 text-right tabular-nums text-ink">{formatVnd(table.totalAmount)}</td>
             <td colSpan={2} />
           </tr>
         </tfoot>
