@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#ECEEF1;font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#1A1D21;-webkit-font-smoothing:antialiased}
+a{color:#F05A28;text-decoration:none}a:hover{color:#C8441C}
+*{box-sizing:border-box}
+</style>
+</helmet>
+
+<div style="padding:72px 80px 120px;display:flex;flex-direction:column;gap:120px;font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#1A1D21;min-width:max-content">
+
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:13px;font-weight:600;color:#F05A28;letter-spacing:.12em;text-transform:uppercase">MSB Hackathon 2026 · Customer Financial Intelligence</div>
+    <div style="font-size:34px;font-weight:600;letter-spacing:-.01em">MSB AI Financial Guardian — Design canvas</div>
+    <div style="font-size:15px;color:#6B7280">Hàng trên: hành trình khách hàng trên Mobile Banking (6 màn). Hàng dưới: vận hành nội bộ & kiến trúc (3 màn). Khách hàng demo: Nguyễn Minh Anh · **** 4821 · 47.820.000 ₫.</div>
+  </div>
+
+  <!-- ================= ROW 1 · MOBILE ================= -->
+  <div style="display:flex;gap:64px;align-items:flex-start">
+
+    <!-- 01 HOME -->
+    <div data-screen-label="01 Home — Mobile Banking" style="display:flex;flex-direction:column">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:12px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">01</span><span style="font-size:14px;font-weight:500">Home — Mobile Banking</span><span style="font-size:12px;color:#6B7280">390×844</span></div>
+      </sc-if>
+      <div style="width:414px;height:868px;background:#1A1D21;border-radius:56px;padding:12px">
+        <div style="width:390px;height:844px;border-radius:46px;background:#F6F7F9;overflow:hidden;position:relative;display:flex;flex-direction:column">
+          <div style="position:absolute;top:12px;left:135px;width:120px;height:34px;border-radius:20px;background:#1A1D21"></div>
+          <div style="height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600;flex:none">
+            <span>9:41</span>
+            <div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end"><span style="display:block;width:3px;height:5px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:7px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:9px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:11px;background:#1A1D21;border-radius:1px"></span></div><div style="width:25px;height:12px;border:1.5px solid #1A1D21;border-radius:4px;padding:1.5px"><div style="width:100%;height:100%;background:#1A1D21;border-radius:2px"></div></div></div>
+          </div>
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:6px 20px 0">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:44px;height:44px;border-radius:50%;background:#FEF0EA;color:#F05A28;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center">MA</div>
+                <div><div style="font-size:13px;line-height:18px;color:#6B7280">Xin chào,</div><div style="font-size:17px;line-height:24px;font-weight:500">Nguyễn Minh Anh</div></div>
+              </div>
+              <div style="width:44px;height:44px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.06)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg></div>
+            </div>
+            <div style="background:linear-gradient(135deg,#F05A28 0%,#F7794D 100%);border-radius:16px;padding:20px;color:#fff;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;line-height:18px;opacity:.9"><span>Tài khoản thanh toán</span><span>**** 4821</span></div>
+              <div style="font-size:32px;line-height:40px;font-weight:700;letter-spacing:-.01em">47.820.000 ₫</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span style="font-size:13px;opacity:.9">Số dư khả dụng</span><span style="font-size:13px;font-weight:600;background:rgba(255,255,255,.2);padding:6px 12px;border-radius:999px">Nạp tiền</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:56px;height:56px;border-radius:18px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"></path></svg></div><span style="font-size:12px;line-height:16px;font-weight:500">Chuyển tiền</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:56px;height:56px;border-radius:18px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"></path><path d="M9 8h6M9 12h6"></path></svg></div><span style="font-size:12px;line-height:16px;font-weight:500">Thanh toán</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:56px;height:56px;border-radius:18px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v8M9.5 10.5h5M9.5 13.5h5"></path></svg></div><span style="font-size:12px;line-height:16px;font-weight:500">Tiết kiệm</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:56px;height:56px;border-radius:18px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><path d="M14 14h3v3M20 14v6h-6"></path></svg></div><span style="font-size:12px;line-height:16px;font-weight:500">QR</span></div>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:12px;border:1px solid #FEE2D5">
+              <div style="width:44px;height:44px;border-radius:14px;background:#FEF0EA;display:flex;align-items:center;justify-content:center;flex:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg></div>
+              <div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:15px;line-height:22px;font-weight:600">AI Financial Guardian</span><span style="font-size:11px;font-weight:600;color:#fff;background:#F05A28;padding:2px 8px;border-radius:999px">Mới</span></div><div style="font-size:13px;line-height:18px;color:#6B7280">Hiểu tiền của bạn. Bảo vệ tiền của bạn.</div></div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Chi tiêu tháng này</span><span style="font-size:13px;color:#F05A28;font-weight:500">Xem chi tiết</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:20px;line-height:28px;font-weight:600">12.460.000 ₫</span><span style="font-size:13px;color:#6B7280">69% ngân sách</span></div>
+              <div style="height:8px;border-radius:999px;background:#E5E7EB;overflow:hidden"><div style="width:69%;height:100%;background:#F05A28;border-radius:999px"></div></div>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:16px 16px 4px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:2px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:15px;font-weight:600">Giao dịch gần đây</span><span style="font-size:13px;color:#F05A28;font-weight:500">Tất cả</span></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #F1F2F4"><div style="width:40px;height:40px;border-radius:50%;background:#FEF0EA;color:#F05A28;font-weight:600;display:flex;align-items:center;justify-content:center">H</div><div style="flex:1"><div style="font-size:15px;line-height:22px">Highlands Coffee</div><div style="font-size:13px;line-height:18px;color:#6B7280">15/09/2026 · Ăn uống</div></div><span style="font-size:15px;font-weight:600">−85.000 ₫</span></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #F1F2F4"><div style="width:40px;height:40px;border-radius:50%;background:#E8F5EE;color:#16A34A;font-weight:600;display:flex;align-items:center;justify-content:center">G</div><div style="flex:1"><div style="font-size:15px;line-height:22px">Grab</div><div style="font-size:13px;line-height:18px;color:#6B7280">14/09/2026 · Di chuyển</div></div><span style="font-size:15px;font-weight:600">−126.000 ₫</span></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #F1F2F4"><div style="width:40px;height:40px;border-radius:50%;background:#E9EFFD;color:#2563EB;font-weight:600;display:flex;align-items:center;justify-content:center">A</div><div style="flex:1"><div style="font-size:15px;line-height:22px">Lương tháng 9 · Công ty ABC</div><div style="font-size:13px;line-height:18px;color:#6B7280">10/09/2026 · Thu nhập</div></div><span style="font-size:15px;font-weight:600;color:#16A34A">+28.500.000 ₫</span></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 0"><div style="width:40px;height:40px;border-radius:50%;background:#FFF7E6;color:#B45309;font-weight:600;display:flex;align-items:center;justify-content:center">E</div><div style="flex:1"><div style="font-size:15px;line-height:22px">EVN Hà Nội</div><div style="font-size:13px;line-height:18px;color:#6B7280">08/09/2026 · Hoá đơn</div></div><span style="font-size:15px;font-weight:600">−1.240.000 ₫</span></div>
+            </div>
+          </div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:88px;background:#fff;border-top:1px solid #E5E7EB;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 8px 0">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#F05A28"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"></path></svg><span style="font-size:11px;font-weight:600">Trang chủ</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#6B7280"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M5 12h14M5 17h9"></path></svg><span style="font-size:11px;font-weight:500">Giao dịch</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#6B7280"><div style="width:48px;height:48px;border-radius:50%;background:#F05A28;display:flex;align-items:center;justify-content:center;margin-top:-22px;box-shadow:0 4px 12px rgba(240,90,40,.35)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><path d="M14 14h3v3M20 14v6h-6"></path></svg></div><span style="font-size:11px;font-weight:500">QR</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#6B7280"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"></rect><path d="M3 10h18"></path></svg><span style="font-size:11px;font-weight:500">Thẻ</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#6B7280"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg><span style="font-size:11px;font-weight:500">Cá nhân</span></div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:128px;width:134px;height:5px;border-radius:3px;background:#1A1D21"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 COPILOT OVERVIEW -->
+    <div data-screen-label="02 Financial Copilot — Tổng quan" style="display:flex;flex-direction:column">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:12px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">02</span><span style="font-size:14px;font-weight:500">Financial Copilot — Tổng quan</span><span style="font-size:12px;color:#6B7280">390×844</span></div>
+      </sc-if>
+      <div style="width:414px;height:868px;background:#1A1D21;border-radius:56px;padding:12px">
+        <div style="width:390px;height:844px;border-radius:46px;background:#F6F7F9;overflow:hidden;position:relative;display:flex;flex-direction:column">
+          <div style="position:absolute;top:12px;left:135px;width:120px;height:34px;border-radius:20px;background:#1A1D21"></div>
+          <div style="height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600;flex:none">
+            <span>9:41</span>
+            <div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end"><span style="display:block;width:3px;height:5px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:7px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:9px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:11px;background:#1A1D21;border-radius:1px"></span></div><div style="width:25px;height:12px;border:1.5px solid #1A1D21;border-radius:4px;padding:1.5px"><div style="width:100%;height:100%;background:#1A1D21;border-radius:2px"></div></div></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 12px 4px;flex:none">
+            <div style="display:flex;align-items:center;gap:4px"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></div><span style="font-size:17px;font-weight:600">Financial Copilot</span></div>
+            <div style="font-size:13px;font-weight:500;background:#fff;border:1px solid #E5E7EB;padding:8px 12px;border-radius:999px;margin-right:8px">Tháng 9/2026 ▾</div>
+          </div>
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:8px 20px 0">
+            <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:18px">
+              <div style="position:relative;width:112px;height:112px;flex:none">
+                <svg width="112" height="112" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#E5E7EB" stroke-width="12"></circle><circle cx="60" cy="60" r="50" fill="none" stroke="#F05A28" stroke-width="12" stroke-linecap="round" stroke-dasharray="216.8 314.2" transform="rotate(-90 60 60)"></circle></svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:24px;font-weight:700;line-height:28px">69%</span><span style="font-size:11px;color:#6B7280">ngân sách</span></div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+                <div><div style="font-size:13px;color:#6B7280;line-height:18px">Đã chi</div><div style="font-size:20px;line-height:28px;font-weight:600">12.460.000 ₫</div></div>
+                <div><div style="font-size:13px;color:#6B7280;line-height:18px">Còn lại · 15 ngày</div><div style="font-size:17px;line-height:24px;font-weight:500;color:#16A34A">5.540.000 ₫</div></div>
+                <div style="font-size:12px;color:#6B7280">Ngân sách 18.000.000 ₫</div>
+              </div>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Theo nhóm chi tiêu</span><span style="font-size:12px;color:#6B7280">so với tháng 8</span></div>
+              <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;font-size:14px"><span style="font-weight:500">Ăn uống</span><span style="display:flex;gap:8px;align-items:baseline"><span style="font-weight:600">34%</span><span style="font-size:12px;font-weight:600;color:#DC2626">↑34%</span></span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:34%;height:100%;background:#F05A28;border-radius:999px"></div></div></div>
+              <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;font-size:14px"><span style="font-weight:500">Mua sắm</span><span style="display:flex;gap:8px;align-items:baseline"><span style="font-weight:600">25%</span><span style="font-size:12px;font-weight:600;color:#DC2626">↑12%</span></span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:25%;height:100%;background:#F58A63;border-radius:999px"></div></div></div>
+              <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;font-size:14px"><span style="font-weight:500">Hoá đơn</span><span style="display:flex;gap:8px;align-items:baseline"><span style="font-weight:600">19%</span><span style="font-size:12px;font-weight:600;color:#6B7280">→ 0%</span></span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:19%;height:100%;background:#F9B39A;border-radius:999px"></div></div></div>
+              <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;font-size:14px"><span style="font-weight:500">Di chuyển</span><span style="display:flex;gap:8px;align-items:baseline"><span style="font-weight:600">15%</span><span style="font-size:12px;font-weight:600;color:#16A34A">↓8%</span></span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:15%;height:100%;background:#FCD6C8;border-radius:999px"></div></div></div>
+              <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;font-size:14px"><span style="font-weight:500">Khác</span><span style="display:flex;gap:8px;align-items:baseline"><span style="font-weight:600">7%</span><span style="font-size:12px;font-weight:600;color:#16A34A">↓3%</span></span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:7%;height:100%;background:#D1D5DB;border-radius:999px"></div></div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#6B7280;letter-spacing:.04em;text-transform:uppercase;font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="#F05A28"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>Insight từ AI</div>
+            <div style="background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;gap:12px;align-items:flex-start"><div style="width:8px;height:8px;border-radius:50%;background:#DC2626;margin-top:7px;flex:none"></div><div style="font-size:14px;line-height:20px"><strong style="font-weight:600">Chi tiêu Ăn uống tăng 34% so với tháng 8</strong> — chủ yếu vào 3 ngày cuối tuần, trung bình 620.000 ₫/ngày.</div></div>
+            <div style="background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;gap:12px;align-items:flex-start"><div style="width:8px;height:8px;border-radius:50%;background:#16A34A;margin-top:7px;flex:none"></div><div style="font-size:14px;line-height:20px"><strong style="font-weight:600">Dự báo đến 30/09 bạn chi thêm ~5.200.000 ₫</strong>, vẫn trong ngân sách nếu giữ nhịp hiện tại.</div></div>
+            <div style="background:#FEF0EA;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:12px;font-weight:600;color:#C8441C;letter-spacing:.04em;text-transform:uppercase">Hành động gợi ý</div>
+              <div style="font-size:15px;line-height:22px;font-weight:600">Chuyển 3.000.000 ₫ vào Tiết kiệm mục tiêu</div>
+              <div style="font-size:13px;line-height:18px;color:#6B7280">Di chuyển và Khác đang thấp hơn dự kiến 1.100.000 ₫ — có thể tiết kiệm mà không ảnh hưởng hoá đơn kỳ tới.</div>
+              <div style="display:flex;gap:10px;margin-top:2px"><div style="height:44px;flex:1;background:#F05A28;color:#fff;border-radius:12px;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center">Thực hiện</div><div style="height:44px;padding:0 16px;color:#1A1D21;border-radius:12px;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center;background:#fff">Để sau</div></div>
+            </div>
+          </div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(180deg,rgba(246,247,249,0) 0%,#F6F7F9 45%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:30px">
+            <div style="height:48px;padding:0 22px;background:#F05A28;color:#fff;border-radius:999px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;box-shadow:0 4px 14px rgba(240,90,40,.35)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"></path></svg>Hỏi Copilot</div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:128px;width:134px;height:5px;border-radius:3px;background:#1A1D21"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 COPILOT CHAT -->
+    <div data-screen-label="03 Financial Copilot — Chat" style="display:flex;flex-direction:column">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:12px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">03</span><span style="font-size:14px;font-weight:500">Financial Copilot — Chat</span><span style="font-size:12px;color:#6B7280">390×844</span></div>
+      </sc-if>
+      <div style="width:414px;height:868px;background:#1A1D21;border-radius:56px;padding:12px">
+        <div style="width:390px;height:844px;border-radius:46px;background:#F6F7F9;overflow:hidden;position:relative;display:flex;flex-direction:column">
+          <div style="position:absolute;top:12px;left:135px;width:120px;height:34px;border-radius:20px;background:#1A1D21"></div>
+          <div style="height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600;flex:none">
+            <span>9:41</span>
+            <div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end"><span style="display:block;width:3px;height:5px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:7px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:9px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:11px;background:#1A1D21;border-radius:1px"></span></div><div style="width:25px;height:12px;border:1.5px solid #1A1D21;border-radius:4px;padding:1.5px"><div style="width:100%;height:100%;background:#1A1D21;border-radius:2px"></div></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;padding:4px 12px 10px;border-bottom:1px solid #E5E7EB;background:#fff;flex:none">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></div>
+            <div style="width:40px;height:40px;border-radius:50%;background:#FEF0EA;display:flex;align-items:center;justify-content:center;margin-right:10px"><svg width="20" height="20" viewBox="0 0 24 24" fill="#F05A28"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg></div>
+            <div><div style="font-size:17px;line-height:22px;font-weight:600">Financial Copilot</div><div style="font-size:12px;line-height:16px;color:#16A34A;display:flex;align-items:center;gap:5px"><span style="display:block;width:6px;height:6px;border-radius:50%;background:#16A34A"></span>Sẵn sàng hỗ trợ</div></div>
+          </div>
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:16px 20px 0">
+            <div style="align-self:flex-start;max-width:300px;background:#fff;border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:15px;line-height:22px;box-shadow:0 1px 3px rgba(0,0,0,.06)">Chào Minh Anh 👋 Tôi có thể trả lời về chi tiêu, dòng tiền và tiết kiệm của bạn.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <span style="font-size:13px;font-weight:500;padding:9px 12px;border-radius:999px;border:1px solid #F05A28;color:#C8441C;background:#FEF0EA">Tháng này tôi tiêu nhiều nhất vào đâu?</span>
+              <span style="font-size:13px;font-weight:500;padding:9px 12px;border-radius:999px;border:1px solid #E5E7EB;background:#fff">Cuối tháng còn bao nhiêu?</span>
+              <span style="font-size:13px;font-weight:500;padding:9px 12px;border-radius:999px;border:1px solid #E5E7EB;background:#fff">So với tháng trước</span>
+            </div>
+            <div style="align-self:flex-end;max-width:280px;background:#F05A28;color:#fff;border-radius:16px 16px 4px 16px;padding:12px 14px;font-size:15px;line-height:22px">Tháng này tôi tiêu nhiều nhất vào đâu?</div>
+            <div style="align-self:flex-start;max-width:320px;background:#fff;border-radius:16px 16px 16px 4px;padding:14px;font-size:15px;line-height:22px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px">
+              <div><strong style="font-weight:600">Ăn uống</strong> là nhóm lớn nhất: <strong style="font-weight:600">4.230.000 ₫</strong> (34% chi tiêu), tăng 34% so với tháng 8. Phần tăng đến từ 3 ngày cuối tuần.</div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;line-height:16px">
+                <div style="display:grid;grid-template-columns:64px 1fr 74px;align-items:center;gap:8px"><span style="color:#6B7280">Ăn uống</span><div style="height:10px;background:#F1F2F4;border-radius:999px"><div style="width:100%;height:100%;background:#F05A28;border-radius:999px"></div></div><span style="text-align:right;font-weight:600">4.230.000</span></div>
+                <div style="display:grid;grid-template-columns:64px 1fr 74px;align-items:center;gap:8px"><span style="color:#6B7280">Mua sắm</span><div style="height:10px;background:#F1F2F4;border-radius:999px"><div style="width:74%;height:100%;background:#F58A63;border-radius:999px"></div></div><span style="text-align:right;font-weight:600">3.120.000</span></div>
+                <div style="display:grid;grid-template-columns:64px 1fr 74px;align-items:center;gap:8px"><span style="color:#6B7280">Hoá đơn</span><div style="height:10px;background:#F1F2F4;border-radius:999px"><div style="width:57%;height:100%;background:#F9B39A;border-radius:999px"></div></div><span style="text-align:right;font-weight:600">2.410.000</span></div>
+                <div style="display:grid;grid-template-columns:64px 1fr 74px;align-items:center;gap:8px"><span style="color:#6B7280">Di chuyển</span><div style="height:10px;background:#F1F2F4;border-radius:999px"><div style="width:44%;height:100%;background:#FCD6C8;border-radius:999px"></div></div><span style="text-align:right;font-weight:600">1.870.000</span></div>
+                <div style="display:grid;grid-template-columns:64px 1fr 74px;align-items:center;gap:8px"><span style="color:#6B7280">Khác</span><div style="height:10px;background:#F1F2F4;border-radius:999px"><div style="width:20%;height:100%;background:#D1D5DB;border-radius:999px"></div></div><span style="text-align:right;font-weight:600">830.000</span></div>
+              </div>
+              <div style="font-size:14px;line-height:20px">Bạn muốn tôi đặt hạn mức 3.500.000 ₫ cho Ăn uống tháng 10 không?</div>
+              <div style="display:flex;gap:8px"><span style="font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;background:#F05A28;color:#fff">Đặt hạn mức</span><span style="font-size:13px;font-weight:500;padding:8px 14px;border-radius:999px;border:1px solid #E5E7EB">Không, cảm ơn</span></div>
+            </div>
+          </div>
+          <div style="flex:none;padding:8px 20px 34px;background:#F6F7F9;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:11px;line-height:14px;color:#6B7280;text-align:center">Thông tin tham khảo, không phải tư vấn đầu tư</div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="flex:1;height:48px;background:#fff;border:1px solid #E5E7EB;border-radius:12px;display:flex;align-items:center;padding:0 16px;font-size:15px;color:#9CA3AF">Nhập câu hỏi…</div>
+              <div style="width:48px;height:48px;border-radius:50%;background:#F05A28;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-7-5 16-3-6z"></path></svg></div>
+            </div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:128px;width:134px;height:5px;border-radius:3px;background:#1A1D21"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 SCAM SHIELD ALERT -->
+    <div data-screen-label="04 Scam Shield — Cảnh báo chặn giao dịch" style="display:flex;flex-direction:column">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:12px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">04</span><span style="font-size:14px;font-weight:500">Scam Shield — Cảnh báo chặn giao dịch</span><span style="font-size:12px;color:#6B7280">390×844</span></div>
+      </sc-if>
+      <div style="width:414px;height:868px;background:#1A1D21;border-radius:56px;padding:12px">
+        <div style="width:390px;height:844px;border-radius:46px;background:#FEF2F2;overflow:hidden;position:relative;display:flex;flex-direction:column">
+          <div style="position:absolute;top:12px;left:135px;width:120px;height:34px;border-radius:20px;background:#1A1D21"></div>
+          <div style="height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600;flex:none">
+            <span>9:41</span>
+            <div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end"><span style="display:block;width:3px;height:5px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:7px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:9px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:11px;background:#1A1D21;border-radius:1px"></span></div><div style="width:25px;height:12px;border:1.5px solid #1A1D21;border-radius:4px;padding:1.5px"><div style="width:100%;height:100%;background:#1A1D21;border-radius:2px"></div></div></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 20px 0;flex:none">
+            <span style="font-size:12px;font-weight:600;color:#B91C1C;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg>Scam Shield · Chuyển tiền</span>
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-right:-10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 20px 0;gap:14px">
+            <div style="width:72px;height:72px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.06)"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="M12 8v5M12 16h.01"></path></svg></div>
+            <div style="text-align:center;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:22px;line-height:28px;font-weight:600">Giao dịch có dấu hiệu lừa đảo</div>
+              <div style="font-size:14px;line-height:20px;color:#6B7280;text-wrap:pretty">Chúng tôi đã tạm dừng lệnh chuyển để bạn kiểm tra lại. Tiền vẫn đang an toàn trong tài khoản.</div>
+            </div>
+            <div style="position:relative;width:200px;height:112px">
+              <svg width="200" height="112" viewBox="0 0 200 112"><path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="#FCE1E1" stroke-width="14" stroke-linecap="round"></path><path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="#DC2626" stroke-width="14" stroke-linecap="round" stroke-dasharray="218.6 251.4"></path></svg>
+              <div style="position:absolute;left:0;right:0;top:40px;display:flex;flex-direction:column;align-items:center"><div style="display:flex;align-items:baseline;gap:2px"><span style="font-size:40px;line-height:44px;font-weight:700;color:#DC2626">87</span><span style="font-size:15px;color:#6B7280">/100</span></div><div style="font-size:12px;font-weight:600;color:#B91C1C;letter-spacing:.04em">RISK SCORE · RẤT CAO</div></div>
+            </div>
+            <div style="width:100%;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:13px;color:#6B7280;line-height:18px">Chuyển đến</div><div style="font-size:15px;line-height:22px;font-weight:600">NGUYEN VAN T.</div><div style="font-size:13px;color:#6B7280;line-height:18px">**** 7731 · Ngân hàng khác</div></div>
+              <div style="text-align:right"><div style="font-size:13px;color:#6B7280;line-height:18px">Số tiền</div><div style="font-size:20px;line-height:28px;font-weight:700">35.000.000 ₫</div></div>
+            </div>
+            <div style="width:100%;background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:13px;font-weight:600;color:#6B7280;letter-spacing:.04em;text-transform:uppercase;font-size:12px">3 dấu hiệu chính</div>
+              <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:20px"><span style="display:block;width:8px;height:8px;border-radius:50%;background:#DC2626;margin-top:6px;flex:none"></span>Tài khoản nhận mới tạo <strong style="font-weight:600">2 ngày</strong> trước</div>
+              <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:20px"><span style="display:block;width:8px;height:8px;border-radius:50%;background:#DC2626;margin-top:6px;flex:none"></span>Nằm trong <strong style="font-weight:600">danh sách cảnh báo cộng đồng</strong> (3 báo cáo)</div>
+              <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:20px"><span style="display:block;width:8px;height:8px;border-radius:50%;background:#DC2626;margin-top:6px;flex:none"></span>Mẫu hành vi giống kịch bản <strong style="font-weight:600">mạo danh công an</strong></div>
+              <div style="font-size:14px;font-weight:500;color:#F05A28;margin-top:2px">Vì sao chúng tôi cảnh báo? →</div>
+            </div>
+          </div>
+          <div style="flex:none;padding:12px 20px 34px;display:flex;flex-direction:column;gap:10px">
+            <div style="height:48px;background:#F05A28;color:#fff;border-radius:12px;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center">Huỷ giao dịch</div>
+            <div style="height:48px;background:#fff;color:#1A1D21;border:1px solid #D1D5DB;border-radius:12px;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center">Tôi vẫn muốn chuyển</div>
+            <div style="height:44px;color:#DC2626;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V4h12l1 3h4v10h-8l-1-3H4"></path></svg>Báo cáo lừa đảo</div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:128px;width:134px;height:5px;border-radius:3px;background:#1A1D21"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 EXPLAINABILITY -->
+    <div data-screen-label="05 Scam Shield — Vì sao chúng tôi cảnh báo" style="display:flex;flex-direction:column">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:12px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">05</span><span style="font-size:14px;font-weight:500">Scam Shield — Vì sao chúng tôi cảnh báo</span><span style="font-size:12px;color:#6B7280">390×844</span></div>
+      </sc-if>
+      <div style="width:414px;height:868px;background:#1A1D21;border-radius:56px;padding:12px">
+        <div style="width:390px;height:844px;border-radius:46px;background:#F6F7F9;overflow:hidden;position:relative;display:flex;flex-direction:column">
+          <div style="position:absolute;top:12px;left:135px;width:120px;height:34px;border-radius:20px;background:#1A1D21"></div>
+          <div style="height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600;flex:none">
+            <span>9:41</span>
+            <div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end"><span style="display:block;width:3px;height:5px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:7px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:9px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:11px;background:#1A1D21;border-radius:1px"></span></div><div style="width:25px;height:12px;border:1.5px solid #1A1D21;border-radius:4px;padding:1.5px"><div style="width:100%;height:100%;background:#1A1D21;border-radius:2px"></div></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;padding:4px 12px 4px;flex:none">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></div>
+            <span style="font-size:17px;font-weight:600">Vì sao chúng tôi cảnh báo</span>
+          </div>
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:8px 20px 0">
+            <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:13px;color:#6B7280;line-height:18px">Risk Score</div><div style="display:flex;align-items:baseline;gap:2px"><span style="font-size:32px;line-height:40px;font-weight:700;color:#DC2626">87</span><span style="font-size:15px;color:#6B7280">/100</span></div></div>
+                <span style="font-size:12px;font-weight:600;color:#B91C1C;background:#FEE2E2;padding:6px 12px;border-radius:999px">Rủi ro rất cao</span>
+              </div>
+              <div style="height:10px;border-radius:999px;background:#F1F2F4;display:flex;overflow:hidden;gap:2px"><div style="width:32%;background:#DC2626"></div><div style="width:28%;background:#EF4444"></div><div style="width:18%;background:#F87171"></div><div style="width:9%;background:#FCA5A5"></div></div>
+              <div style="font-size:12px;line-height:16px;color:#6B7280">Điểm được tính từ 4 tín hiệu bên dưới. Ngưỡng can thiệp: ≥ 75.</div>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:15px;font-weight:600">Phân rã theo tín hiệu</div>
+              <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:14px;line-height:20px"><span>Tài khoản nhận mới tạo 2 ngày</span><span style="font-weight:600;color:#DC2626">+32</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:32%;height:100%;background:#DC2626;border-radius:999px"></div></div></div>
+              <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:14px;line-height:20px"><span>Trong danh sách cảnh báo cộng đồng</span><span style="font-weight:600;color:#DC2626">+28</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:28%;height:100%;background:#EF4444;border-radius:999px"></div></div></div>
+              <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:14px;line-height:20px"><span>Mẫu hành vi mạo danh công an</span><span style="font-weight:600;color:#DC2626">+18</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:18%;height:100%;background:#F87171;border-radius:999px"></div></div></div>
+              <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:14px;line-height:20px"><span>Gấp 7 lần mức bạn thường chuyển</span><span style="font-weight:600;color:#DC2626">+9</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:9%;height:100%;background:#FCA5A5;border-radius:999px"></div></div></div>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:15px;font-weight:600">Hành vi tài khoản nhận **** 7731</div>
+              <div style="display:grid;grid-template-columns:16px 1fr;column-gap:12px;row-gap:0">
+                <div style="display:flex;flex-direction:column;align-items:center"><span style="display:block;width:10px;height:10px;border-radius:50%;background:#9CA3AF;margin-top:5px"></span><span style="display:block;width:2px;flex:1;background:#E5E7EB"></span></div><div style="padding-bottom:12px"><div style="font-size:12px;color:#6B7280;line-height:16px">13/09/2026</div><div style="font-size:14px;line-height:20px">Mở tài khoản tại ngân hàng khác</div></div>
+                <div style="display:flex;flex-direction:column;align-items:center"><span style="display:block;width:10px;height:10px;border-radius:50%;background:#F59E0B;margin-top:5px"></span><span style="display:block;width:2px;flex:1;background:#E5E7EB"></span></div><div style="padding-bottom:12px"><div style="font-size:12px;color:#6B7280;line-height:16px">14/09/2026</div><div style="font-size:14px;line-height:20px">Nhận 7 lệnh từ 7 người khác nhau · 210.000.000 ₫</div></div>
+                <div style="display:flex;flex-direction:column;align-items:center"><span style="display:block;width:10px;height:10px;border-radius:50%;background:#DC2626;margin-top:5px"></span></div><div><div style="font-size:12px;color:#6B7280;line-height:16px">15/09/2026 · 08:20</div><div style="font-size:14px;line-height:20px">3 khách hàng MSB báo cáo lừa đảo</div></div>
+              </div>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Kịch bản lừa đảo tương tự</span><span style="font-size:12px;font-weight:600;color:#B91C1C;background:#FEE2E2;padding:4px 10px;border-radius:999px">Mạo danh công an</span></div>
+              <div style="font-size:14px;line-height:20px;color:#1A1D21;text-wrap:pretty">Kẻ gian gọi điện xưng là cán bộ điều tra, yêu cầu chuyển tiền để “chứng minh trong sạch” và dặn giữ bí mật với gia đình.</div>
+              <div style="font-size:12px;color:#6B7280">112 trường hợp ghi nhận tại MSB trong tháng 9/2026</div>
+            </div>
+            <div style="background:#FEF0EA;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:12px;font-weight:600;color:#C8441C;letter-spacing:.04em;text-transform:uppercase">Bạn nên làm gì</div>
+              <div style="display:flex;gap:12px;align-items:flex-start"><span style="width:24px;height:24px;border-radius:50%;background:#F05A28;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none">1</span><span style="font-size:14px;line-height:20px">Cúp máy và gọi lại tổng đài MSB <strong style="font-weight:600">1900 6083</strong> để xác minh.</span></div>
+              <div style="display:flex;gap:12px;align-items:flex-start"><span style="width:24px;height:24px;border-radius:50%;background:#F05A28;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none">2</span><span style="font-size:14px;line-height:20px">Công an không yêu cầu chuyển tiền qua điện thoại. Hãy báo người thân trước khi làm gì tiếp.</span></div>
+            </div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:128px;width:134px;height:5px;border-radius:3px;background:#1A1D21"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 SAFETY CENTER -->
+    <div data-screen-label="06 Scam Shield — Trung tâm an toàn" style="display:flex;flex-direction:column">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:12px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">06</span><span style="font-size:14px;font-weight:500">Scam Shield — Trung tâm an toàn</span><span style="font-size:12px;color:#6B7280">390×844</span></div>
+      </sc-if>
+      <div style="width:414px;height:868px;background:#1A1D21;border-radius:56px;padding:12px">
+        <div style="width:390px;height:844px;border-radius:46px;background:#F6F7F9;overflow:hidden;position:relative;display:flex;flex-direction:column">
+          <div style="position:absolute;top:12px;left:135px;width:120px;height:34px;border-radius:20px;background:#1A1D21"></div>
+          <div style="height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600;flex:none">
+            <span>9:41</span>
+            <div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end"><span style="display:block;width:3px;height:5px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:7px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:9px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:11px;background:#1A1D21;border-radius:1px"></span></div><div style="width:25px;height:12px;border:1.5px solid #1A1D21;border-radius:4px;padding:1.5px"><div style="width:100%;height:100%;background:#1A1D21;border-radius:2px"></div></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;padding:4px 12px 4px;flex:none">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></div>
+            <span style="font-size:17px;font-weight:600">Trung tâm an toàn</span>
+          </div>
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:8px 20px 0">
+            <div style="background:#fff;border-radius:16px;padding:20px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:18px">
+              <div style="width:72px;height:72px;border-radius:50%;background:#FEF0EA;display:flex;align-items:center;justify-content:center;flex:none"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg></div>
+              <div style="flex:1">
+                <div style="font-size:13px;color:#6B7280;line-height:18px">Điểm an toàn tài khoản</div>
+                <div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:40px;line-height:44px;font-weight:700;color:#F05A28">92</span><span style="font-size:12px;font-weight:600;color:#15803D;background:#DCFCE7;padding:4px 10px;border-radius:999px">Rất tốt</span></div>
+                <div style="font-size:12px;color:#6B7280;line-height:16px;margin-top:4px">Cập nhật 15/09/2026 · Scam Shield đang bật</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+              <div style="background:#fff;border-radius:16px;padding:14px 12px;box-shadow:0 1px 3px rgba(0,0,0,.06);text-align:center"><div style="font-size:24px;line-height:28px;font-weight:700;color:#DC2626">2</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:2px">Đã chặn</div></div>
+              <div style="background:#fff;border-radius:16px;padding:14px 12px;box-shadow:0 1px 3px rgba(0,0,0,.06);text-align:center"><div style="font-size:24px;line-height:28px;font-weight:700;color:#D97706">5</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:2px">Đã cảnh báo</div></div>
+              <div style="background:#fff;border-radius:16px;padding:14px 12px;box-shadow:0 1px 3px rgba(0,0,0,.06);text-align:center"><div style="font-size:24px;line-height:28px;font-weight:700;color:#2563EB">1</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:2px">Đã báo cáo</div></div>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:16px 16px 6px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:15px;font-weight:600">Lịch sử cảnh báo</span><span style="font-size:13px;color:#F05A28;font-weight:500">Tất cả</span></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F1F2F4"><div style="flex:1;min-width:0"><div style="font-size:14px;line-height:20px;font-weight:500">Chuyển 35.000.000 ₫ → **** 7731</div><div style="font-size:12px;line-height:16px;color:#6B7280">15/09/2026 · Mạo danh công an</div></div><span style="font-size:11px;font-weight:600;color:#B91C1C;background:#FEE2E2;padding:4px 10px;border-radius:999px;white-space:nowrap">Đã chặn</span></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F1F2F4"><div style="flex:1;min-width:0"><div style="font-size:14px;line-height:20px;font-weight:500">Đăng nhập từ thiết bị mới</div><div style="font-size:12px;line-height:16px;color:#6B7280">11/09/2026 · iPhone 15 · Hà Nội</div></div><span style="font-size:11px;font-weight:600;color:#15803D;background:#DCFCE7;padding:4px 10px;border-radius:999px;white-space:nowrap">Đã xác minh</span></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F1F2F4"><div style="flex:1;min-width:0"><div style="font-size:14px;line-height:20px;font-weight:500">Chuyển 8.000.000 ₫ → **** 2210</div><div style="font-size:12px;line-height:16px;color:#6B7280">03/09/2026 · Người nhận mới · 58/100</div></div><span style="font-size:11px;font-weight:600;color:#B45309;background:#FEF3C7;padding:4px 10px;border-radius:999px;white-space:nowrap">Đã cảnh báo</span></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0"><div style="flex:1;min-width:0"><div style="font-size:14px;line-height:20px;font-weight:500">Tin nhắn giả mạo MSB</div><div style="font-size:12px;line-height:16px;color:#6B7280">28/08/2026 · Bạn đã gửi báo cáo</div></div><span style="font-size:11px;font-weight:600;color:#1D4ED8;background:#DBEAFE;padding:4px 10px;border-radius:999px;white-space:nowrap">Đã báo cáo</span></div>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:16px 16px 6px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px">Lớp bảo vệ</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #F1F2F4"><div><div style="font-size:14px;line-height:20px;font-weight:500">Scam Shield thời gian thực</div><div style="font-size:12px;line-height:16px;color:#6B7280">Chấm điểm mọi lệnh chuyển tiền</div></div><div style="width:51px;height:31px;border-radius:999px;background:#F05A28;padding:2px;flex:none"><div style="width:27px;height:27px;border-radius:50%;background:#fff;margin-left:20px"></div></div></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #F1F2F4"><div><div style="font-size:14px;line-height:20px;font-weight:500">Cảnh báo người nhận mới</div><div style="font-size:12px;line-height:16px;color:#6B7280">Nhắc kiểm tra tên trước khi chuyển</div></div><div style="width:51px;height:31px;border-radius:999px;background:#F05A28;padding:2px;flex:none"><div style="width:27px;height:27px;border-radius:50%;background:#fff;margin-left:20px"></div></div></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #F1F2F4"><div><div style="font-size:14px;line-height:20px;font-weight:500">Khoá chuyển tiền 22:00–06:00</div><div style="font-size:12px;line-height:16px;color:#6B7280">Chặn lệnh trên 10.000.000 ₫ ban đêm</div></div><div style="width:51px;height:31px;border-radius:999px;background:#D1D5DB;padding:2px;flex:none"><div style="width:27px;height:27px;border-radius:50%;background:#fff"></div></div></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0"><div><div style="font-size:14px;line-height:20px;font-weight:500">Chia sẻ cảnh báo cộng đồng</div><div style="font-size:12px;line-height:16px;color:#6B7280">Ẩn danh, giúp khách hàng khác</div></div><div style="width:51px;height:31px;border-radius:999px;background:#F05A28;padding:2px;flex:none"><div style="width:27px;height:27px;border-radius:50%;background:#fff;margin-left:20px"></div></div></div>
+            </div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:128px;width:134px;height:5px;border-radius:3px;background:#1A1D21"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= ROW 2 · DESKTOP ================= -->
+  <div style="display:flex;gap:80px;align-items:flex-start">
+
+    <!-- 07 OPS DASHBOARD -->
+    <div data-screen-label="07 Ops Dashboard — Giám sát Scam Shield" style="display:flex;flex-direction:column">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">07</span><span style="font-size:14px;font-weight:500">Ops Dashboard — Giám sát Scam Shield</span><span style="font-size:12px;color:#6B7280">1440×900</span></div>
+      </sc-if>
+      <div style="width:1440px;height:900px;background:#F6F7F9;border-radius:12px;overflow:hidden;display:flex;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+        <div style="width:240px;background:#14181D;color:#fff;display:flex;flex-direction:column;padding:24px 16px;flex:none">
+          <div style="display:flex;align-items:baseline;gap:8px;padding:0 8px 28px"><span style="font-size:24px;font-weight:700;color:#F05A28;letter-spacing:-.02em">MSB</span><span style="font-size:13px;color:#9CA3AF;font-weight:500">Guardian Ops</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:500">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;background:rgba(240,90,40,.16);color:#F97B4E"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"></rect><rect x="13" y="3" width="8" height="8" rx="1.5"></rect><rect x="3" y="13" width="8" height="8" rx="1.5"></rect><rect x="13" y="13" width="8" height="8" rx="1.5"></rect></svg>Tổng quan</div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#C4C9D1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"></path><path d="M12 10v4M12 17h.01"></path></svg>Cảnh báo<span style="margin-left:auto;font-size:11px;font-weight:600;background:#DC2626;color:#fff;padding:2px 8px;border-radius:999px">42</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#C4C9D1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v13H4z"></path><path d="M9 7V4h6v3"></path></svg>Case</div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#C4C9D1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"></path><path d="M9 9h6M9 13h6"></path></svg>Kịch bản lừa đảo</div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#C4C9D1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M6 14l4-5 4 3 4-6"></path></svg>Mô hình &amp; ngưỡng</div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#C4C9D1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg>Nhật ký quyết định AI</div>
+          </div>
+          <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding:8px"><div style="width:36px;height:36px;border-radius:50%;background:#2A3038;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">QB</div><div><div style="font-size:13px;font-weight:500">Trần Quốc Bảo</div><div style="font-size:11px;color:#9CA3AF">Fraud Ops · Ca sáng</div></div></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="height:64px;background:#fff;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex:none">
+            <div style="width:380px;height:40px;background:#F6F7F9;border-radius:10px;display:flex;align-items:center;gap:10px;padding:0 14px;color:#6B7280;font-size:14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4-4"></path></svg>Tìm khách hàng, số tài khoản, case…</div>
+            <div style="display:flex;align-items:center;gap:16px;font-size:13px;color:#6B7280"><span>Thứ Ba, 15/09/2026 · 09:41</span><span style="display:flex;align-items:center;gap:6px;color:#15803D;font-weight:600"><span style="display:block;width:8px;height:8px;border-radius:50%;background:#16A34A"></span>Realtime</span><div style="width:36px;height:36px;border-radius:50%;background:#FEF0EA;color:#F05A28;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center">QB</div></div>
+          </div>
+          <div style="flex:1;padding:24px;display:flex;flex-direction:column;gap:16px;min-height:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <div><div style="font-size:24px;line-height:32px;font-weight:600">Giám sát Scam Shield</div><div style="font-size:13px;color:#6B7280">Hôm nay · Toàn bộ kênh Mobile Banking</div></div>
+              <div style="display:flex;gap:8px"><span style="height:36px;padding:0 14px;border-radius:10px;background:#fff;border:1px solid #E5E7EB;font-size:13px;font-weight:500;display:flex;align-items:center">Hôm nay ▾</span><span style="height:36px;padding:0 14px;border-radius:10px;background:#F05A28;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center">Xuất báo cáo</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+              <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><div style="font-size:13px;color:#6B7280">Giao dịch quét hôm nay</div><div style="font-size:28px;line-height:36px;font-weight:700;margin-top:4px">1.284.302</div><div style="font-size:12px;color:#6B7280;margin-top:4px">Độ trễ TB <strong style="color:#15803D;font-weight:600">212 ms</strong></div></div>
+              <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><div style="font-size:13px;color:#6B7280">Cảnh báo đã bắn</div><div style="font-size:28px;line-height:36px;font-weight:700;margin-top:4px">327</div><div style="font-size:12px;color:#6B7280;margin-top:4px"><strong style="color:#DC2626;font-weight:600">↑ 12%</strong> so với hôm qua</div></div>
+              <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><div style="font-size:13px;color:#6B7280">Tỷ lệ khách huỷ giao dịch</div><div style="font-size:28px;line-height:36px;font-weight:700;margin-top:4px">64%</div><div style="font-size:12px;color:#6B7280;margin-top:4px"><strong style="color:#15803D;font-weight:600">↑ 9 điểm</strong> so với rule cũ</div></div>
+              <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid #FEE2D5"><div style="font-size:13px;color:#6B7280">Giá trị đã bảo vệ</div><div style="font-size:28px;line-height:36px;font-weight:700;margin-top:4px;color:#F05A28">8,4 tỷ ₫</div><div style="font-size:12px;color:#6B7280;margin-top:4px">Từ đầu tháng: <strong style="font-weight:600">96,2 tỷ ₫</strong></div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
+              <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Cảnh báo theo giờ</span><span style="font-size:12px;color:#6B7280">24 giờ qua · đỉnh 24 lúc 16:00</span></div>
+                <svg width="100%" height="150" viewBox="0 0 700 180" preserveAspectRatio="none" style="display:block"><line x1="0" y1="20" x2="700" y2="20" stroke="#F1F2F4" stroke-width="1"></line><line x1="0" y1="95" x2="700" y2="95" stroke="#F1F2F4" stroke-width="1"></line><line x1="0" y1="170" x2="700" y2="170" stroke="#E5E7EB" stroke-width="1"></line><path d="M0,180 L0,145 30.4,151.3 60.9,157.5 91.3,157.5 121.7,151.3 152.2,138.8 182.6,120 213,95 243.5,76.3 273.9,57.5 304.3,38.8 334.8,51.3 365.2,63.8 395.7,70 426.1,57.5 456.5,32.5 487,20 517.4,45 547.8,63.8 578.3,82.5 608.7,95 639.1,113.8 669.6,126.3 700,138.8 L700,180 Z" fill="#FEF0EA"></path><polyline points="0,145 30.4,151.3 60.9,157.5 91.3,157.5 121.7,151.3 152.2,138.8 182.6,120 213,95 243.5,76.3 273.9,57.5 304.3,38.8 334.8,51.3 365.2,63.8 395.7,70 426.1,57.5 456.5,32.5 487,20 517.4,45 547.8,63.8 578.3,82.5 608.7,95 639.1,113.8 669.6,126.3 700,138.8" fill="none" stroke="#F05A28" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline><circle cx="487" cy="20" r="5" fill="#F05A28" stroke="#fff" stroke-width="2"></circle></svg>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:#6B7280"><span>10:00</span><span>14:00</span><span>18:00</span><span>22:00</span><span>02:00</span><span>06:00</span><span>09:00</span></div>
+              </div>
+              <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Theo kịch bản lừa đảo</span><span style="font-size:12px;color:#6B7280">327 cảnh báo</span></div>
+                <div style="display:grid;grid-template-columns:130px 1fr 36px;align-items:center;gap:10px;font-size:13px"><span>Mạo danh công an</span><div style="height:12px;background:#F1F2F4;border-radius:4px"><div style="width:100%;height:100%;background:#F05A28;border-radius:4px"></div></div><span style="text-align:right;font-weight:600">112</span></div>
+                <div style="display:grid;grid-template-columns:130px 1fr 36px;align-items:center;gap:10px;font-size:13px"><span>Việc nhẹ lương cao</span><div style="height:12px;background:#F1F2F4;border-radius:4px"><div style="width:70%;height:100%;background:#F58A63;border-radius:4px"></div></div><span style="text-align:right;font-weight:600">78</span></div>
+                <div style="display:grid;grid-template-columns:130px 1fr 36px;align-items:center;gap:10px;font-size:13px"><span>Giả người thân</span><div style="height:12px;background:#F1F2F4;border-radius:4px"><div style="width:48%;height:100%;background:#F9B39A;border-radius:4px"></div></div><span style="text-align:right;font-weight:600">54</span></div>
+                <div style="display:grid;grid-template-columns:130px 1fr 36px;align-items:center;gap:10px;font-size:13px"><span>Đầu tư ảo</span><div style="height:12px;background:#F1F2F4;border-radius:4px"><div style="width:41%;height:100%;background:#FCD6C8;border-radius:4px"></div></div><span style="text-align:right;font-weight:600">46</span></div>
+                <div style="display:grid;grid-template-columns:130px 1fr 36px;align-items:center;gap:10px;font-size:13px"><span>Mạo danh ngân hàng</span><div style="height:12px;background:#F1F2F4;border-radius:4px"><div style="width:33%;height:100%;background:#D1D5DB;border-radius:4px"></div></div><span style="text-align:right;font-weight:600">37</span></div>
+              </div>
+            </div>
+            <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px"><span style="font-size:15px;font-weight:600">Cảnh báo cần xử lý</span><span style="font-size:13px;color:#F05A28;font-weight:500">Xem tất cả 42 →</span></div>
+              <div style="display:grid;grid-template-columns:90px 1.4fr 1fr 150px 1.2fr 160px;padding:8px 20px;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #E5E7EB;background:#FAFAFB"><span>Thời gian</span><span>Khách hàng</span><span>Số tiền</span><span>Risk Score</span><span>Kịch bản</span><span>Trạng thái</span></div>
+              <div style="display:grid;grid-template-columns:90px 1.4fr 1fr 150px 1.2fr 160px;padding:0 20px;height:46px;align-items:center;font-size:13px;border-bottom:1px solid #F1F2F4;background:#FFF8F5"><span style="color:#6B7280">09:38</span><span style="font-weight:600">Nguyễn Minh Anh <span style="font-weight:400;color:#6B7280">· **** 4821</span></span><span style="font-weight:600">35.000.000 ₫</span><span style="display:flex;align-items:center;gap:8px"><span style="font-weight:700;color:#DC2626;width:24px">87</span><span style="display:block;width:70px;height:6px;background:#F1F2F4;border-radius:999px"><span style="display:block;width:87%;height:100%;background:#DC2626;border-radius:999px"></span></span></span><span>Mạo danh công an</span><span><span style="font-size:11px;font-weight:600;color:#B45309;background:#FEF3C7;padding:4px 10px;border-radius:999px">Chờ xử lý</span></span></div>
+              <div style="display:grid;grid-template-columns:90px 1.4fr 1fr 150px 1.2fr 160px;padding:0 20px;height:46px;align-items:center;font-size:13px;border-bottom:1px solid #F1F2F4"><span style="color:#6B7280">09:21</span><span style="font-weight:500">Phạm Thu Hà <span style="font-weight:400;color:#6B7280">· **** 0934</span></span><span style="font-weight:600">12.500.000 ₫</span><span style="display:flex;align-items:center;gap:8px"><span style="font-weight:700;color:#DC2626;width:24px">79</span><span style="display:block;width:70px;height:6px;background:#F1F2F4;border-radius:999px"><span style="display:block;width:79%;height:100%;background:#DC2626;border-radius:999px"></span></span></span><span>Việc nhẹ lương cao</span><span><span style="font-size:11px;font-weight:600;color:#B45309;background:#FEF3C7;padding:4px 10px;border-radius:999px">Chờ xử lý</span></span></div>
+              <div style="display:grid;grid-template-columns:90px 1.4fr 1fr 150px 1.2fr 160px;padding:0 20px;height:46px;align-items:center;font-size:13px;border-bottom:1px solid #F1F2F4"><span style="color:#6B7280">08:56</span><span style="font-weight:500">Lê Văn Đức <span style="font-weight:400;color:#6B7280">· **** 5517</span></span><span style="font-weight:600">68.000.000 ₫</span><span style="display:flex;align-items:center;gap:8px"><span style="font-weight:700;color:#DC2626;width:24px">91</span><span style="display:block;width:70px;height:6px;background:#F1F2F4;border-radius:999px"><span style="display:block;width:91%;height:100%;background:#DC2626;border-radius:999px"></span></span></span><span>Mạo danh ngân hàng</span><span><span style="font-size:11px;font-weight:600;color:#1D4ED8;background:#DBEAFE;padding:4px 10px;border-radius:999px">Đang điều tra</span></span></div>
+              <div style="display:grid;grid-template-columns:90px 1.4fr 1fr 150px 1.2fr 160px;padding:0 20px;height:46px;align-items:center;font-size:13px;border-bottom:1px solid #F1F2F4"><span style="color:#6B7280">08:40</span><span style="font-weight:500">Trần Ngọc Lan <span style="font-weight:400;color:#6B7280">· **** 8802</span></span><span style="font-weight:600">4.200.000 ₫</span><span style="display:flex;align-items:center;gap:8px"><span style="font-weight:700;color:#D97706;width:24px">62</span><span style="display:block;width:70px;height:6px;background:#F1F2F4;border-radius:999px"><span style="display:block;width:62%;height:100%;background:#F59E0B;border-radius:999px"></span></span></span><span>Giả người thân</span><span><span style="font-size:11px;font-weight:600;color:#15803D;background:#DCFCE7;padding:4px 10px;border-radius:999px">Khách đã huỷ</span></span></div>
+              <div style="display:grid;grid-template-columns:90px 1.4fr 1fr 150px 1.2fr 160px;padding:0 20px;height:46px;align-items:center;font-size:13px;border-bottom:1px solid #F1F2F4"><span style="color:#6B7280">08:12</span><span style="font-weight:500">Hoàng Anh Tuấn <span style="font-weight:400;color:#6B7280">· **** 1176</span></span><span style="font-weight:600">150.000.000 ₫</span><span style="display:flex;align-items:center;gap:8px"><span style="font-weight:700;color:#DC2626;width:24px">94</span><span style="display:block;width:70px;height:6px;background:#F1F2F4;border-radius:999px"><span style="display:block;width:94%;height:100%;background:#DC2626;border-radius:999px"></span></span></span><span>Đầu tư ảo</span><span><span style="font-size:11px;font-weight:600;color:#B91C1C;background:#FEE2E2;padding:4px 10px;border-radius:999px">Xác nhận lừa đảo</span></span></div>
+              <div style="display:grid;grid-template-columns:90px 1.4fr 1fr 150px 1.2fr 160px;padding:0 20px;height:46px;align-items:center;font-size:13px"><span style="color:#6B7280">07:55</span><span style="font-weight:500">Vũ Thị Mai <span style="font-weight:400;color:#6B7280">· **** 6640</span></span><span style="font-weight:600">9.800.000 ₫</span><span style="display:flex;align-items:center;gap:8px"><span style="font-weight:700;color:#D97706;width:24px">58</span><span style="display:block;width:70px;height:6px;background:#F1F2F4;border-radius:999px"><span style="display:block;width:58%;height:100%;background:#F59E0B;border-radius:999px"></span></span></span><span>Việc nhẹ lương cao</span><span><span style="font-size:11px;font-weight:600;color:#4B5563;background:#F1F2F4;padding:4px 10px;border-radius:999px">Bỏ qua</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 08 CASE DETAIL -->
+    <div data-screen-label="08 Ops Dashboard — Chi tiết case" style="display:flex;flex-direction:column">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">08</span><span style="font-size:14px;font-weight:500">Ops Dashboard — Chi tiết case</span><span style="font-size:12px;color:#6B7280">1440×900</span></div>
+      </sc-if>
+      <div style="width:1440px;height:900px;background:#F6F7F9;border-radius:12px;overflow:hidden;display:flex;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+        <div style="width:240px;background:#14181D;color:#fff;display:flex;flex-direction:column;padding:24px 16px;flex:none">
+          <div style="display:flex;align-items:baseline;gap:8px;padding:0 8px 28px"><span style="font-size:24px;font-weight:700;color:#F05A28;letter-spacing:-.02em">MSB</span><span style="font-size:13px;color:#9CA3AF;font-weight:500">Guardian Ops</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:500">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#C4C9D1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"></rect><rect x="13" y="3" width="8" height="8" rx="1.5"></rect><rect x="3" y="13" width="8" height="8" rx="1.5"></rect><rect x="13" y="13" width="8" height="8" rx="1.5"></rect></svg>Tổng quan</div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;background:rgba(240,90,40,.16);color:#F97B4E"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"></path><path d="M12 10v4M12 17h.01"></path></svg>Cảnh báo<span style="margin-left:auto;font-size:11px;font-weight:600;background:#DC2626;color:#fff;padding:2px 8px;border-radius:999px">42</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#C4C9D1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v13H4z"></path><path d="M9 7V4h6v3"></path></svg>Case</div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#C4C9D1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"></path><path d="M9 9h6M9 13h6"></path></svg>Kịch bản lừa đảo</div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#C4C9D1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M6 14l4-5 4 3 4-6"></path></svg>Mô hình &amp; ngưỡng</div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#C4C9D1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg>Nhật ký quyết định AI</div>
+          </div>
+          <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding:8px"><div style="width:36px;height:36px;border-radius:50%;background:#2A3038;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">QB</div><div><div style="font-size:13px;font-weight:500">Trần Quốc Bảo</div><div style="font-size:11px;color:#9CA3AF">Fraud Ops · Ca sáng</div></div></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="height:64px;background:#fff;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex:none">
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#6B7280"><span>Cảnh báo</span><span>/</span><span style="color:#1A1D21;font-weight:500">Case SS-260915-0418</span></div>
+            <div style="display:flex;align-items:center;gap:16px;font-size:13px;color:#6B7280"><span>Thứ Ba, 15/09/2026 · 09:41</span><div style="width:36px;height:36px;border-radius:50%;background:#FEF0EA;color:#F05A28;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center">QB</div></div>
+          </div>
+          <div style="flex:1;padding:24px;display:flex;flex-direction:column;gap:16px;min-height:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:24px;line-height:32px;font-weight:600">Chuyển 35.000.000 ₫ → **** 7731</div>
+                <div style="display:flex;gap:8px;align-items:center"><span style="font-size:12px;font-weight:600;color:#B91C1C;background:#FEE2E2;padding:5px 12px;border-radius:999px">Risk Score 87</span><span style="font-size:12px;font-weight:600;color:#1A1D21;background:#fff;border:1px solid #E5E7EB;padding:5px 12px;border-radius:999px">Mạo danh công an</span><span style="font-size:12px;font-weight:600;color:#B45309;background:#FEF3C7;padding:5px 12px;border-radius:999px">Chờ xử lý</span><span style="font-size:13px;color:#6B7280">Tạo lúc 09:38 · SLA còn 42 phút</span></div>
+              </div>
+              <div style="display:flex;gap:8px"><span style="height:36px;padding:0 14px;border-radius:10px;background:#fff;border:1px solid #E5E7EB;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg>Gọi khách hàng</span><span style="height:36px;padding:0 14px;border-radius:10px;background:#fff;border:1px solid #E5E7EB;font-size:13px;font-weight:500;display:flex;align-items:center">Case trước ▸</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:340px 1fr 320px;gap:16px;flex:1;min-height:0">
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px">
+                  <div style="font-size:15px;font-weight:600">Giao dịch</div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#6B7280">Số tiền</span><span style="font-weight:600">35.000.000 ₫</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#6B7280">Người nhận</span><span style="font-weight:500;text-align:right">NGUYEN VAN T.<br><span style="color:#6B7280;font-weight:400">**** 7731 · Ngân hàng khác</span></span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#6B7280">Nội dung</span><span style="font-weight:500">Nop tien xac minh</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#6B7280">Thời gian</span><span style="font-weight:500">15/09/2026 · 09:38</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#6B7280">Kênh · Thiết bị</span><span style="font-weight:500">Mobile · iPhone 15 (quen)</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#6B7280">Trạng thái lệnh</span><span style="font-weight:600;color:#D97706">Tạm giữ bởi Scam Shield</span></div>
+                </div>
+                <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px">
+                  <div style="font-size:15px;font-weight:600">Khách hàng</div>
+                  <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:50%;background:#FEF0EA;color:#F05A28;font-weight:600;display:flex;align-items:center;justify-content:center">MA</div><div><div style="font-size:15px;font-weight:600">Nguyễn Minh Anh</div><div style="font-size:12px;color:#6B7280">**** 4821 · KH từ 2019 · Phân khúc Lương</div></div></div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
+                    <div style="background:#F6F7F9;border-radius:10px;padding:10px 12px"><div style="color:#6B7280;font-size:11px">Số dư hiện tại</div><div style="font-weight:600">47.820.000 ₫</div></div>
+                    <div style="background:#F6F7F9;border-radius:10px;padding:10px 12px"><div style="color:#6B7280;font-size:11px">Mức chuyển TB</div><div style="font-weight:600">5.000.000 ₫</div></div>
+                    <div style="background:#F6F7F9;border-radius:10px;padding:10px 12px"><div style="color:#6B7280;font-size:11px">Cảnh báo 90 ngày</div><div style="font-weight:600">1 (58/100)</div></div>
+                    <div style="background:#F6F7F9;border-radius:10px;padding:10px 12px"><div style="color:#6B7280;font-size:11px">Khung giờ quen</div><div style="font-weight:600">08:00–21:00</div></div>
+                  </div>
+                  <div style="font-size:13px;line-height:18px;color:#6B7280">Người nhận chưa từng có trong danh bạ chuyển tiền. Khách hàng đã bấm “Huỷ giao dịch” lúc 09:39.</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:16px;min-height:0">
+                <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:14px">
+                  <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Phân rã điểm rủi ro của AI</span><span style="font-size:12px;color:#6B7280">Risk Engine v2.3 · rule + anomaly</span></div>
+                  <div style="display:flex;gap:24px;align-items:center">
+                    <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:44px;line-height:48px;font-weight:700;color:#DC2626">87</span><span style="font-size:15px;color:#6B7280">/100</span></div>
+                    <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#6B7280">Độ tin cậy mô hình</span><span style="font-weight:600">92%</span></div>
+                      <div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:92%;height:100%;background:#1A1D21;border-radius:999px"></div></div>
+                      <div style="font-size:12px;color:#6B7280">Ngưỡng can thiệp ≥ 75 · Cảnh báo mềm 40–74 · Chấm điểm trong 212 ms</div>
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 24px">
+                    <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:13px"><span>Tài khoản nhận mới tạo 2 ngày</span><span style="font-weight:600;color:#DC2626">+32</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:32%;height:100%;background:#DC2626;border-radius:999px"></div></div></div>
+                    <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:13px"><span>Danh sách cảnh báo cộng đồng (3 báo cáo)</span><span style="font-weight:600;color:#DC2626">+28</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:28%;height:100%;background:#EF4444;border-radius:999px"></div></div></div>
+                    <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:13px"><span>Mẫu hành vi mạo danh công an</span><span style="font-weight:600;color:#DC2626">+18</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:18%;height:100%;background:#F87171;border-radius:999px"></div></div></div>
+                    <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:13px"><span>Gấp 7 lần mức chuyển trung bình</span><span style="font-weight:600;color:#DC2626">+9</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:9%;height:100%;background:#FCA5A5;border-radius:999px"></div></div></div>
+                  </div>
+                  <div style="border-top:1px solid #F1F2F4;padding-top:12px;display:flex;flex-direction:column;gap:8px">
+                    <div style="font-size:12px;font-weight:600;color:#6B7280;letter-spacing:.04em;text-transform:uppercase">Tín hiệu đầu vào</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px">
+                      <span style="padding:5px 10px;border-radius:999px;background:#F6F7F9;border:1px solid #E5E7EB">Tuổi TK nhận: 2 ngày</span><span style="padding:5px 10px;border-radius:999px;background:#F6F7F9;border:1px solid #E5E7EB">Báo cáo cộng đồng: 3</span><span style="padding:5px 10px;border-radius:999px;background:#F6F7F9;border:1px solid #E5E7EB">Số tiền / TB: 7,0×</span><span style="padding:5px 10px;border-radius:999px;background:#F6F7F9;border:1px solid #E5E7EB">Nội dung CK: “xác minh”</span><span style="padding:5px 10px;border-radius:999px;background:#F6F7F9;border:1px solid #E5E7EB">Cuộc gọi đang diễn ra: có</span><span style="padding:5px 10px;border-radius:999px;background:#F6F7F9;border:1px solid #E5E7EB">Thiết bị quen: có</span><span style="padding:5px 10px;border-radius:999px;background:#F6F7F9;border:1px solid #E5E7EB">Khung giờ quen: có</span><span style="padding:5px 10px;border-radius:999px;background:#F6F7F9;border:1px solid #E5E7EB">Vị trí: Hà Nội (quen)</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:10px;flex:1;min-height:0">
+                  <div style="font-size:15px;font-weight:600">Timeline xử lý</div>
+                  <div style="display:grid;grid-template-columns:16px 1fr;column-gap:14px">
+                    <div style="display:flex;flex-direction:column;align-items:center"><span style="display:block;width:10px;height:10px;border-radius:50%;background:#DC2626;margin-top:5px"></span><span style="display:block;width:2px;flex:1;background:#E5E7EB"></span></div><div style="padding-bottom:10px;font-size:13px;line-height:18px"><span style="color:#6B7280">09:38:04</span> · Precheck → 87/100 · <strong style="font-weight:600">intervene</strong> · lệnh tạm giữ</div>
+                    <div style="display:flex;flex-direction:column;align-items:center"><span style="display:block;width:10px;height:10px;border-radius:50%;background:#F05A28;margin-top:5px"></span><span style="display:block;width:2px;flex:1;background:#E5E7EB"></span></div><div style="padding-bottom:10px;font-size:13px;line-height:18px"><span style="color:#6B7280">09:38:06</span> · Hiển thị cảnh báo có giải thích; LLM sinh lời khuyên (1,4 s)</div>
+                    <div style="display:flex;flex-direction:column;align-items:center"><span style="display:block;width:10px;height:10px;border-radius:50%;background:#16A34A;margin-top:5px"></span><span style="display:block;width:2px;flex:1;background:#E5E7EB"></span></div><div style="padding-bottom:10px;font-size:13px;line-height:18px"><span style="color:#6B7280">09:39:12</span> · Khách hàng chọn <strong style="font-weight:600">Huỷ giao dịch</strong> · xác nhận “có người gọi hướng dẫn”</div>
+                    <div style="display:flex;flex-direction:column;align-items:center"><span style="display:block;width:10px;height:10px;border-radius:50%;background:#9CA3AF;margin-top:5px"></span></div><div style="font-size:13px;line-height:18px"><span style="color:#6B7280">09:39:15</span> · Mở case SS-260915-0418 · gán Fraud Ops ca sáng · chờ quyết định</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px;flex:1">
+                  <div style="font-size:15px;font-weight:600">Ghi chú xử lý</div>
+                  <div style="flex:1;min-height:160px;border:1px solid #E5E7EB;border-radius:12px;padding:12px;font-size:13px;line-height:20px;color:#1A1D21;background:#FAFAFB">Đã gọi KH lúc 09:40. KH xác nhận nhận cuộc gọi tự xưng "Công an Hà Nội" yêu cầu chuyển tiền xác minh. KH đồng ý khoá chuyển tiền 24 giờ.<span style="display:inline-block;width:1.5px;height:16px;background:#F05A28;vertical-align:-3px;margin-left:1px"></span></div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px"><span style="padding:5px 10px;border-radius:999px;background:#FEF0EA;color:#C8441C;font-weight:500">Đã liên hệ KH</span><span style="padding:5px 10px;border-radius:999px;background:#F6F7F9;border:1px solid #E5E7EB">Khoá 24h</span><span style="padding:5px 10px;border-radius:999px;background:#F6F7F9;border:1px solid #E5E7EB">Thêm TK vào blacklist</span></div>
+                </div>
+                <div style="background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:12px;font-weight:600;color:#6B7280;letter-spacing:.04em;text-transform:uppercase">Quyết định</div>
+                  <div style="height:44px;border-radius:12px;background:#DC2626;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center">Xác nhận lừa đảo</div>
+                  <div style="height:44px;border-radius:12px;background:#fff;border:1px solid #D1D5DB;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center">Chuyển điều tra</div>
+                  <div style="height:44px;border-radius:12px;color:#6B7280;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center">Bỏ qua — giao dịch hợp lệ</div>
+                  <div style="font-size:11px;line-height:16px;color:#6B7280;text-align:center">Quyết định được ghi vào nhật ký AI và dùng để huấn luyện lại ngưỡng.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 09 ARCHITECTURE -->
+    <div data-screen-label="09 Kiến trúc & luồng dữ liệu" style="display:flex;flex-direction:column">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">09</span><span style="font-size:14px;font-weight:500">Kiến trúc &amp; luồng dữ liệu</span><span style="font-size:12px;color:#6B7280">1440×900</span></div>
+      </sc-if>
+      <div style="width:1440px;height:900px;background:#fff;border-radius:12px;overflow:hidden;position:relative;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+        <div style="position:absolute;left:64px;top:48px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:22px;font-weight:700;color:#F05A28;letter-spacing:-.02em">MSB</span><span style="font-size:13px;font-weight:600;color:#6B7280;letter-spacing:.1em;text-transform:uppercase">AI Financial Guardian</span></div>
+          <div style="font-size:30px;line-height:38px;font-weight:600">Kiến trúc &amp; luồng dữ liệu</div>
+          <div style="font-size:14px;color:#6B7280">Điểm rủi ro do Risk Engine tính (deterministic). LLM chỉ giải thích và đối thoại — không quyết định chặn.</div>
+        </div>
+        <div style="position:absolute;right:64px;top:56px;display:flex;gap:16px;font-size:12px;color:#6B7280">
+          <span style="display:flex;align-items:center;gap:6px"><span style="display:block;width:12px;height:12px;border-radius:3px;background:#FEF0EA;border:1px solid #F05A28"></span>Năng lực mới (hackathon)</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="display:block;width:12px;height:12px;border-radius:3px;background:#E9EFFD;border:1px solid #2563EB"></span>LLM / AI Platform</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="display:block;width:12px;height:12px;border-radius:3px;background:#fff;border:1px solid #D1D5DB"></span>Hệ thống hiện hữu</span>
+        </div>
+
+        <div style="position:absolute;left:64px;top:214px;font-size:11px;font-weight:600;color:#9CA3AF;letter-spacing:.12em;text-transform:uppercase">Kênh</div>
+        <div style="position:absolute;left:64px;top:340px;font-size:11px;font-weight:600;color:#9CA3AF;letter-spacing:.12em;text-transform:uppercase">Gateway</div>
+        <div style="position:absolute;left:64px;top:452px;font-size:11px;font-weight:600;color:#9CA3AF;letter-spacing:.12em;text-transform:uppercase;width:120px;line-height:16px">AI Financial<br>Guardian Service</div>
+        <div style="position:absolute;left:64px;top:700px;font-size:11px;font-weight:600;color:#9CA3AF;letter-spacing:.12em;text-transform:uppercase;width:120px;line-height:16px">Dữ liệu &amp;<br>mô hình</div>
+
+        <div style="position:absolute;left:220px;top:190px;width:360px;height:84px;border-radius:12px;background:#FEF0EA;border:1px solid #F05A28;padding:14px 18px"><div style="font-size:15px;font-weight:600">Mobile Banking App</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:4px">Financial Copilot · Scam Shield interstitial · Trung tâm an toàn. Nhúng dạng SDK/mini-app.</div></div>
+        <div style="position:absolute;left:860px;top:190px;width:360px;height:84px;border-radius:12px;background:#fff;border:1px solid #D1D5DB;padding:14px 18px"><div style="font-size:15px;font-weight:600">Guardian Ops Dashboard</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:4px">Fraud Ops: KPI · case · quyết định · nhật ký AI. Human-in-the-loop.</div></div>
+
+        <div style="position:absolute;left:220px;top:318px;width:1000px;height:64px;border-radius:12px;background:#fff;border:1px solid #D1D5DB;padding:12px 18px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:15px;font-weight:600">API Gateway (KONG)</div><div style="font-size:12px;color:#6B7280">OAuth2/JWT · rate limit · WAF · audit log</div></div><div style="font-size:12px;color:#6B7280;font-family:ui-monospace,Menlo,monospace">/copilot/ask · /transfer/precheck · /transfer/intervene · /transfer/action · /ops/*</div></div>
+
+        <div style="position:absolute;left:220px;top:426px;width:1000px;height:200px;border-radius:14px;background:#FFF8F5;border:1px solid #F05A28;padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:600">AI Financial Guardian Service</span><span style="font-size:12px;color:#6B7280">FastAPI · Python · chấm điểm &lt; 300 ms · PII được che trước khi ra khỏi service</span></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:12px">
+            <div style="height:120px;border-radius:12px;background:#fff;border:1px solid #F05A28;padding:12px 14px"><div style="font-size:14px;font-weight:600">Risk Engine</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:4px">Rule + anomaly theo baseline từng khách hàng. 6 yếu tố giải thích được, điểm 0–100, 3 mức pass / soft-warn / intervene.</div></div>
+            <div style="height:120px;border-radius:12px;background:#fff;border:1px solid #F05A28;padding:12px 14px"><div style="font-size:14px;font-weight:600">Financial Insight Engine</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:4px">Phân loại giao dịch, tổng hợp theo nhóm, dự báo dòng tiền cuối tháng, sinh insight &amp; hành động gợi ý.</div></div>
+            <div style="height:120px;border-radius:12px;background:#fff;border:1px solid #E5E7EB;padding:12px 14px"><div style="font-size:14px;font-weight:600">AI Orchestrator</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:4px">Copilot Agent · Shield Agent · tool registry. Guardrails: PII mask, timeout → fallback rule-based.</div></div>
+            <div style="height:120px;border-radius:12px;background:#fff;border:1px solid #E5E7EB;padding:12px 14px"><div style="font-size:14px;font-weight:600">Decision &amp; Action</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:4px">hold · cancel · contact · continue. Mở case, gửi thông báo, ghi mọi quyết định vào audit log.</div></div>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:220px;top:690px;width:230px;height:110px;border-radius:12px;background:#fff;border:1px solid #D1D5DB;padding:12px 14px"><div style="font-size:14px;font-weight:600">Core banking T24</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:4px">Số dư · lệnh chuyển · hold/cancel. Qua IRIS middleware, adapter pattern.</div></div>
+        <div style="position:absolute;left:476px;top:690px;width:230px;height:110px;border-radius:12px;background:#fff;border:1px solid #D1D5DB;padding:12px 14px"><div style="font-size:14px;font-weight:600">Lịch sử giao dịch</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:4px">Kafka CDC → feature store. Baseline 12–24 tháng theo khách hàng.</div></div>
+        <div style="position:absolute;left:732px;top:690px;width:230px;height:110px;border-radius:12px;background:#fff;border:1px solid #D1D5DB;padding:12px 14px"><div style="font-size:14px;font-weight:600">Danh sách cảnh báo</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:4px">Blacklist nội bộ · danh sách NHNN · báo cáo cộng đồng MSB · playbook 10 kịch bản.</div></div>
+        <div style="position:absolute;left:988px;top:690px;width:232px;height:110px;border-radius:12px;background:#E9EFFD;border:1px solid #2563EB;padding:12px 14px"><div style="font-size:14px;font-weight:600">LLM — GreenNode</div><div style="font-size:12px;line-height:16px;color:#6B7280;margin-top:4px">OpenAI-compatible. Chỉ nhận dữ liệu đã che PII; sinh lời giải thích, câu hỏi can thiệp, trả lời Copilot.</div></div>
+
+        <div style="position:absolute;left:220px;top:832px;width:1000px;display:flex;justify-content:space-between;font-size:12px;color:#6B7280">
+          <span style="display:flex;align-items:center;gap:6px"><span style="display:block;width:6px;height:6px;border-radius:50%;background:#F05A28"></span>Mọi prompt, điểm số và quyết định được ghi vào Decision &amp; Audit Log</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="display:block;width:6px;height:6px;border-radius:50%;background:#F05A28"></span>LLM lỗi / timeout → thông điệp rule-based, không chặn chuyển tiền vì Guardian lỗi</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="display:block;width:6px;height:6px;border-radius:50%;background:#F05A28"></span>Tuân thủ Nghị định 13 về dữ liệu cá nhân</span>
+        </div>
+
+        <svg width="1440" height="900" viewBox="0 0 1440 900" style="position:absolute;inset:0;pointer-events:none">
+          <defs><marker id="msb-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9CA3AF"></path></marker></defs>
+          <g stroke="#9CA3AF" stroke-width="1.5" fill="none" marker-end="url(#msb-arrow)">
+            <path d="M400,274 L400,316"></path>
+            <path d="M1040,274 L1040,316"></path>
+            <path d="M720,382 L720,424"></path>
+            <path d="M335,626 L335,688"></path>
+            <path d="M591,626 L591,688"></path>
+            <path d="M847,626 L847,688"></path>
+            <path d="M1104,626 L1104,688"></path>
+          </g>
+          <g stroke="#9CA3AF" stroke-width="1.5" fill="none" marker-end="url(#msb-arrow)"><path d="M1124,688 L1124,628"></path></g>
+          <text x="410" y="300" font-size="11" fill="#6B7280" font-family="Be Vietnam Pro, sans-serif">precheck · ask · action</text>
+          <text x="1050" y="300" font-size="11" fill="#6B7280" font-family="Be Vietnam Pro, sans-serif">ops summary · decision</text>
+          <text x="730" y="408" font-size="11" fill="#6B7280" font-family="Be Vietnam Pro, sans-serif">customer_id · JWT</text>
+          <text x="1134" y="662" font-size="11" fill="#6B7280" font-family="Be Vietnam Pro, sans-serif">prompt đã che PII ⇄ JSON</text>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showLabels&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Canvas&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showLabels: this.props.showLabels ?? true };
+  }
+}
+</script>
+</body>
+</html>

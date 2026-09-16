@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+@import './design/tokens.css';
+
+@theme inline {
+  --font-sans: var(--msb-font);
+
+  --color-primary: var(--msb-primary);
+  --color-primary-pressed: var(--msb-primary-pressed);
+  --color-orange-soft: var(--msb-orange-soft);
+  --color-orange-300: var(--msb-orange-300);
+  --color-orange-200: var(--msb-orange-200);
+  --color-orange-border: var(--msb-orange-border);
+
+  --color-app: var(--msb-bg);
+  --color-surface: var(--msb-surface);
+  --color-canvas: var(--msb-canvas);
+  --color-sidebar: var(--msb-sidebar);
+  --color-sidebar-soft: var(--msb-sidebar-soft);
+  --color-sidebar-text: var(--msb-sidebar-text);
+
+  --color-ink: var(--msb-text);
+  --color-muted: var(--msb-text-muted);
+  --color-line: var(--msb-border);
+  --color-divider: var(--msb-divider);
+
+  --color-success: var(--msb-success);
+  --color-success-soft: var(--msb-success-soft);
+  --color-success-deep: var(--msb-success-deep);
+  --color-warning: var(--msb-warning);
+  --color-warning-soft: var(--msb-warning-soft);
+  --color-danger: var(--msb-danger);
+  --color-danger-soft: var(--msb-danger-soft);
+  --color-danger-deep: var(--msb-danger-deep);
+  --color-danger-400: var(--msb-danger-400);
+  --color-danger-300: var(--msb-danger-300);
+  --color-danger-200: var(--msb-danger-200);
+  --color-info: var(--msb-info);
+  --color-info-soft: var(--msb-info-soft);
+  --color-gold: var(--msb-gold);
+  --color-success-bright: var(--msb-success-bright);
+  --color-warning-bright: var(--msb-warning-bright);
+
+  --radius-card: var(--msb-radius-card);
+  --radius-btn: var(--msb-radius-button);
+
+  --shadow-card: var(--msb-shadow-card);
+  --shadow-raised: var(--msb-shadow-raised);
+  --shadow-float: var(--msb-shadow-float);
+  --shadow-pop: var(--msb-shadow-pop);
+  --shadow-primary: var(--msb-shadow-primary);
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--msb-bg);
+  color: var(--msb-text);
+  font-family: var(--msb-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ẩn scrollbar bên trong khung điện thoại nhưng vẫn cuộn được */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -1,0 +1,69 @@
+/*
+ * MSB AI Financial Guardian — design tokens.
+ * Trích từ web/design-ref/*.dc.html (Claude Design hand-off).
+ * Đây là nơi DUY NHẤT được khai báo mã màu.
+ */
+:root {
+  /* Màu thương hiệu */
+  --msb-primary: #f05a28; /* MSB Orange */
+  --msb-primary-pressed: #c8441c;
+  --msb-orange-soft: #fef0ea; /* nền nhấn, badge, pill active */
+  --msb-orange-300: #f58a63; /* thanh chart mức 2 */
+  --msb-orange-200: #f9b39a; /* thanh chart mức 3 */
+  --msb-orange-border: #fee2d5;
+
+  /* Nền & bề mặt */
+  --msb-bg: #f6f7f9;
+  --msb-surface: #ffffff;
+  --msb-canvas: #eceef1; /* nền ngoài khung điện thoại */
+  --msb-sidebar: #14181d;
+  --msb-sidebar-soft: #24282e;
+  --msb-sidebar-text: #c4c9d1;
+
+  /* Chữ & đường kẻ */
+  --msb-text: #1a1d21;
+  --msb-text-muted: #6b7280;
+  --msb-border: #e5e7eb;
+  --msb-divider: #f1f2f4;
+
+  /* Ngữ nghĩa */
+  --msb-success: #16a34a;
+  --msb-success-soft: #e8f5ee;
+  --msb-success-deep: #166534;
+  --msb-warning: #f59e0b;
+  --msb-warning-soft: #fef6e7;
+  --msb-danger: #dc2626;
+  --msb-danger-soft: #fef2f2;
+  --msb-danger-deep: #991b1b;
+  --msb-danger-400: #ef4444; /* dải phân rã điểm rủi ro */
+  --msb-danger-300: #f87171;
+  --msb-danger-200: #fca5a5;
+  --msb-danger-track: #fce1e1; /* nền gauge */
+  --msb-danger-row: #fff8f5; /* nền dòng bảng risk cao */
+  --msb-info: #2563eb;
+  --msb-info-soft: #e9effd;
+  --msb-gold: #e8c37a;
+  --msb-gold-ink: #4a2a08; /* chữ trên nút vàng */
+  --msb-campaign: #b0230f; /* nền chiến dịch sau ảnh */
+  --msb-success-bright: #4ade80; /* chấm trạng thái trên nền tối */
+  --msb-warning-bright: #fbbf24;
+
+  /* Bo góc */
+  --msb-radius-card: 16px;
+  --msb-radius-button: 12px;
+  --msb-radius-input: 12px;
+
+  /* Đổ bóng */
+  --msb-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --msb-shadow-raised: 0 4px 16px rgba(26, 29, 33, 0.08);
+  --msb-shadow-float: 0 6px 22px rgba(26, 29, 33, 0.16);
+  --msb-shadow-pop: 0 8px 28px rgba(26, 29, 33, 0.12);
+  --msb-shadow-primary: 0 4px 14px rgba(240, 90, 40, 0.35); /* nút cam nổi */
+
+  /* Gradient */
+  --msb-gradient-balance: linear-gradient(135deg, #f05a28 0%, #f7794d 100%);
+  --msb-gradient-gold: linear-gradient(180deg, #e8c37a 0%, #cba25a 100%); /* nút Đăng nhập */
+
+  /* Typography */
+  --msb-font: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+}

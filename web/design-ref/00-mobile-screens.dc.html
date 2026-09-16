@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#ECEEF1;font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#1A1D21;-webkit-font-smoothing:antialiased}
+a{color:#F05A28;text-decoration:none}a:hover{color:#C8441C}
+*{box-sizing:border-box}
+</style>
+</helmet>
+
+<div style="padding:72px 80px 120px;display:flex;flex-direction:column;gap:56px;font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#1A1D21;min-width:max-content">
+
+  <div style="display:flex;flex-direction:column;gap:6px;max-width:980px">
+    <div style="font-size:13px;font-weight:600;color:#F05A28;letter-spacing:.12em;text-transform:uppercase">MSB Mobile Banking · Hand-off cho code</div>
+    <div style="font-size:34px;font-weight:600;letter-spacing:-.01em">Đăng nhập · Trang chủ · Chat Banking chuyển tiền · Chatbot</div>
+    <div style="font-size:15px;line-height:23px;color:#6B7280">4 màn hình 390×844, bám bộ token MSB (Primary #F05A28, nền app #F6F7F9, radius card 16px, button cao 48px, Be Vietnam Pro). Dữ liệu mẫu nhất quán: Nguyễn Minh Anh · **** 4821 · 47.820.000 ₫ · 15/09/2026.</div>
+  </div>
+
+  <div style="display:flex;gap:64px;align-items:flex-start">
+
+    <!-- ============ 01 ĐĂNG NHẬP ============ -->
+    <div id="s01" data-screen-label="01 Đăng nhập" style="display:flex;flex-direction:column;width:414px">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:12px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">01</span><span style="font-size:14px;font-weight:500">Đăng nhập</span><span style="font-size:12px;color:#6B7280">390×844</span></div>
+      </sc-if>
+      <div style="width:414px;height:868px;background:#1A1D21;border-radius:56px;padding:12px">
+        <div style="width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:#B0230F url('assets/bg-campaign.png') center top/cover no-repeat">
+          <div style="position:absolute;top:12px;left:135px;width:120px;height:34px;border-radius:20px;background:#1A1D21;z-index:4"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:520px;background:linear-gradient(180deg,rgba(124,22,10,0) 0%,rgba(110,18,8,.72) 38%,rgba(74,10,4,.94) 100%);z-index:1"></div>
+          <div style="position:relative;z-index:3;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600;color:#fff;flex:none">
+            <span>9:41</span>
+            <div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end"><span style="display:block;width:3px;height:5px;background:#fff;border-radius:1px"></span><span style="display:block;width:3px;height:7px;background:#fff;border-radius:1px"></span><span style="display:block;width:3px;height:9px;background:#fff;border-radius:1px"></span><span style="display:block;width:3px;height:11px;background:#fff;border-radius:1px"></span></div><div style="width:25px;height:12px;border:1.5px solid #fff;border-radius:4px;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:2px"></div></div></div>
+          </div>
+          <div style="position:relative;z-index:3;height:48px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 20px">
+            <img src="assets/msb-logo-white.png" alt="MSB" style="display:block;height:26px;width:auto">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26);display:flex;align-items:center;justify-content:center;position:relative"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg><span style="position:absolute;top:5px;right:6px;width:7px;height:7px;border-radius:50%;background:#E8C37A"></span></div>
+              <div style="height:32px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26);display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#fff">VN<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></div>
+            </div>
+          </div>
+
+          <div style="flex:1;min-height:0"></div>
+
+          <div style="position:relative;z-index:3;padding:0 16px 28px;display:flex;flex-direction:column;gap:12px">
+            <div style="background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div><div style="font-size:13px;line-height:18px;color:rgba(255,255,255,.85)">Chào buổi sáng,</div><div style="font-size:20px;line-height:28px;font-weight:600;color:#fff">Nguyễn Minh Anh</div></div>
+                <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 20a7 7 0 0 1 14 0"></path><path d="M19 5h3M20.5 3.5v3"></path></svg></div>
+              </div>
+              <div style="height:48px;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.22);display:flex;align-items:center;gap:10px;padding:0 14px">
+                <div style="flex:1;display:flex;align-items:center;gap:7px">
+                  <span style="display:block;width:8px;height:8px;border-radius:50%;background:#fff"></span><span style="display:block;width:8px;height:8px;border-radius:50%;background:#fff"></span><span style="display:block;width:8px;height:8px;border-radius:50%;background:#fff"></span><span style="display:block;width:8px;height:8px;border-radius:50%;background:#fff"></span><span style="display:block;width:8px;height:8px;border-radius:50%;background:#fff"></span><span style="display:block;width:8px;height:8px;border-radius:50%;background:#fff"></span>
+                  <span style="display:block;width:1.5px;height:20px;background:#E8C37A;margin-left:2px"></span>
+                </div>
+                <span style="font-size:12px;color:rgba(255,255,255,.7)">Mật khẩu</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+              </div>
+              <div style="height:48px;border-radius:12px;background:linear-gradient(180deg,#E8C37A 0%,#CBA25A 100%);color:#4A2A08;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:9px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A2A08" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"></path><path d="M9 10v1.5M15 10v1.5M9.5 15.5c1.5 1.2 3.5 1.2 5 0"></path></svg>Đăng nhập</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:500;color:rgba(255,255,255,.85)"><span>Đổi người dùng</span><span style="color:#E8C37A;font-weight:600">Quên mật khẩu?</span></div>
+            </div>
+
+            <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:14px 8px;display:grid;grid-template-columns:repeat(3,1fr);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:7px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 14.5l5-5M10.5 9.5h4v4"></path></svg><span style="font-size:12px;line-height:16px;font-weight:500;color:#fff">Chuyển tiền</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:7px;border-left:1px solid rgba(255,255,255,.18);border-right:1px solid rgba(255,255,255,.18)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><path d="M14 14h3v3M20 14v6h-6"></path></svg><span style="font-size:12px;line-height:16px;font-weight:500;color:#fff">Quét QR</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:7px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15v-3a7 7 0 0 1 14 0v3"></path><rect x="3" y="13" width="4" height="6" rx="2"></rect><rect x="17" y="13" width="4" height="6" rx="2"></rect></svg><span style="font-size:12px;line-height:16px;font-weight:500;color:#fff">Hỗ trợ</span></div>
+            </div>
+
+            <div style="border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.2)"><img src="assets/banner-mfirst.png" alt="Ưu đãi thẻ M-First" style="display:block;width:100%;height:auto"></div>
+
+            <div style="text-align:center;font-size:12px;line-height:17px;color:rgba(255,255,255,.75)">Hotline 24/7 <span style="color:#E8C37A;font-weight:600">1800 6083</span> · Phiên bản 9.2.1</div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:128px;width:134px;height:5px;border-radius:3px;background:rgba(255,255,255,.85);z-index:4"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:18px;padding:16px;background:#fff;border-radius:16px;border:1px solid #E5E7EB;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6B7280">Spec · Đăng nhập</div>
+          <div style="font-size:13px;line-height:20px">Header gradient cao 318px, <span style="font-family:ui-monospace,monospace;font-size:12px">linear-gradient(160deg,#F05A28,#C8441C)</span>. Card đăng nhập nổi trên gradient, radius 20px, shadow <span style="font-family:ui-monospace,monospace;font-size:12px">0 8px 28px rgba(26,29,33,.12)</span>.</div>
+          <div style="font-size:13px;line-height:20px">Input 52px, viền 1.5px cam khi focus; 6 dot mật khẩu + caret. Button chính 48px / radius 12px. Vùng chạm icon ≥ 44px.</div>
+          <div style="font-size:13px;line-height:20px">State cần code: nhập sai mật khẩu (viền #DC2626 + helper text), còn 2 lần thử, Face ID không khả dụng → ẩn khối Face ID.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <!-- ============ 02 TRANG CHỦ ============ -->
+    <div id="s02" data-screen-label="02 Trang chủ" style="display:flex;flex-direction:column;width:414px">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:12px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">02</span><span style="font-size:14px;font-weight:500">Trang chủ</span><span style="font-size:12px;color:#6B7280">390×844</span></div>
+      </sc-if>
+      <div style="width:414px;height:868px;background:#1A1D21;border-radius:56px;padding:12px">
+        <div style="width:390px;height:844px;border-radius:46px;background:#F6F7F9;overflow:hidden;position:relative;display:flex;flex-direction:column">
+          <div style="position:absolute;top:12px;left:135px;width:120px;height:34px;border-radius:20px;background:#1A1D21;z-index:5"></div>
+          <div style="position:absolute;top:0;left:0;right:0;height:300px;background:#B0230F url('assets/bg-campaign.png') center top/cover no-repeat"></div>
+          <div style="position:absolute;top:0;left:0;right:0;height:300px;background:linear-gradient(180deg,rgba(112,18,8,.42) 0%,rgba(96,14,6,.55) 55%,rgba(246,247,249,1) 100%)"></div>
+
+          <div style="position:relative;z-index:3;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600;color:#fff;flex:none">
+            <span>9:41</span>
+            <div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end"><span style="display:block;width:3px;height:5px;background:#fff;border-radius:1px"></span><span style="display:block;width:3px;height:7px;background:#fff;border-radius:1px"></span><span style="display:block;width:3px;height:9px;background:#fff;border-radius:1px"></span><span style="display:block;width:3px;height:11px;background:#fff;border-radius:1px"></span></div><div style="width:25px;height:12px;border:1.5px solid #fff;border-radius:4px;padding:1.5px"><div style="width:100%;height:100%;background:#fff;border-radius:2px"></div></div></div>
+          </div>
+
+          <div style="position:relative;z-index:3;flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 20px">
+            <img src="assets/msb-logo-white.png" alt="MSB" style="display:block;height:22px;width:auto">
+            <div style="display:flex;gap:8px">
+              <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg></div>
+              <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 14v-2a7 7 0 0 1 14 0v2"></path><rect x="3" y="12.5" width="4" height="6" rx="2"></rect><rect x="17" y="12.5" width="4" height="6" rx="2"></rect></svg></div>
+              <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;position:relative"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg><span style="position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:999px;background:#fff;color:#C8441C;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px">9</span></div>
+            </div>
+          </div>
+
+          <div style="position:relative;z-index:3;flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:70px 16px 100px">
+
+            <div style="background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(26,29,33,.08);display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
+                <div style="width:34px;height:34px;border-radius:50%;background:#FEF0EA;display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"></path></svg></div>
+                <span style="flex:1;font-size:15px;font-weight:600;color:#F05A28;letter-spacing:.01em">M-FIRST GOLD</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+              </div>
+              <div style="height:1px;background:#F1F2F4"></div>
+              <div style="padding:12px 16px 16px;display:flex;align-items:flex-end;justify-content:space-between">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:13px;line-height:18px;color:#6B7280;letter-spacing:.02em">0310 1011 2345 678</span>
+                  <span style="display:flex;align-items:baseline;gap:8px"><span style="font-size:26px;line-height:32px;font-weight:700;letter-spacing:.06em">•••••••</span><span style="font-size:17px;font-weight:500;color:#6B7280">VND</span></span>
+                </div>
+                <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z"></path><circle cx="12" cy="12" r="2.5"></circle></svg></div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;padding:6px 4px 0">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);padding:6px 0">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 14.5l5-5M10.5 9.5h4v4"></path></svg><span style="font-size:14px;line-height:19px;font-weight:500;color:#1A1D21">Chuyển tiền</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5A1.5 1.5 0 0 1 18.5 20H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"></path><rect x="9" y="9" width="6" height="6" rx="1"></rect></svg><span style="font-size:14px;line-height:19px;font-weight:500;color:#1A1D21">Quét QR</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a5 5 0 0 1 5-5h4.5A5.5 5.5 0 0 1 19 12.5V16a1 1 0 0 1-1 1h-1.5l-.5 2h-2l-.5-2H9l-.5 2h-2L6 17H5a1 1 0 0 1-1-1z"></path><path d="M14.5 11h.01M4 11.5l-1.5-1"></path></svg><span style="font-size:14px;line-height:19px;font-weight:500;color:#1A1D21">Tiền gửi</span></div>
+              </div>
+              <div style="height:1px;background:#F1F2F4;margin:0 12px"></div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);padding:6px 0">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2.5"></rect><path d="M3 10.5h18M6.5 14.5h3"></path></svg><span style="font-size:14px;line-height:19px;font-weight:500;color:#1A1D21">Thẻ</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15l-2.5-1.6L13 21l-2.5-1.6L8 21l-2-1.5z"></path><path d="M9 8h6M9 12h6M9 16h3"></path></svg><span style="font-size:14px;line-height:19px;font-weight:500;color:#1A1D21">Thanh toán</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="10" rx="2"></rect><circle cx="12" cy="12" r="2.2"></circle><path d="M17 20l3-3-3-3"></path></svg><span style="font-size:14px;line-height:19px;font-weight:500;color:#1A1D21">Vay</span></div>
+              </div>
+              <div style="height:1px;background:#F1F2F4;margin:0 12px"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr">
+                <div style="height:52px;display:flex;align-items:center;justify-content:center;gap:9px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l2.2 4.5L19 9.2l-3.5 3.4.8 4.9L12 15.2 7.7 17.5l.8-4.9L5 9.2l4.8-.7z"></path></svg><span style="font-size:15px;font-weight:500">Rewards</span></div>
+                <div style="height:52px;display:flex;align-items:center;justify-content:center;gap:9px;border-left:1px solid #F1F2F4"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="4" y="14" width="6" height="6" rx="1.5"></rect><path d="M13 6h7M13 9h5M13 16h7M13 19h5"></path></svg><span style="font-size:15px;font-weight:500">Xem thêm</span></div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:12px;border:1px solid #FEE2D5">
+              <div style="width:40px;height:40px;border-radius:13px;background:#FEF0EA;display:flex;align-items:center;justify-content:center;flex:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"></path><path d="M9 10.5h6"></path></svg></div>
+              <div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:15px;line-height:21px;font-weight:600">Chat Banking</span><span style="font-size:11px;font-weight:600;color:#fff;background:#F05A28;padding:2px 8px;border-radius:999px">Mới</span></div><div style="font-size:13px;line-height:18px;color:#6B7280">Nhắn một câu, chuyển tiền xong ngay.</div></div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+
+                      </div>
+
+          <div style="position:absolute;right:16px;bottom:104px;display:flex;align-items:flex-end;gap:8px;z-index:6">
+            <div style="background:#fff;border-radius:16px 16px 4px 16px;box-shadow:0 6px 20px rgba(26,29,33,.16);padding:10px 12px;max-width:196px;display:flex;flex-direction:column;gap:3px;position:relative">
+              <span style="font-size:12px;font-weight:600;color:#F05A28">Trợ lý AI Guardian</span>
+              <span style="font-size:13px;line-height:18px">Chi tiêu Ăn uống tháng này tăng 34%. Xem ngay?</span>
+              <div style="position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:#fff;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></div>
+            </div>
+            <img src="assets/msb-bot.png" alt="Trợ lý AI MSB" style="display:block;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(240,90,40,.38))">
+          </div>
+          <div style="position:absolute;left:16px;right:16px;bottom:26px;height:64px;background:#fff;border-radius:999px;box-shadow:0 6px 22px rgba(26,29,33,.16);display:grid;grid-template-columns:repeat(3,1fr);align-items:center;padding:8px;z-index:4">
+            <div style="height:48px;border-radius:999px;background:#FEF0EA;display:flex;align-items:center;justify-content:center;gap:8px;color:#F05A28"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"></path></svg><span style="font-size:13px;font-weight:600">Trang chủ</span></div>
+            <div style="height:48px;display:flex;align-items:center;justify-content:center;gap:8px;color:#6B7280"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2.5"></rect><path d="M16 12h2"></path></svg><span style="font-size:13px;font-weight:500">Tài khoản</span></div>
+            <div style="height:48px;display:flex;align-items:center;justify-content:center;gap:8px;color:#6B7280"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 14.6a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 0 1-4 0v-.11a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 0 1 0-4h.11A1.7 1.7 0 0 0 4.67 8.8a1.7 1.7 0 0 0-.34-1.87l-.06-.06A2 2 0 1 1 7.1 4.04l.06.06a1.7 1.7 0 0 0 1.87.34H9.1a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 0 1 4 0v.11a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.04a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 0 1 0 4h-.11a1.7 1.7 0 0 0-1.49 1.03z"></path></svg><span style="font-size:13px;font-weight:500">Cài đặt</span></div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:128px;width:134px;height:5px;border-radius:3px;background:#1A1D21;z-index:5"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:18px;padding:16px;background:#fff;border-radius:16px;border:1px solid #E5E7EB;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6B7280">Spec · Trang chủ</div>
+          <div style="font-size:13px;line-height:20px">Header campaign cao 300px (ảnh + lớp phủ tan dần vào #F6F7F9), logo trắng 22px + 3 icon tròn 40px (tìm kiếm · hỗ trợ · thông báo có badge). Card tài khoản đè lên vùng ảnh, shadow <span style="font-family:ui-monospace,monospace;font-size:12px">0 4px 16px rgba(26,29,33,.08)</span>.</div>
+          <div style="font-size:13px;line-height:20px">Quick action 2×3 trong một card, icon outline 1.5px màu #F05A28 không nền, chia bằng đường kẻ #F1F2F4; hàng cuối Rewards · Xem thêm.</div>
+          <div style="font-size:13px;line-height:20px">Trợ lý AI: nút nổi 68px góc phải (bottom 104px) kèm bong bóng chủ động 1 gợi ý, có nút đóng; chạm mở màn 04. Bottom nav dạng pill nổi (16px hai bên, bottom 26px, cao 64px), 3 mục — mục active là pill #FEF0EA chữ cam. Số dư mặc định ẩn ••••••• VND, toggle bằng con mắt.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <!-- ============ 03 CHAT BANKING — CHUYỂN TIỀN ============ -->
+    <div id="s03" data-screen-label="03 Chat Banking — Chuyển tiền" style="display:flex;flex-direction:column;width:414px">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:12px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">03</span><span style="font-size:14px;font-weight:500">Chat Banking — Chuyển tiền</span><span style="font-size:12px;color:#6B7280">390×844</span></div>
+      </sc-if>
+      <div style="width:414px;height:868px;background:#1A1D21;border-radius:56px;padding:12px">
+        <div style="width:390px;height:844px;border-radius:46px;background:#F6F7F9;overflow:hidden;position:relative;display:flex;flex-direction:column">
+          <div style="position:absolute;top:12px;left:135px;width:120px;height:34px;border-radius:20px;background:#1A1D21;z-index:3"></div>
+          <div style="height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600;flex:none;background:#fff">
+            <span>9:41</span>
+            <div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end"><span style="display:block;width:3px;height:5px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:7px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:9px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:11px;background:#1A1D21;border-radius:1px"></span></div><div style="width:25px;height:12px;border:1.5px solid #1A1D21;border-radius:4px;padding:1.5px"><div style="width:100%;height:100%;background:#1A1D21;border-radius:2px"></div></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;padding:2px 12px 10px;background:#fff;border-bottom:1px solid #E5E7EB;flex:none">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></div>
+            <div style="width:40px;height:40px;border-radius:50%;background:#F05A28;display:flex;align-items:center;justify-content:center;margin-right:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"></path><path d="M9 10.5h6"></path></svg></div>
+            <div style="flex:1"><div style="font-size:17px;line-height:22px;font-weight:600">Chat Banking</div><div style="font-size:12px;line-height:16px;color:#16A34A;display:flex;align-items:center;gap:5px"><span style="display:block;width:6px;height:6px;border-radius:50%;background:#16A34A"></span>Đang hoạt động</div></div>
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 8v4.5l3 1.8"></path></svg></div>
+          </div>
+
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:12px 16px 0">
+            <div style="text-align:center;font-size:12px;color:#6B7280">Hôm nay · 15/09/2026</div>
+            <div style="align-self:flex-end;max-width:270px;background:#F05A28;color:#fff;border-radius:16px 16px 4px 16px;padding:12px 14px;font-size:15px;line-height:22px">Chuyển 2tr cho anh Quang tiền thuê nhà tháng 9</div>
+
+            <div style="align-self:flex-start;max-width:330px;display:flex;flex-direction:column;gap:8px">
+              <div style="background:#fff;border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:15px;line-height:22px;box-shadow:0 1px 3px rgba(0,0,0,.06)">Tôi đã điền sẵn thông tin. Anh kiểm tra rồi xác nhận nhé.</div>
+              <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid #E5E7EB;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:44px;height:44px;border-radius:50%;background:#E9EFFD;color:#2563EB;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none">LQ</div>
+                  <div style="flex:1;min-width:0"><div style="font-size:15px;line-height:22px;font-weight:600">LE MINH QUANG</div><div style="font-size:13px;line-height:18px;color:#6B7280">Vietcombank · **** 7245</div></div>
+                  <span style="font-size:12px;font-weight:600;color:#16A34A;background:#E8F5EE;padding:4px 10px;border-radius:999px">Đã lưu</span>
+                </div>
+                <div style="height:1px;background:#F1F2F4"></div>
+                <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:13px;color:#6B7280">Số tiền</span><span style="font-size:28px;line-height:36px;font-weight:700;letter-spacing:-.01em">2.000.000 ₫</span><span style="font-size:13px;color:#6B7280">Hai triệu đồng · Phí 0 ₫</span></div>
+                <div style="background:#F6F7F9;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#6B7280">Nội dung</span><span style="font-size:14px;line-height:20px;font-weight:500">MINH ANH CK TIEN THUE NHA T9</span></div>
+                <div style="display:flex;align-items:center;gap:10px;background:#E8F5EE;border-radius:12px;padding:10px 12px">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                  <div style="font-size:12px;line-height:17px;color:#166534"><strong style="font-weight:600">Scam Shield: an toàn</strong> — người nhận đã giao dịch 14 lần, không có cảnh báo.</div>
+                </div>
+                <div style="display:flex;gap:10px">
+                  <div style="flex:1;height:48px;background:#F05A28;color:#fff;border-radius:12px;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"></path></svg>Xác nhận</div>
+                  <div style="height:48px;padding:0 16px;border:1px solid #E5E7EB;background:#fff;border-radius:12px;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center">Sửa</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:none;background:#fff;border-top:1px solid #E5E7EB;padding:10px 12px 0">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:40px;height:40px;border-radius:50%;background:#F6F7F9;display:flex;align-items:center;justify-content:center;flex:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg></div>
+              <div style="flex:1;height:44px;border-radius:999px;background:#F6F7F9;display:flex;align-items:center;padding:0 16px;font-size:15px;color:#6B7280">Nhập tin nhắn…</div>
+              <div style="width:44px;height:44px;border-radius:50%;background:#F05A28;display:flex;align-items:center;justify-content:center;flex:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"></path><path d="M9 7l3-3 3 3"></path><path d="M5 16v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"></path></svg></div>
+            </div>
+            <div style="text-align:center;font-size:11px;color:#6B7280;padding:8px 0 30px">Giao dịch trong Chat Banking được bảo vệ bởi Scam Shield</div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:128px;width:134px;height:5px;border-radius:3px;background:#1A1D21"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:18px;padding:16px;background:#fff;border-radius:16px;border:1px solid #E5E7EB;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6B7280">Spec · Chat Banking</div>
+          <div style="font-size:13px;line-height:20px">Bong bóng: user #F05A28/chữ trắng, radius 16 16 4 16; bot trắng, radius 16 16 16 4; max-width 290–330px. Gap giữa lượt 12px.</div>
+          <div style="font-size:13px;line-height:20px">Thẻ lệnh chuyển tiền là message có cấu trúc (không phải text): người nhận · số tiền · nội dung · Scam Shield · CTA. Các field NLP chưa chắc chắn cần viền #F59E0B + nhãn “Kiểm tra lại”.</div>
+          <div style="font-size:13px;line-height:20px">State cần code: đang phân tích (3 dot), thiếu thông tin (bot hỏi lại), Risk Score ≥ 70 → chèn interstitial Scam Shield trước khi mở Face ID, thành công → thẻ biên lai + nút “Chia sẻ”.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <!-- ============ 04 CHATBOT ============ -->
+    <div id="s04" data-screen-label="04 Chatbot — Trợ lý ảo" style="display:flex;flex-direction:column;width:414px">
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:12px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">04</span><span style="font-size:14px;font-weight:500">Chatbot — Trợ lý ảo</span><span style="font-size:12px;color:#6B7280">390×844</span></div>
+      </sc-if>
+      <div style="width:414px;height:868px;background:#1A1D21;border-radius:56px;padding:12px">
+        <div style="width:390px;height:844px;border-radius:46px;background:#F6F7F9;overflow:hidden;position:relative;display:flex;flex-direction:column">
+          <div style="position:absolute;top:12px;left:135px;width:120px;height:34px;border-radius:20px;background:#1A1D21;z-index:3"></div>
+          <div style="height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600;flex:none;background:#fff">
+            <span>9:41</span>
+            <div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end"><span style="display:block;width:3px;height:5px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:7px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:9px;background:#1A1D21;border-radius:1px"></span><span style="display:block;width:3px;height:11px;background:#1A1D21;border-radius:1px"></span></div><div style="width:25px;height:12px;border:1.5px solid #1A1D21;border-radius:4px;padding:1.5px"><div style="width:100%;height:100%;background:#1A1D21;border-radius:2px"></div></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;padding:2px 12px 10px;background:#fff;border-bottom:1px solid #E5E7EB;flex:none">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></div>
+            <div style="width:40px;height:40px;border-radius:50%;background:#FEF0EA;display:flex;align-items:center;justify-content:center;margin-right:10px"><svg width="20" height="20" viewBox="0 0 24 24" fill="#F05A28"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg></div>
+            <div style="flex:1"><div style="font-size:17px;line-height:22px;font-weight:600">Trợ lý ảo MSB</div><div style="font-size:12px;line-height:16px;color:#6B7280">Hỗ trợ 24/7 · Hỏi gì cũng được</div></div>
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1D21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></div>
+          </div>
+
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:14px 16px 0">
+            <div style="align-self:flex-start;max-width:300px;background:#fff;border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:15px;line-height:22px;box-shadow:0 1px 3px rgba(0,0,0,.06)">Chào Minh Anh. Tôi giúp được về chi tiêu, thẻ, khoản vay và các thắc mắc giao dịch.</div>
+            <div style="display:flex;flex-direction:column;gap:8px;align-self:flex-start;max-width:320px">
+              <span style="font-size:13px;font-weight:500;padding:10px 14px;border-radius:999px;border:1px solid #E5E7EB;background:#fff">Tháng này tôi tiêu bao nhiêu?</span>
+              <span style="font-size:13px;font-weight:500;padding:10px 14px;border-radius:999px;border:1px solid #E5E7EB;background:#fff">Phí thường niên thẻ của tôi bao nhiêu?</span>
+              <span style="font-size:13px;font-weight:500;padding:10px 14px;border-radius:999px;border:1px solid #E5E7EB;background:#fff">Tra soát giao dịch chưa nhận được tiền</span>
+            </div>
+            <div style="align-self:flex-end;max-width:250px;background:#F05A28;color:#fff;border-radius:16px 16px 4px 16px;padding:12px 14px;font-size:15px;line-height:22px">Tháng này tôi tiêu bao nhiêu?</div>
+
+            <div style="align-self:flex-start;max-width:330px;background:#fff;border-radius:16px 16px 16px 4px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:15px;line-height:22px">Từ 01/09 đến 15/09 anh đã chi <strong style="font-weight:600">12.460.000 ₫</strong>, bằng 69% ngân sách tháng. Ba nhóm lớn nhất:</div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;line-height:16px">
+                <div style="display:grid;grid-template-columns:62px 1fr 72px;align-items:center;gap:8px"><span style="color:#6B7280">Ăn uống</span><div style="height:10px;background:#F1F2F4;border-radius:999px"><div style="width:100%;height:100%;background:#F05A28;border-radius:999px"></div></div><span style="text-align:right;font-weight:600">4.230.000</span></div>
+                <div style="display:grid;grid-template-columns:62px 1fr 72px;align-items:center;gap:8px"><span style="color:#6B7280">Mua sắm</span><div style="height:10px;background:#F1F2F4;border-radius:999px"><div style="width:74%;height:100%;background:#F58A63;border-radius:999px"></div></div><span style="text-align:right;font-weight:600">3.120.000</span></div>
+                <div style="display:grid;grid-template-columns:62px 1fr 72px;align-items:center;gap:8px"><span style="color:#6B7280">Hoá đơn</span><div style="height:10px;background:#F1F2F4;border-radius:999px"><div style="width:57%;height:100%;background:#F9B39A;border-radius:999px"></div></div><span style="text-align:right;font-weight:600">2.410.000</span></div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <span style="font-size:13px;font-weight:600;color:#C8441C;background:#FEF0EA;padding:9px 12px;border-radius:999px">Xem chi tiết chi tiêu</span>
+                <span style="font-size:13px;font-weight:600;color:#C8441C;background:#FEF0EA;padding:9px 12px;border-radius:999px">Đặt hạn mức</span>
+              </div>
+            </div>
+
+            <div style="align-self:flex-start;display:flex;align-items:center;gap:6px;background:#fff;border-radius:16px 16px 16px 4px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+              <span style="display:block;width:7px;height:7px;border-radius:50%;background:#C9CDD3"></span>
+              <span style="display:block;width:7px;height:7px;border-radius:50%;background:#9CA3AF"></span>
+              <span style="display:block;width:7px;height:7px;border-radius:50%;background:#6B7280"></span>
+            </div>
+          </div>
+
+          <div style="flex:none;background:#fff;border-top:1px solid #E5E7EB;padding:10px 12px 0">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="flex:1;height:44px;border-radius:999px;background:#F6F7F9;display:flex;align-items:center;gap:10px;padding:0 16px;font-size:15px;color:#6B7280"><span style="flex:1">Nhập câu hỏi…</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></div>
+              <div style="width:44px;height:44px;border-radius:50%;background:#FEF0EA;display:flex;align-items:center;justify-content:center;flex:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F05A28" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></div>
+            </div>
+            <div style="text-align:center;font-size:11px;line-height:16px;color:#6B7280;padding:8px 10px 26px">Nội dung do AI tạo, mang tính tham khảo. Cần người hỗ trợ? <span style="color:#F05A28;font-weight:600">Gặp tư vấn viên</span></div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:128px;width:134px;height:5px;border-radius:3px;background:#1A1D21"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:18px;padding:16px;background:#fff;border-radius:16px;border:1px solid #E5E7EB;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6B7280">Spec · Chatbot</div>
+          <div style="font-size:13px;line-height:20px">Chip gợi ý xếp dọc khi câu dài (&gt; 24 ký tự), xếp ngang khi ngắn. Chip hành động trong bong bóng trả lời dùng nền #FEF0EA / chữ #C8441C để tách khỏi chip gợi ý viền xám.</div>
+          <div style="font-size:13px;line-height:20px">Bong bóng trả lời có thể chứa block: text · mini-chart · danh sách giao dịch · thẻ sản phẩm. Chart vẽ bằng div/SVG, số liệu khớp text.</div>
+          <div style="font-size:13px;line-height:20px">State cần code: đang trả lời (3 dot), lỗi model (bong bóng xám + “Thử lại”), chuyển tư vấn viên, lưu lịch sử hội thoại 30 ngày.</div>
+        </div>
+      </sc-if>
+    </div>
+
+  </div>
+
+  <!-- ============ 05 DASHBOARD MONITOR & LOG ============ -->
+  <div id="s05" data-screen-label="05 Ops Dashboard — Monitor & Log" style="display:flex;flex-direction:column;width:1440px">
+    <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px"><span style="font-size:12px;font-weight:600;color:#F05A28;letter-spacing:.08em">05</span><span style="font-size:14px;font-weight:500">Ops Dashboard — Monitor &amp; Log</span><span style="font-size:12px;color:#6B7280">1440×900 · web nội bộ</span></div>
+    </sc-if>
+    <div style="width:1440px;height:900px;background:#F6F7F9;border-radius:12px;overflow:hidden;display:flex;box-shadow:0 8px 28px rgba(26,29,33,.1)">
+
+      <div style="width:232px;flex:none;background:#1A1D21;display:flex;flex-direction:column;padding:20px 14px;gap:22px">
+        <div style="display:flex;align-items:center;gap:11px;padding:0 8px">
+          <img src="assets/msb-logo-white.png" alt="MSB" style="display:block;height:22px;width:auto">
+          <div style="width:1px;height:26px;background:#3A3F46"></div>
+          <div style="font-size:12px;line-height:15px;color:#9CA3AF">AI Financial<br>Guardian</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280;padding:6px 10px">Vận hành</div>
+          <div style="height:42px;border-radius:10px;display:flex;align-items:center;gap:10px;padding:0 10px;font-size:14px;font-weight:500;color:#9CA3AF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"></rect><rect x="13" y="3" width="8" height="8" rx="2"></rect><rect x="3" y="13" width="8" height="8" rx="2"></rect><rect x="13" y="13" width="8" height="8" rx="2"></rect></svg>Tổng quan</div>
+          <div style="height:42px;border-radius:10px;background:#F05A28;display:flex;align-items:center;gap:10px;padding:0 10px;font-size:14px;font-weight:600;color:#fff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2-6 3 12 3-9 2 3h4"></path></svg>Monitor &amp; Log</div>
+          <div style="height:42px;border-radius:10px;display:flex;align-items:center;gap:10px;padding:0 10px;font-size:14px;font-weight:500;color:#9CA3AF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg>Cảnh báo Scam Shield</div>
+          <div style="height:42px;border-radius:10px;display:flex;align-items:center;gap:10px;padding:0 10px;font-size:14px;font-weight:500;color:#9CA3AF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4zM4 10h16M10 10v9"></path></svg>Case điều tra</div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280;padding:14px 10px 6px">Nền tảng</div>
+          <div style="height:42px;border-radius:10px;display:flex;align-items:center;gap:10px;padding:0 10px;font-size:14px;font-weight:500;color:#9CA3AF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path></svg>Model &amp; prompt</div>
+          <div style="height:42px;border-radius:10px;display:flex;align-items:center;gap:10px;padding:0 10px;font-size:14px;font-weight:500;color:#9CA3AF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6h14M5 12h14M5 18h9"></path></svg>Audit log</div>
+        </div>
+        <div style="margin-top:auto;background:#24282E;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6B7280">Tình trạng hệ thống</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#D1D5DB"><span>API Gateway</span><span style="display:flex;align-items:center;gap:6px;color:#4ADE80"><span style="display:block;width:7px;height:7px;border-radius:50%;background:#4ADE80"></span>OK</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#D1D5DB"><span>Risk Engine</span><span style="display:flex;align-items:center;gap:6px;color:#4ADE80"><span style="display:block;width:7px;height:7px;border-radius:50%;background:#4ADE80"></span>OK</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#D1D5DB"><span>LLM GreenNode</span><span style="display:flex;align-items:center;gap:6px;color:#FBBF24"><span style="display:block;width:7px;height:7px;border-radius:50%;background:#FBBF24"></span>Chậm</span></div>
+        </div>
+      </div>
+
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+        <div style="height:64px;flex:none;background:#fff;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:16px;padding:0 24px">
+          <div style="flex:1;max-width:420px;height:40px;border:1px solid #E5E7EB;border-radius:10px;display:flex;align-items:center;gap:10px;padding:0 12px;font-size:14px;color:#6B7280"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg>Tìm theo Trace ID, CIF, số tài khoản…</div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
+            <span style="font-size:13px;color:#6B7280">Cập nhật 15/09/2026 09:41:12</span>
+            <span style="font-size:12px;font-weight:600;color:#166534;background:#E8F5EE;padding:6px 10px;border-radius:999px;display:flex;align-items:center;gap:6px"><span style="display:block;width:7px;height:7px;border-radius:50%;background:#16A34A"></span>Live</span>
+            <div style="width:1px;height:28px;background:#E5E7EB"></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:#FEF0EA;color:#F05A28;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center">TH</div><div><div style="font-size:13px;font-weight:600;line-height:17px">Trần Hải</div><div style="font-size:12px;line-height:16px;color:#6B7280">Fraud Ops</div></div></div>
+          </div>
+        </div>
+
+        <div style="flex:1;min-height:0;overflow:hidden;padding:20px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between">
+            <div><div style="font-size:22px;font-weight:600;line-height:30px">Monitor &amp; Log</div><div style="font-size:13px;color:#6B7280">Giao dịch và hội thoại đi qua AI Financial Guardian trong 24 giờ qua</div></div>
+            <div style="display:flex;gap:8px">
+              <div style="height:38px;padding:0 14px;background:#fff;border:1px solid #E5E7EB;border-radius:10px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px">24 giờ qua<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></div>
+              <div style="height:38px;padding:0 14px;background:#fff;border:1px solid #E5E7EB;border-radius:10px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px">Tất cả kênh<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></div>
+              <div style="height:38px;padding:0 14px;background:#F05A28;color:#fff;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M8 11l4 4 4-4M5 19h14"></path></svg>Xuất CSV</div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #FEE2D5;border-radius:16px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:14px;position:relative">
+            <img src="assets/msb-bot.png" alt="Trợ lý AI" style="display:block;width:52px;height:52px;flex:none">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#C8441C">Trợ lý AI Guardian</span>
+              <span style="font-size:14px;line-height:20px">Kịch bản <strong style="font-weight:600">mạo danh công an</strong> tăng 32% trong 3 giờ qua, tập trung ở nhóm khách 55+. Có 18 case Risk ≥ 85 chưa ai nhận xử lý.</span>
+            </div>
+            <div style="display:flex;gap:8px;flex:none">
+              <div style="height:38px;padding:0 14px;background:#F05A28;color:#fff;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center">Mở 18 case ưu tiên</div>
+              <div style="height:38px;padding:0 14px;border:1px solid #E5E7EB;border-radius:10px;font-size:13px;font-weight:500;display:flex;align-items:center">Hỏi trợ lý</div>
+              <div style="width:32px;height:38px;display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+            <div style="background:#fff;border-radius:16px;padding:13px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:#6B7280">Giao dịch đã quét</span><span style="font-size:28px;line-height:34px;font-weight:700">128.430</span><span style="font-size:12px;font-weight:600;color:#16A34A">↑ 6,2% so với hôm qua</span></div>
+            <div style="background:#fff;border-radius:16px;padding:13px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:#6B7280">Cảnh báo đã bắn</span><span style="font-size:28px;line-height:34px;font-weight:700">412</span><span style="font-size:12px;font-weight:600;color:#DC2626">↑ 18 case ưu tiên cao</span></div>
+            <div style="background:#fff;border-radius:16px;padding:13px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:#6B7280">Khách huỷ sau cảnh báo</span><span style="font-size:28px;line-height:34px;font-weight:700">71,4%</span><span style="font-size:12px;font-weight:600;color:#16A34A">↑ 2,1 điểm</span></div>
+            <div style="background:#fff;border-radius:16px;padding:13px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:#6B7280">Giá trị đã bảo vệ</span><span style="font-size:28px;line-height:34px;font-weight:700">8,4 tỷ ₫</span><span style="font-size:12px;color:#6B7280">Trung bình 20,4 tr ₫/case</span></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 340px;gap:14px;flex:1;min-height:0">
+            <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;min-height:0;overflow:hidden">
+              <div style="padding:14px 18px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between;flex:none">
+                <span style="font-size:15px;font-weight:600">Log sự kiện realtime</span>
+                <div style="display:flex;gap:6px;font-size:12px;font-weight:500">
+                  <span style="padding:6px 10px;border-radius:999px;background:#FEF0EA;color:#C8441C;font-weight:600">Tất cả · 1.284</span>
+                  <span style="padding:6px 10px;border-radius:999px;color:#6B7280">Cảnh báo · 412</span>
+                  <span style="padding:6px 10px;border-radius:999px;color:#6B7280">Lỗi · 7</span>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:82px 116px 96px 1fr 74px 96px 104px;gap:10px;padding:9px 18px;background:#F6F7F9;border-bottom:1px solid #E5E7EB;font-size:12px;font-weight:600;color:#6B7280;flex:none">
+                <span>Thời gian</span><span>Trace ID</span><span>Kênh</span><span>Sự kiện</span><span>Risk</span><span>Độ trễ</span><span>Trạng thái</span>
+              </div>
+              <div style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;font-size:13px">
+                <div style="display:grid;grid-template-columns:82px 116px 96px 1fr 74px 96px 104px;gap:10px;padding:9px 18px;border-bottom:1px solid #F1F2F4;align-items:center;background:#FFF8F5">
+                  <span style="color:#6B7280;font-family:ui-monospace,monospace;font-size:12px">09:41:02</span><span style="font-family:ui-monospace,monospace;font-size:12px">7f3a·c91d</span><span>Chat Banking</span><span>Chặn chuyển tiền 45.000.000 ₫ · mạo danh công an</span><span style="font-weight:700;color:#DC2626">92</span><span style="color:#6B7280">418 ms</span><span style="font-size:12px;font-weight:600;color:#991B1B;background:#FDE8E8;padding:4px 8px;border-radius:999px;justify-self:start">Đã chặn</span>
+                </div>
+                <div style="display:grid;grid-template-columns:82px 116px 96px 1fr 74px 96px 104px;gap:10px;padding:9px 18px;border-bottom:1px solid #F1F2F4;align-items:center">
+                  <span style="color:#6B7280;font-family:ui-monospace,monospace;font-size:12px">09:39:47</span><span style="font-family:ui-monospace,monospace;font-size:12px">2b18·44e0</span><span>Mobile App</span><span>Cảnh báo người nhận mới tạo 2 ngày · **** 7245</span><span style="font-weight:700;color:#DC2626">87</span><span style="color:#6B7280">362 ms</span><span style="font-size:12px;font-weight:600;color:#92400E;background:#FEF3C7;padding:4px 8px;border-radius:999px;justify-self:start">Chờ xử lý</span>
+                </div>
+                <div style="display:grid;grid-template-columns:82px 116px 96px 1fr 74px 96px 104px;gap:10px;padding:9px 18px;border-bottom:1px solid #F1F2F4;align-items:center">
+                  <span style="color:#6B7280;font-family:ui-monospace,monospace;font-size:12px">09:38:15</span><span style="font-family:ui-monospace,monospace;font-size:12px">9c02·a7b3</span><span>Chatbot</span><span>Hỏi đáp chi tiêu · trả lời có mini-chart</span><span style="color:#6B7280">—</span><span style="color:#6B7280">1.240 ms</span><span style="font-size:12px;font-weight:600;color:#166534;background:#E8F5EE;padding:4px 8px;border-radius:999px;justify-self:start">Thành công</span>
+                </div>
+                <div style="display:grid;grid-template-columns:82px 116px 96px 1fr 74px 96px 104px;gap:10px;padding:9px 18px;border-bottom:1px solid #F1F2F4;align-items:center">
+                  <span style="color:#6B7280;font-family:ui-monospace,monospace;font-size:12px">09:36:58</span><span style="font-family:ui-monospace,monospace;font-size:12px">4e77·10fa</span><span>Chat Banking</span><span>Chuyển 2.000.000 ₫ · Scam Shield đánh giá an toàn</span><span style="font-weight:600;color:#16A34A">12</span><span style="color:#6B7280">276 ms</span><span style="font-size:12px;font-weight:600;color:#166534;background:#E8F5EE;padding:4px 8px;border-radius:999px;justify-self:start">Thành công</span>
+                </div>
+                <div style="display:grid;grid-template-columns:82px 116px 96px 1fr 74px 96px 104px;gap:10px;padding:9px 18px;border-bottom:1px solid #F1F2F4;align-items:center">
+                  <span style="color:#6B7280;font-family:ui-monospace,monospace;font-size:12px">09:35:22</span><span style="font-family:ui-monospace,monospace;font-size:12px">a154·6d29</span><span>Mobile App</span><span>LLM timeout · fallback sang câu trả lời mẫu</span><span style="color:#6B7280">—</span><span style="color:#DC2626;font-weight:600">5.000 ms</span><span style="font-size:12px;font-weight:600;color:#991B1B;background:#FDE8E8;padding:4px 8px;border-radius:999px;justify-self:start">Lỗi</span>
+                </div>
+                                <div style="display:grid;grid-template-columns:82px 116px 96px 1fr 74px 96px 104px;gap:10px;padding:11px 18px;align-items:center">
+                  <span style="color:#6B7280;font-family:ui-monospace,monospace;font-size:12px">09:31:41</span><span style="font-family:ui-monospace,monospace;font-size:12px">51ba·9e64</span><span>Chatbot</span><span>Chuyển tư vấn viên · chủ đề tra soát giao dịch</span><span style="color:#6B7280">—</span><span style="color:#6B7280">842 ms</span><span style="font-size:12px;font-weight:600;color:#1E40AF;background:#E9EFFD;padding:4px 8px;border-radius:999px;justify-self:start">Đã chuyển</span>
+                </div>
+                              </div>
+              <div style="padding:10px 18px;border-top:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#6B7280;flex:none">
+                <span>Đang xem 1–6 trong 1.284 sự kiện</span>
+                <div style="display:flex;gap:6px;align-items:center"><span style="width:28px;height:28px;border:1px solid #E5E7EB;border-radius:8px;display:flex;align-items:center;justify-content:center">‹</span><span style="width:28px;height:28px;border-radius:8px;background:#F05A28;color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center">1</span><span style="width:28px;height:28px;border:1px solid #E5E7EB;border-radius:8px;display:flex;align-items:center;justify-content:center">2</span><span style="width:28px;height:28px;border:1px solid #E5E7EB;border-radius:8px;display:flex;align-items:center;justify-content:center">›</span></div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px;min-height:0">
+              <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:600">Cảnh báo theo giờ</span><span style="font-size:12px;color:#6B7280">cao nhất 21:00</span></div>
+                <div style="display:flex;align-items:flex-end;gap:6px;height:88px">
+                  <div style="flex:1;height:26%;background:#FCD6C8;border-radius:4px 4px 0 0"></div>
+                  <div style="flex:1;height:18%;background:#FCD6C8;border-radius:4px 4px 0 0"></div>
+                  <div style="flex:1;height:34%;background:#F9B39A;border-radius:4px 4px 0 0"></div>
+                  <div style="flex:1;height:48%;background:#F9B39A;border-radius:4px 4px 0 0"></div>
+                  <div style="flex:1;height:62%;background:#F58A63;border-radius:4px 4px 0 0"></div>
+                  <div style="flex:1;height:54%;background:#F58A63;border-radius:4px 4px 0 0"></div>
+                  <div style="flex:1;height:71%;background:#F05A28;border-radius:4px 4px 0 0"></div>
+                  <div style="flex:1;height:100%;background:#F05A28;border-radius:4px 4px 0 0"></div>
+                  <div style="flex:1;height:83%;background:#F05A28;border-radius:4px 4px 0 0"></div>
+                  <div style="flex:1;height:44%;background:#F9B39A;border-radius:4px 4px 0 0"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:#6B7280"><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+              </div>
+              <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:10px;flex:1;min-height:0">
+                <div style="font-size:15px;font-weight:600">Kịch bản lừa đảo nổi bật</div>
+                <div style="display:flex;flex-direction:column;gap:9px;font-size:13px">
+                  <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between"><span>Mạo danh công an</span><span style="font-weight:600">148</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:100%;height:100%;background:#F05A28;border-radius:999px"></div></div></div>
+                  <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between"><span>Việc làm online</span><span style="font-weight:600">96</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:65%;height:100%;background:#F58A63;border-radius:999px"></div></div></div>
+                  <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between"><span>Đầu tư lợi nhuận cao</span><span style="font-weight:600">74</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:50%;height:100%;background:#F9B39A;border-radius:999px"></div></div></div>
+                  <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between"><span>Người thân vay gấp</span><span style="font-weight:600">52</span></div><div style="height:6px;border-radius:999px;background:#F1F2F4"><div style="width:35%;height:100%;background:#FCD6C8;border-radius:999px"></div></div></div>
+                </div>
+                <div style="margin-top:auto;height:40px;border:1px solid #E5E7EB;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center">Mở trung tâm cảnh báo</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:18px;padding:16px;background:#fff;border-radius:16px;border:1px solid #E5E7EB;display:flex;flex-direction:column;gap:8px;max-width:760px">
+        <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6B7280">Spec · Monitor &amp; Log</div>
+        <div style="font-size:13px;line-height:20px">Grid 1440: sidebar 232px cố định (#1A1D21), nội dung padding 24px, gap 14px. Bảng log dùng grid cột <span style="font-family:ui-monospace,monospace;font-size:12px">82 · 116 · 96 · 1fr · 74 · 96 · 104</span>; Trace ID và thời gian dùng font monospace.</div>
+        <div style="font-size:13px;line-height:20px">Badge trạng thái: Đã chặn #FDE8E8/#991B1B · Chờ xử lý &amp; Theo dõi #FEF3C7/#92400E · Thành công #E8F5EE/#166534 · Đã chuyển #E9EFFD/#1E40AF. Dòng có Risk ≥ 90 tô nền #FFF8F5.</div>
+        <div style="font-size:13px;line-height:20px">State cần code: auto-refresh 5s (toggle Live/Pause), lọc theo kênh · trạng thái · khoảng Risk, click dòng mở drawer chi tiết case, xuất CSV theo bộ lọc hiện tại, giữ log 90 ngày cho audit.</div>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showLabels&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Canvas&quot;},&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Canvas&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showLabels: this.props.showLabels ?? true,
+      showNotes: this.props.showNotes ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>
