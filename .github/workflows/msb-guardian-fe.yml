@@ -1,0 +1,121 @@
+name: build-msb-guardian-fe
+
+on:
+  push:
+    branches: [ main ]
+    # Chạy cho mọi thay đổi trừ tài liệu và bản export thiết kế. Lọc theo kiểu
+    # "chỉ theo dõi vài thư mục" dễ dẫn tới việc sửa file cấu hình mà không sinh
+    # image nào, rồi deploy trỏ vào một tag không tồn tại.
+    paths-ignore:
+      - 'README.md'
+      - 'design-ref/**'
+  workflow_dispatch: {}
+
+env:
+  # Host registry, project, namespace để công khai; credentials (VCR_*, KUBE_CONFIG)
+  # lấy từ GitHub Secrets — KHÔNG hardcode.
+  SERVICE: msb-guardian-fe
+  REGISTRY: vcr.vngcloud.vn
+  IMAGE_REPO: vcr.vngcloud.vn/114544-ea-hackathon/msb-guardian-fe
+  NAMESPACE: finance-demo
+  MANIFEST: k8s/msb-guardian-fe.yaml
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Cài dependencies
+        run: npm ci
+
+      - name: Build (gồm tsc nên lỗi kiểu bị chặn tại đây)
+        run: npm run build
+
+      - name: Kiểm tra dist có sản phẩm thật
+        # Build "thành công" nhưng ra thư mục rỗng là lỗi im lặng tệ nhất:
+        # image vẫn push, pod vẫn xanh, chỉ có trang trắng.
+        run: |
+          test -f dist/index.html || { echo "::error::dist/index.html không tồn tại"; exit 1; }
+          if [ -z "$(ls -A dist/assets 2>/dev/null)" ]; then
+            echo "::error::dist/assets rỗng — bundle không được sinh ra"; exit 1
+          fi
+          echo "dist OK: $(find dist -type f | wc -l) file"
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to VNG Container Registry (vCR)
+        uses: docker/login-action@v3
+        with:
+          registry: vcr.vngcloud.vn
+          username: ${{ secrets.VCR_USERNAME }}
+          password: ${{ secrets.VCR_PASSWORD }}
+
+      - name: Build and push image (tag = commit SHA)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_REPO }}:${{ github.sha }}
+            ${{ env.IMAGE_REPO }}:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Write kubeconfig from secret (base64)
+        run: |
+          mkdir -p "$HOME/.kube"
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+
+      - name: Đảm bảo namespace tồn tại
+        run: |
+          kubectl create namespace "${{ env.NAMESPACE }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Ensure imagePullSecret vcr-cred
+        run: |
+          kubectl -n "${{ env.NAMESPACE }}" create secret docker-registry vcr-cred \
+            --docker-server="${{ env.REGISTRY }}" \
+            --docker-username='${{ secrets.VCR_USERNAME }}' \
+            --docker-password='${{ secrets.VCR_PASSWORD }}' \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy image (commit SHA) to VKS
+        # Manifest ghi :latest, nhưng imagePullPolicy là IfNotPresent nên deploy
+        # bằng :latest sẽ khiến node dùng lại bản đã cache — pod khởi động lại mà
+        # vẫn chạy bundle cũ, nhìn từ ngoài vẫn xanh. Ghim theo commit SHA.
+        run: |
+          sed "s#:latest#:${{ github.sha }}#" "${{ env.MANIFEST }}" \
+            | kubectl -n "${{ env.NAMESPACE }}" apply -f -
+          kubectl -n "${{ env.NAMESPACE }}" rollout status deployment/${{ env.SERVICE }} --timeout=120s
+
+      - name: In trạng thái khi rollout hỏng
+        if: failure()
+        run: |
+          kubectl -n "${{ env.NAMESPACE }}" get pods -l app=${{ env.SERVICE }} -o wide || true
+          kubectl -n "${{ env.NAMESPACE }}" describe deployment/${{ env.SERVICE }} | tail -30 || true
+          echo "ImagePullBackOff nghĩa là image chưa có trên vCR."

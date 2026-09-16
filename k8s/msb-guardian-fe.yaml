@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msb-guardian-fe
+  namespace: finance-demo
+  labels:
+    app: msb-guardian-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: msb-guardian-fe
+  template:
+    metadata:
+      labels:
+        app: msb-guardian-fe
+    spec:
+      imagePullSecrets:
+        - name: vcr-cred
+      containers:
+        - name: msb-guardian-fe
+          # CI thay :latest bằng commit SHA lúc deploy.
+          image: vcr.vngcloud.vn/114544-ea-hackathon/msb-guardian-fe:latest
+          imagePullPolicy: IfNotPresent
+          # Bỏ comment khi đã có gateway phục vụ /api/copilot, /api/risk, /api/ops.
+          # Chưa có thì để trống: app chạy bằng demo mode, không gọi mạng.
+          # env:
+          #   - name: API_UPSTREAM
+          #     value: "http://guardian-gateway"
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 300m
+              memory: 192Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: msb-guardian-fe
+  namespace: finance-demo
+  labels:
+    app: msb-guardian-fe
+spec:
+  # ClusterIP giống 5 service backend: vào bằng port-forward, không mở ra Internet.
+  type: ClusterIP
+  selector:
+    app: msb-guardian-fe
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP

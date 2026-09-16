@@ -1,0 +1,9 @@
+# Build context chỉ cần nguồn để npm ci và vite build.
+node_modules
+dist
+.git
+.github
+k8s
+design-ref
+*.log
+.DS_Store

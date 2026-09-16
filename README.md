@@ -57,3 +57,52 @@ src/
   components/ ui primitives + shared
 design-ref/   export từ Claude Design để đối chiếu
 ```
+
+## Triển khai
+
+Image là nginx phục vụ thư mục `dist` đã build sẵn — không có Node lúc chạy.
+
+```bash
+docker build -t msb-guardian-fe:local .
+docker run --rm -p 8080:8080 msb-guardian-fe:local   # http://localhost:8080
+```
+
+| Đường dẫn | Hành vi |
+|---|---|
+| `/healthz` | Trả `ok`, dùng cho probe Kubernetes — không chạm backend |
+| `/assets/*` | Cache 1 năm (`immutable`), vì tên file đã có hash |
+| `/index.html` | `no-cache`, để lần deploy sau không bị trình duyệt giữ bản cũ |
+| mọi route khác | Trả `index.html` cho react-router xử lý |
+| `/api/*` | Proxy sang `API_UPSTREAM`; chưa đặt biến này thì trả 502 kèm lý do |
+
+**`VITE_DEMO_MODE` là quyết định lúc build, không phải lúc chạy.** Vite thay
+`import.meta.env.*` bằng hằng số ngay khi build, nên muốn tắt demo mode phải
+build lại image với `--build-arg VITE_DEMO_MODE=false`. Mặc định để bật: app
+chạy đủ luồng demo mà không cần backend nào.
+
+**`API_UPSTREAM` thì ngược lại — đọc lúc container khởi động.** Khi đã có
+gateway phục vụ `/api/copilot`, `/api/risk`, `/api/ops`, bỏ comment khối `env`
+trong `k8s/msb-guardian-fe.yaml` và trỏ tới nó.
+
+### Kubernetes
+
+`k8s/msb-guardian-fe.yaml` tạo Deployment + Service `ClusterIP` trong namespace
+`finance-demo`, cùng chỗ với 5 service backend. Không mở ra Internet — vào bằng:
+
+```bash
+kubectl -n finance-demo port-forward svc/msb-guardian-fe 8080:80
+```
+
+### CI/CD
+
+`.github/workflows/msb-guardian-fe.yml` chạy khi push vào `main` (trừ `README.md`
+và `design-ref/`), hoặc bấm tay qua *Run workflow*:
+
+| Job | Nội dung |
+|---|---|
+| `test` | `npm ci`, `npm run build` (gồm `tsc`), kiểm tra `dist` có sản phẩm thật |
+| `build-and-push` | Build image, push vCR với tag commit SHA và `latest` |
+| `deploy` | Tạo imagePullSecret, apply manifest ghim theo commit SHA, chờ rollout |
+
+Ba secret cần có trong repo: `VCR_USERNAME`, `VCR_PASSWORD`, `KUBE_CONFIG`
+(kubeconfig đã base64). Không giá trị nào được commit.
