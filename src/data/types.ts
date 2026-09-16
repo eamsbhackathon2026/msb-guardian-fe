@@ -217,8 +217,9 @@ export interface CaseCustomerProfile {
   customerSince: string
   segment: string
   avgTransferVnd: number
-  alerts90dCount: number
-  alerts90dTopScore: number
+  recentAlertsWindowDays: number
+  recentAlertsCount: number
+  recentAlertsTopScore: number
 }
 
 export interface CaseModelInfo {

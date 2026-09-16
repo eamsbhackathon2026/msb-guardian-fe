@@ -133,7 +133,10 @@ export function CaseDetailPage() {
               </span>
               <InfoRow label="Số dư hiện tại" value={formatVnd(customer?.balance ?? 0)} />
               <InfoRow label="Mức chuyển TB" value={detail ? formatVnd(detail.customerProfile.avgTransferVnd) : '—'} />
-              <InfoRow label="Cảnh báo 90 ngày" value={detail ? `${detail.customerProfile.alerts90dCount} (${detail.customerProfile.alerts90dTopScore}/100)` : '—'} />
+              <InfoRow
+                label={detail ? `Cảnh báo ${detail.customerProfile.recentAlertsWindowDays} ngày` : 'Cảnh báo gần đây'}
+                value={detail ? `${detail.customerProfile.recentAlertsCount} (${detail.customerProfile.recentAlertsTopScore}/100)` : '—'}
+              />
             </div>
 
             <div className="flex flex-col gap-2.5 rounded-card bg-surface p-5 shadow-card">
