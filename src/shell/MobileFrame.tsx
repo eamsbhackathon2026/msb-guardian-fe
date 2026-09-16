@@ -1,5 +1,20 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+
+/** Giờ thật múi GMT+7 kiểu iOS ("9:41") — GMT+7 không có DST nên cộng offset trực tiếp */
+function formatGmt7() {
+  const now = new Date(Date.now() + 7 * 3_600_000)
+  return `${now.getUTCHours()}:${String(now.getUTCMinutes()).padStart(2, '0')}`
+}
+
+function useGmt7Clock() {
+  const [time, setTime] = useState(formatGmt7)
+  useEffect(() => {
+    const id = setInterval(() => setTime(formatGmt7()), 10_000)
+    return () => clearInterval(id)
+  }, [])
+  return time
+}
 
 /** Container của màn hình điện thoại — dùng làm portal cho Sheet/Dialog bên trong khung */
 const PhoneContainerContext = createContext<HTMLElement | null>(null)
@@ -19,9 +34,10 @@ interface MobileFrameProps {
 
 function StatusBar({ theme }: { theme: 'dark' | 'light' }) {
   const color = theme === 'dark' ? 'var(--msb-text)' : 'var(--msb-surface)'
+  const time = useGmt7Clock()
   return (
     <div className="relative z-30 flex h-[54px] flex-none items-end justify-between px-[30px] pb-1.5 text-[15px] font-semibold" style={{ color }}>
-      <span>9:41</span>
+      <span>{time}</span>
       <div className="flex items-center gap-1.5">
         <div className="flex items-end gap-[2px]">
           {[5, 7, 9, 11].map((h) => (

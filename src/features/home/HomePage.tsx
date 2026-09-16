@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Bell,
@@ -6,19 +6,27 @@ import {
   CreditCard,
   Eye,
   EyeOff,
+  Gift,
   Headphones,
   HandCoins,
   Home,
   LayoutGrid,
   LogOut,
+  Mail,
+  MapPin,
   MessageSquareText,
+  PhoneCall,
+  PhoneOff,
   PiggyBank,
   QrCode,
   ReceiptText,
   Search,
   Settings,
+  ShieldAlert,
+  ShieldCheck,
   Star,
   Sun,
+  Wallet,
   X,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -48,16 +56,21 @@ const blockVariants = {
   show: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.04, duration: 0.35, ease: 'easeOut' as const } }),
 }
 
-function GlassIcon({ children, badge }: { children: React.ReactNode; badge?: string }) {
+function GlassIcon({ children, badge, label, onClick }: { children: React.ReactNode; badge?: string; label?: string; onClick?: () => void }) {
   return (
-    <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/20 text-white">
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/30 bg-white/20 text-white"
+    >
       {children}
       {badge && (
         <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-surface px-1 text-[11px] font-bold text-primary-pressed">
           {badge}
         </span>
       )}
-    </span>
+    </button>
   )
 }
 
@@ -67,6 +80,195 @@ function QuickAction({ icon, label, onClick }: { icon: React.ReactNode; label: s
       {icon}
       <span className="text-sm font-medium leading-[19px] text-ink">{label}</span>
     </button>
+  )
+}
+
+const searchFeatures = [
+  { icon: <TransferIcon size={22} />, label: 'Chuyển tiền', desc: 'Chuyển nhanh 24/7 miễn phí', to: '/transfer/review' },
+  { icon: <QrCode size={22} strokeWidth={1.5} />, label: 'Quét QR', desc: 'Thanh toán bằng mã QR' },
+  { icon: <PiggyBank size={22} strokeWidth={1.5} />, label: 'Tiền gửi', desc: 'Mở sổ tiết kiệm online' },
+  { icon: <CreditCard size={22} strokeWidth={1.5} />, label: 'Thẻ', desc: 'Quản lý thẻ ghi nợ, tín dụng' },
+  { icon: <ReceiptText size={22} strokeWidth={1.5} />, label: 'Thanh toán hóa đơn', desc: 'Điện, nước, internet…' },
+  { icon: <HandCoins size={22} strokeWidth={1.5} />, label: 'Vay', desc: 'Vay tiêu dùng lãi suất ưu đãi' },
+  { icon: <MessageSquareText size={22} strokeWidth={1.5} />, label: 'Chat Banking', desc: 'Nhắn một câu, chuyển tiền xong ngay', to: '/copilot/chat' },
+  { icon: <ShieldCheck size={22} strokeWidth={1.5} />, label: 'Trung tâm an toàn', desc: 'Scam Shield bảo vệ giao dịch', to: '/safety-center' },
+  { icon: <Headphones size={22} strokeWidth={1.5} />, label: 'Trung tâm hỗ trợ', desc: 'Câu hỏi thường gặp, liên hệ MSB', to: '/support' },
+]
+
+/** Sheet Tìm kiếm tính năng (mockup) */
+function SearchSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const container = usePhoneContainer()
+  const navigate = useNavigate()
+  const [query, setQuery] = useState('')
+  useEffect(() => {
+    if (!open) setQuery('')
+  }, [open])
+  const items = searchFeatures.filter((f) => f.label.toLowerCase().includes(query.trim().toLowerCase()))
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent container={container}>
+        <div className="flex flex-col gap-4">
+          <SheetTitle className="text-lg font-semibold">Tìm kiếm</SheetTitle>
+          <label className="flex items-center gap-2.5 rounded-full bg-app px-4 py-3 text-ink">
+            <Search size={18} strokeWidth={1.7} className="flex-none text-muted" />
+            <input
+              autoFocus
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Tìm tính năng, dịch vụ…"
+              className="w-full bg-transparent text-[15px] outline-none placeholder:text-muted"
+            />
+            {query && (
+              <button type="button" aria-label="Xóa" onClick={() => setQuery('')} className="flex-none cursor-pointer text-muted">
+                <X size={16} strokeWidth={2} />
+              </button>
+            )}
+          </label>
+          <div className="no-scrollbar flex max-h-[380px] flex-col overflow-y-auto">
+            {items.length === 0 && <span className="py-6 text-center text-[13px] text-muted">Không tìm thấy tính năng phù hợp</span>}
+            {items.map((f) => (
+              <button
+                key={f.label}
+                type="button"
+                onClick={() => {
+                  onOpenChange(false)
+                  if (f.to) navigate(f.to)
+                }}
+                className="flex cursor-pointer items-center gap-3 rounded-card px-2 py-3 text-left hover:bg-app"
+              >
+                <span className="flex h-10 w-10 flex-none items-center justify-center rounded-[13px] bg-orange-soft text-primary">{f.icon}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] font-medium leading-5">{f.label}</span>
+                  <span className="block truncate text-[13px] leading-[18px] text-muted">{f.desc}</span>
+                </span>
+                <ChevronRight size={18} strokeWidth={1.6} className="flex-none text-muted" />
+              </button>
+            ))}
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  )
+}
+
+/** Sheet Tổng đài — mock cuộc gọi 1800 6083 với trạng thái đang kết nối/đã kết nối */
+function HotlineSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const container = usePhoneContainer()
+  const [calling, setCalling] = useState(false)
+  const [seconds, setSeconds] = useState(0)
+  const connected = seconds >= 3
+
+  useEffect(() => {
+    if (!calling) return
+    const id = setInterval(() => setSeconds((s) => s + 1), 1000)
+    return () => clearInterval(id)
+  }, [calling])
+  useEffect(() => {
+    if (!open) {
+      setCalling(false)
+      setSeconds(0)
+    }
+  }, [open])
+
+  const talk = Math.max(0, seconds - 3)
+  const timer = `${String(Math.floor(talk / 60)).padStart(2, '0')}:${String(talk % 60).padStart(2, '0')}`
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent container={container}>
+        {calling ? (
+          <div className="flex flex-col items-center gap-4 py-2">
+            <span className="relative flex h-20 w-20 items-center justify-center">
+              <motion.span
+                className="absolute inset-0 rounded-full bg-orange-soft"
+                animate={{ scale: [1, 1.35, 1], opacity: [0.9, 0.25, 0.9] }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <span className="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary text-white">
+                <Headphones size={28} strokeWidth={1.6} />
+              </span>
+            </span>
+            <span className="flex flex-col items-center gap-1">
+              <span className="text-[17px] font-semibold">Tổng đài MSB · 1800 6083</span>
+              <span className="text-[13px] text-muted">{connected ? `Đã kết nối tổng đài viên · ${timer}` : 'Đang kết nối…'}</span>
+            </span>
+            <Button variant="outline" className="w-full font-semibold text-danger" onClick={() => onOpenChange(false)}>
+              <PhoneOff size={18} strokeWidth={1.8} />
+              Kết thúc cuộc gọi
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <SheetTitle className="text-lg font-semibold">Liên hệ MSB</SheetTitle>
+            <div className="flex items-center gap-3 rounded-card bg-app p-4">
+              <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
+                <Headphones size={22} strokeWidth={1.6} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[15px] font-semibold">Tổng đài 24/7</span>
+                <span className="block text-[20px] font-bold tracking-[.02em] text-primary">1800 6083</span>
+              </span>
+            </div>
+            <Button className="w-full font-semibold" onClick={() => setCalling(true)}>
+              <PhoneCall size={18} strokeWidth={1.8} />
+              Gọi tổng đài
+            </Button>
+            <div className="flex flex-col rounded-card bg-app">
+              <span className="flex items-center gap-3 px-4 py-3">
+                <Mail size={18} strokeWidth={1.6} className="flex-none text-primary" />
+                <span className="text-[14px]">msb@msb.com.vn</span>
+              </span>
+              <div className="mx-4 h-px bg-divider" />
+              <span className="flex items-center gap-3 px-4 py-3">
+                <MapPin size={18} strokeWidth={1.6} className="flex-none text-primary" />
+                <span className="text-[14px]">Tìm ATM / Chi nhánh / PGD gần bạn</span>
+              </span>
+            </div>
+          </div>
+        )}
+      </SheetContent>
+    </Sheet>
+  )
+}
+
+const mockNotifications = [
+  { id: 'n1', icon: <ShieldAlert size={19} strokeWidth={1.7} />, tone: 'text-danger bg-danger/10', title: 'Scam Shield tạm giữ giao dịch 85.000.000 ₫', time: 'Hôm nay · 09:41', unread: true },
+  { id: 'n2', icon: <Wallet size={19} strokeWidth={1.7} />, tone: 'text-primary bg-orange-soft', title: 'Biến động số dư: -2.500.000 ₫ đến NGUYEN VAN B', time: 'Hôm nay · 08:15', unread: true },
+  { id: 'n3', icon: <ShieldCheck size={19} strokeWidth={1.7} />, tone: 'text-primary bg-orange-soft', title: 'Đăng nhập trên thiết bị mới — iPhone 15 Pro', time: 'Hôm nay · 07:58', unread: false },
+  { id: 'n4', icon: <Gift size={19} strokeWidth={1.7} />, tone: 'text-primary bg-orange-soft', title: 'Hoàn tiền 30% khi thanh toán QR tại Highlands Coffee', time: 'Hôm qua · 19:20', unread: false },
+  { id: 'n5', icon: <ReceiptText size={19} strokeWidth={1.7} />, tone: 'text-primary bg-orange-soft', title: 'Sao kê tháng 8 của bạn đã sẵn sàng', time: '01/09 · 09:00', unread: false },
+]
+
+/** Sheet Thông báo (mockup) */
+function NotificationsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const container = usePhoneContainer()
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent container={container}>
+        <div className="flex flex-col gap-3">
+          <span className="flex items-center gap-2">
+            <SheetTitle className="text-lg font-semibold">Thông báo</SheetTitle>
+            <Badge variant="primary">9 mới</Badge>
+          </span>
+          <div className="no-scrollbar flex max-h-[420px] flex-col overflow-y-auto">
+            {mockNotifications.map((n) => (
+              <span key={n.id} className="flex items-start gap-3 rounded-card px-2 py-3 hover:bg-app">
+                <span className={`flex h-10 w-10 flex-none items-center justify-center rounded-full ${n.tone}`}>{n.icon}</span>
+                <span className="min-w-0 flex-1">
+                  <span className={`block text-[14px] leading-5 ${n.unread ? 'font-semibold' : 'font-medium'}`}>{n.title}</span>
+                  <span className="block text-[12px] leading-[18px] text-muted">{n.time}</span>
+                </span>
+                {n.unread && <span className="mt-2 h-2 w-2 flex-none rounded-full bg-primary" />}
+              </span>
+            ))}
+          </div>
+          <Button variant="outline" className="w-full font-medium" onClick={() => onOpenChange(false)}>
+            Xem tất cả thông báo
+          </Button>
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -118,6 +320,9 @@ export function HomePage() {
   const { balanceHidden, toggleBalance } = useGuardianStore()
   const [botBubble, setBotBubble] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [hotlineOpen, setHotlineOpen] = useState(false)
+  const [notiOpen, setNotiOpen] = useState(false)
 
   return (
     <MobileFrame statusBar="light" indicator="dark">
@@ -134,13 +339,13 @@ export function HomePage() {
       <div className="relative z-10 flex h-[52px] flex-none items-center justify-between px-5">
         <img src="/assets/msb-logo-white.png" alt="MSB" className="h-[22px] w-auto" />
         <div className="flex gap-2">
-          <GlassIcon>
+          <GlassIcon label="Tìm kiếm" onClick={() => setSearchOpen(true)}>
             <Search size={19} strokeWidth={1.6} />
           </GlassIcon>
-          <GlassIcon>
+          <GlassIcon label="Gọi tổng đài" onClick={() => setHotlineOpen(true)}>
             <Headphones size={19} strokeWidth={1.6} />
           </GlassIcon>
-          <GlassIcon badge="9">
+          <GlassIcon badge="9" label="Thông báo" onClick={() => setNotiOpen(true)}>
             <Bell size={19} strokeWidth={1.6} />
           </GlassIcon>
         </div>
@@ -277,6 +482,9 @@ export function HomePage() {
         </button>
       </div>
 
+      <SearchSheet open={searchOpen} onOpenChange={setSearchOpen} />
+      <HotlineSheet open={hotlineOpen} onOpenChange={setHotlineOpen} />
+      <NotificationsSheet open={notiOpen} onOpenChange={setNotiOpen} />
       <SettingsSheet open={settingsOpen} onOpenChange={setSettingsOpen} />
     </MobileFrame>
   )
