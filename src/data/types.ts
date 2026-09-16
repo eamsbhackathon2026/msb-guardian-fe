@@ -94,6 +94,8 @@ export interface ChatTable {
   rows: ChatTableRow[]
   totalLabel: string
   totalAmount: number
+  /** Nhãn cột đầu: "Nhóm" (mặc định) hoặc "Tháng" cho bảng so sánh tháng. */
+  rowHeader?: string
 }
 
 export interface ChatMessage {

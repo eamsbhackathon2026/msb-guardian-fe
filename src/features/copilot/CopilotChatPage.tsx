@@ -55,7 +55,7 @@ function SpendingTable({ table }: { table: ChatTable }) {
       <table className="w-full border-collapse text-[12.5px]">
         <thead>
           <tr className="text-[10px] uppercase tracking-wide text-muted">
-            <th className="px-3 pb-1 text-left font-medium">Nhóm</th>
+            <th className="px-3 pb-1 text-left font-medium">{table.rowHeader ?? 'Nhóm'}</th>
             <th className="px-1 pb-1 text-right font-medium">Số tiền</th>
             <th className="px-1 pb-1 text-right font-medium">%</th>
             <th className="px-3 pb-1 text-right font-medium">Δ kỳ trước</th>
