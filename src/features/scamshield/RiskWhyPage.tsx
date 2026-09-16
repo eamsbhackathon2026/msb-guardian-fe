@@ -10,6 +10,17 @@ import { getRiskExplain } from '@/lib/api'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
 
+/**
+ * Nhãn mức rủi ro. Engine có cơ chế nâng mức: nội dung chuyển khoản khớp kịch
+ * bản lừa đảo thì mức lên "can thiệp" mà điểm số giữ nguyên. Vì vậy không thể
+ * suy mức từ điểm, và cũng không được viết cứng một ngưỡng nào trên màn hình.
+ */
+const LEVEL_LABEL: Record<'low' | 'medium' | 'high', string> = {
+  low: 'Rủi ro thấp',
+  medium: 'Cần chú ý',
+  high: 'Rủi ro rất cao',
+}
+
 const segmentShades = ['var(--msb-danger)', 'var(--msb-danger-400)', 'var(--msb-danger-300)', 'var(--msb-danger-200)']
 
 function toneColor(tone: TimelineEvent['tone']): string {
@@ -32,7 +43,7 @@ export function RiskWhyPage() {
     )
   }
 
-  const { score, signals, recommendations } = data.assessment
+  const { score, level, signals, recommendations } = data.assessment
   const beneficiaryTimeline = data.beneficiaryTimeline
   const similarScenario = data.similarScenario
 
@@ -49,8 +60,8 @@ export function RiskWhyPage() {
                 {score} <span className="text-lg font-medium text-muted">/ 100</span>
               </span>
             </span>
-            <Badge variant="danger" size="md">
-              Rủi ro rất cao
+            <Badge variant={level === 'high' ? 'danger' : 'soft'} size="md">
+              {LEVEL_LABEL[level]}
             </Badge>
           </div>
           <span className="flex h-2.5 gap-0.5 overflow-hidden rounded-full">
@@ -65,7 +76,10 @@ export function RiskWhyPage() {
               />
             ))}
           </span>
-          <span className="text-xs leading-4 text-muted">Điểm được tính từ 4 tín hiệu bên dưới. Ngưỡng can thiệp: ≥ 75.</span>
+          <span className="text-xs leading-4 text-muted">
+            Điểm được tính từ {signals.length} tín hiệu bên dưới.
+            {level === 'high' && score < 75 && ' Mức can thiệp do nội dung chuyển khoản khớp kịch bản lừa đảo, không phải do điểm số.'}
+          </span>
         </div>
 
         {/* Phân rã điểm — tổng 4 thanh đúng bằng 87 */}
