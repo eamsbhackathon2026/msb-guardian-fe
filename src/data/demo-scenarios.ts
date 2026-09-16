@@ -164,6 +164,10 @@ export const demoSimilarScenario: SimilarScenario = {
 export const demoSafetyCenter: SafetyCenter = {
   safetyScore: 92,
   scoreLabel: 'Rất an toàn',
+  // Hai trường thêm khi SafetyCenter chuyển sang lấy từ gateway. Giữ ở đây để
+  // file mock vẫn khớp kiểu và khôi phục được nếu cần trình bày offline.
+  updatedLabel: 'Cập nhật 15/09/2026',
+  shieldEnabled: true,
   blockedCount: 3,
   warnedCount: 7,
   reportedCount: 2,

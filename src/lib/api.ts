@@ -13,7 +13,13 @@
  * không xoá, để đối chiếu hoặc khôi phục nhanh khi cần trình bày offline.
  */
 import type {
+  CaseDetail,
   CaseTimelineStep,
+  CopilotIntro,
+  CustomerAction,
+  HomeContent,
+  OpsSession,
+  TransferActionResult,
   ChatChart,
   CopilotOverview,
   Customer,
@@ -60,8 +66,8 @@ export function getCopilotOverview(): Promise<CopilotOverview> {
   return fetchJson<CopilotOverview>('/api/copilot/overview')
 }
 
-export function getChatSuggestions(): Promise<string[]> {
-  return fetchJson<string[]>('/api/copilot/suggestions')
+export function getCopilotIntro(): Promise<CopilotIntro> {
+  return fetchJson<CopilotIntro>('/api/copilot/intro')
 }
 
 export interface ChatStreamResult {
@@ -183,4 +189,40 @@ export function postDecision(id: string, decision: OpsDecision, note: string): P
     method: 'POST',
     body: JSON.stringify({ decision, note }),
   })
+}
+
+/* ---- Nội dung màn Home ---- */
+
+export function getHomeContent(): Promise<HomeContent> {
+  return fetchJson<HomeContent>('/api/home')
+}
+
+/* ---- Thao tác ghi của khách trong luồng Scam Shield ---- */
+
+/**
+ * Trước đây ba nút Huỷ / Vẫn chuyển / Báo cáo chỉ đổi state zustand, backend
+ * không hề biết. Nay mỗi hành động cập nhật case và dòng thời gian bên Ops.
+ */
+export function postTransferAction(action: CustomerAction): Promise<TransferActionResult> {
+  return fetchJson<TransferActionResult>('/api/transfer/action', {
+    method: 'POST',
+    body: JSON.stringify({ action }),
+  })
+}
+
+export function patchProtection(key: string, enabled: boolean): Promise<{ ok: boolean }> {
+  return fetchJson<{ ok: boolean }>(`/api/safety-center/protections/${key}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ enabled }),
+  })
+}
+
+/* ---- Ops: phiên làm việc và chi tiết case ---- */
+
+export function getOpsSession(): Promise<OpsSession> {
+  return fetchJson<OpsSession>('/api/ops/session')
+}
+
+export function getCaseDetail(id: string): Promise<CaseDetail> {
+  return fetchJson<CaseDetail>(`/api/ops/alerts/${id}/detail`)
 }

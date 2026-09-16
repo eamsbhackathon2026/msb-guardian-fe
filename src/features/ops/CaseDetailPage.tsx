@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 // MOCK CŨ: import { demoCustomer, demoModelInputs } from '@/data/demo-scenarios'
 import type { OpsDecision } from '@/data/types'
-import { getCaseTimeline, getOpsAlert, getOpsDashboard, getSessionCustomer, postDecision } from '@/lib/api'
+import { getCaseDetail, getCaseTimeline, getOpsAlert, getOpsDashboard, getSessionCustomer, postDecision } from '@/lib/api'
 import { formatDateTime, formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { DesktopShell } from '@/shell/DesktopShell'
@@ -42,6 +42,7 @@ export function CaseDetailPage() {
   const { data: timeline = [] } = useQuery({ queryKey: ['case-timeline', id], queryFn: () => getCaseTimeline(id) })
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
   const { data: dashboard } = useQuery({ queryKey: ['ops-dashboard'], queryFn: getOpsDashboard })
+  const { data: detail } = useQuery({ queryKey: ['case-detail', id], queryFn: () => getCaseDetail(id) })
 
   async function decide(decision: OpsDecision) {
     if (!alert || submitting) return
@@ -95,7 +96,7 @@ export function CaseDetailPage() {
                 {assessment.scenarioName}
               </Badge>
               <AlertStatusBadge status={status} />
-              <span className="text-[13px] text-muted">Tạo lúc {formatDateTime(alert.timestamp)} · SLA còn 42 phút</span>
+              <span className="text-[13px] text-muted">Tạo lúc {formatDateTime(alert.timestamp)}{detail ? ` · SLA còn ${detail.transaction.slaMinutes} phút` : ''}</span>
             </span>
           </div>
           <Button variant="secondary" size="sm" onClick={() => navigate('/ops')}>
@@ -110,9 +111,9 @@ export function CaseDetailPage() {
               <span className="text-[15px] font-semibold">Giao dịch</span>
               <InfoRow label="Số tiền" value={formatVnd(alert.amount)} strong />
               <InfoRow label="Thời gian" value={formatDateTime(alert.timestamp)} />
-              <InfoRow label="Kênh" value="Mobile · iPhone 15 (quen)" />
-              <InfoRow label="Nội dung" value="Nop tien xac minh" />
-              <InfoRow label="Trạng thái lệnh" value="Tạm giữ bởi Scam Shield" strong />
+              <InfoRow label="Kênh" value={detail?.transaction.channel ?? '—'} />
+              <InfoRow label="Nội dung" value={detail?.transaction.content ?? '—'} />
+              <InfoRow label="Trạng thái lệnh" value={detail?.transaction.holdStatus ?? '—'} strong />
             </div>
 
             <div className="flex flex-col gap-2.5 rounded-card bg-surface p-5 shadow-card">
@@ -127,12 +128,12 @@ export function CaseDetailPage() {
                 </span>
                 <span>
                   <span className="block text-[15px] font-semibold">{alert.customer}</span>
-                  <span className="block text-xs text-muted">{customer?.maskedAccount ?? '••••'} · KH từ 2019 · Phân khúc Lương</span>
+                  <span className="block text-xs text-muted">{customer?.maskedAccount ?? '••••'}{detail ? ` · KH từ ${detail.customerProfile.customerSince} · Phân khúc ${detail.customerProfile.segment}` : ''}</span>
                 </span>
               </span>
               <InfoRow label="Số dư hiện tại" value={formatVnd(customer?.balance ?? 0)} />
-              <InfoRow label="Mức chuyển TB" value="9.400.000 ₫" />
-              <InfoRow label="Cảnh báo 90 ngày" value="1 (58/100)" />
+              <InfoRow label="Mức chuyển TB" value={detail ? formatVnd(detail.customerProfile.avgTransferVnd) : '—'} />
+              <InfoRow label="Cảnh báo 90 ngày" value={detail ? `${detail.customerProfile.alerts90dCount} (${detail.customerProfile.alerts90dTopScore}/100)` : '—'} />
             </div>
 
             <div className="flex flex-col gap-2.5 rounded-card bg-surface p-5 shadow-card">
@@ -150,7 +151,7 @@ export function CaseDetailPage() {
             <div className="flex flex-col gap-4 rounded-card bg-surface p-5 shadow-card">
               <div>
                 <span className="text-[15px] font-semibold">Phân rã điểm rủi ro của AI</span>
-                <span className="block text-xs text-muted">Risk Engine v2.3 · rule + anomaly · chấm điểm trong 212 ms</span>
+                <span className="block text-xs text-muted">{detail ? `Risk Engine ${detail.model.version} · ${detail.model.method} · chấm điểm trong ${detail.model.scoringMs} ms` : ''}</span>
               </div>
               <div className="flex items-center gap-6">
                 <span className="text-[44px] font-bold leading-[48px]" style={{ color: riskTone(assessment.score) }}>
@@ -160,10 +161,10 @@ export function CaseDetailPage() {
                 <span className="flex-1">
                   <span className="flex justify-between text-[13px]">
                     <span className="text-muted">Độ tin cậy mô hình</span>
-                    <span className="font-semibold">92%</span>
+                    <span className="font-semibold">{detail?.model.confidencePct ?? 0}%</span>
                   </span>
                   <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-divider">
-                    <span className="block h-full w-[92%] rounded-full bg-ink" />
+                    <span className="block h-full rounded-full bg-ink" style={{ width: `${detail?.model.confidencePct ?? 0}%` }} />
                   </span>
                   <span className="mt-1 block text-xs text-muted">Ngưỡng can thiệp ≥ 75 · Cảnh báo mềm 40–74</span>
                 </span>
@@ -228,9 +229,13 @@ export function CaseDetailPage() {
                 className="min-h-[150px] resize-none rounded-xl border border-line bg-[color:var(--msb-bg)] p-3 text-[13px] leading-5 outline-none placeholder:text-muted focus:border-primary"
               />
               <span className="flex flex-wrap gap-1.5">
-                <span className="rounded-full bg-orange-soft px-2.5 py-1 text-xs font-medium text-primary-pressed">Đã liên hệ KH</span>
-                <span className="rounded-full border border-line bg-app px-2.5 py-1 text-xs">Khoá 24h</span>
-                <span className="rounded-full border border-line bg-app px-2.5 py-1 text-xs">Thêm TK vào blacklist</span>
+                {(detail?.noteChips ?? []).map((chip) =>
+                  chip.primary ? (
+                    <span key={chip.label} className="rounded-full bg-orange-soft px-2.5 py-1 text-xs font-medium text-primary-pressed">{chip.label}</span>
+                  ) : (
+                    <span key={chip.label} className="rounded-full border border-line bg-app px-2.5 py-1 text-xs">{chip.label}</span>
+                  ),
+                )}
               </span>
             </div>
 

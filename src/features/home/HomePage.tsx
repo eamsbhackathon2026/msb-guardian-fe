@@ -27,7 +27,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
-import { getSessionCustomer } from '@/lib/api'
+import { getHomeContent, getSessionCustomer } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
@@ -73,6 +73,7 @@ function QuickAction({ icon, label, onClick }: { icon: React.ReactNode; label: s
 /** Sheet Cài đặt — chứa thông tin phiên và nút Đăng xuất */
 function SettingsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
+  const { data: home } = useQuery({ queryKey: ['home-content'], queryFn: getHomeContent })
   const container = usePhoneContainer()
   const navigate = useNavigate()
   const logout = useAuthStore((s) => s.logout)
@@ -94,7 +95,7 @@ function SettingsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o
               <span className="block text-[15px] font-semibold">{customer?.name ?? '…'}</span>
               <span className="block text-[13px] text-muted">Tài khoản thanh toán {customer?.maskedAccount ?? '••••'}</span>
             </span>
-            <Badge variant="soft">M-FIRST GOLD</Badge>
+            <Badge variant="soft">{home?.productTier ?? ""}</Badge>
           </div>
           <span className="text-[13px] leading-5 text-muted">
             Phiên đăng nhập được bảo vệ bởi Scam Shield. Đăng xuất sẽ đưa bạn về màn hình đăng nhập.
@@ -113,6 +114,7 @@ export function HomePage() {
   const navigate = useNavigate()
   // Cùng queryKey với SettingsSheet nên chỉ có một lời gọi mạng cho cả hai.
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
+  const { data: home } = useQuery({ queryKey: ['home-content'], queryFn: getHomeContent })
   const { balanceHidden, toggleBalance } = useGuardianStore()
   const [botBubble, setBotBubble] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -152,7 +154,7 @@ export function HomePage() {
             <span className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
               <Sun size={18} strokeWidth={1.5} />
             </span>
-            <span className="flex-1 text-[15px] font-semibold tracking-[.01em] text-primary">M-FIRST GOLD</span>
+            <span className="flex-1 text-[15px] font-semibold tracking-[.01em] text-primary">{home?.productTier ?? ''}</span>
             <ChevronRight size={20} strokeWidth={1.6} className="text-muted" />
           </div>
           <div className="mx-0 h-px bg-divider" />
@@ -233,7 +235,7 @@ export function HomePage() {
             onClick={() => navigate('/copilot')}
           >
             <span className="block text-xs font-semibold text-primary">Trợ lý AI Guardian</span>
-            <span className="block text-[13px] leading-[18px]">Chi tiêu Ăn uống tháng này tăng 34%. Xem ngay?</span>
+            <span className="block text-[13px] leading-[18px]">{home?.assistantHint ?? ''}</span>
             <button
               type="button"
               aria-label="Đóng gợi ý"

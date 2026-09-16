@@ -4,7 +4,7 @@ import { Bell, ChevronDown, Eye, EyeOff, Headphones, QrCode, ScanFace, ShieldChe
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
-import { getSessionCustomer } from '@/lib/api'
+import { getHomeContent } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { MobileFrame } from '@/shell/MobileFrame'
 
@@ -67,7 +67,7 @@ function LoginSplash() {
 export function LoginPage() {
   const navigate = useNavigate()
   const login = useAuthStore((s) => s.login)
-  const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
+  const { data: home } = useQuery({ queryKey: ['home-content'], queryFn: getHomeContent })
 
   const [splash, setSplash] = useState(false)
   const [password, setPassword] = useState('')
@@ -139,8 +139,8 @@ export function LoginPage() {
         <div className={`${glassCard} flex flex-col gap-3 p-4`}>
           <div className="flex items-center justify-between">
             <span>
-              <span className="block text-[13px] leading-[18px] text-white/85">Chào buổi sáng,</span>
-              <span className="block text-xl font-semibold leading-7 text-white">{customer?.name ?? '…'}</span>
+              <span className="block text-[13px] leading-[18px] text-white/85">{home ? `${home.greeting},` : ''}</span>
+              <span className="block text-xl font-semibold leading-7 text-white">{home?.customerName ?? '…'}</span>
             </span>
             <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/20 text-white">
               <UserRoundPlus size={20} strokeWidth={1.6} />

@@ -6,7 +6,7 @@ import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
 import type { ChatChart, ChatMessage } from '@/data/types'
-import { getChatSuggestions, streamChat } from '@/lib/api'
+import { getCopilotIntro, streamChat } from '@/lib/api'
 import { formatVnd } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 
@@ -56,10 +56,18 @@ export function CopilotChatPage() {
   const navigate = useNavigate()
   // Gợi ý câu hỏi lấy từ gateway. Khi chưa tải xong thì không hiện chip nào,
   // thay vì hiện danh sách cứng rồi nhảy sang danh sách khác.
-  const { data: suggestions = [] } = useQuery({ queryKey: ['chat-suggestions'], queryFn: getChatSuggestions })
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    makeMessage('assistant', 'Chào Minh Anh 👋 Tôi có thể trả lời về chi tiêu, dòng tiền và tiết kiệm của bạn.'),
-  ])
+  const { data: intro } = useQuery({ queryKey: ['copilot-intro'], queryFn: getCopilotIntro })
+  const suggestions = intro?.suggestions ?? []
+  // Lời chào đến từ gateway. Khởi tạo rỗng rồi nạp khi tải xong, vì useState
+  // chỉ đọc giá trị khởi tạo đúng một lần.
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+
+  // Chèn lời chào khi tải xong, và chỉ khi chưa có tin nhắn nào — nếu không,
+  // refetch giữa cuộc trò chuyện sẽ chèn lại lời chào vào giữa.
+  useEffect(() => {
+    if (!intro) return
+    setMessages((prev) => (prev.length === 0 ? [makeMessage('assistant', intro.greeting)] : prev))
+  }, [intro])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
   const [waitingFirstToken, setWaitingFirstToken] = useState(false)

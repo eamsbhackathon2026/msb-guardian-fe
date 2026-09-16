@@ -6,7 +6,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 // MOCK CŨ: import { demoBeneficiary, demoScamAmount } from '@/data/demo-scenarios'
-import { assessRisk, getPendingTransfer } from '@/lib/api'
+import type { CustomerAction } from '@/data/types'
+import { assessRisk, getPendingTransfer, postTransferAction } from '@/lib/api'
 import { formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame, usePhoneContainer } from '@/shell/MobileFrame'
@@ -74,8 +75,27 @@ function ScamAlertInner() {
 
   const topSignals = assessment?.signals.slice(0, 3) ?? []
 
+  /**
+   * Ghi hành động của khách xuống gateway rồi mới đổi màn hình.
+   *
+   * Trước đây ba nút này chỉ đổi state trong trình duyệt, nên chuyên viên vận
+   * hành không bao giờ biết khách đã bấm gì. Nay case và dòng thời gian bên Ops
+   * cập nhật theo — đó là mắt xích khép vòng của luồng demo.
+   *
+   * Lỗi mạng không được chặn khách rời màn cảnh báo: chuyển tiếp vẫn diễn ra,
+   * chỉ có phần ghi nhận là thiếu.
+   */
+  async function recordAction(action: CustomerAction) {
+    setShieldOutcome(action)
+    try {
+      await postTransferAction(action)
+    } catch {
+      // Đã đổi state phía khách; ghi nhận phía Ops sẽ thiếu bước này.
+    }
+  }
+
   function cancelTransfer() {
-    setShieldOutcome('cancelled')
+    void recordAction('cancelled')
     setPhase('protected')
   }
 
@@ -166,7 +186,7 @@ function ScamAlertInner() {
           size="md"
           className="w-full font-semibold"
           onClick={() => {
-            setShieldOutcome('reported')
+            void recordAction('reported')
             navigate('/safety-center')
           }}
         >
@@ -205,7 +225,7 @@ function ScamAlertInner() {
                 className="w-full font-medium text-muted"
                 disabled={!understood}
                 onClick={() => {
-                  setShieldOutcome('proceeded')
+                  void recordAction('proceeded')
                   setConfirmOpen(false)
                   navigate('/safety-center')
                 }}

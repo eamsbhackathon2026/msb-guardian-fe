@@ -132,7 +132,7 @@ export function CopilotOverviewPage() {
 
   return (
     <MobileFrame>
-      <MobileHeader title="Financial Copilot" backTo="/" right={<span className="mr-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[13px] font-medium">Tháng 9/2026</span>} />
+      <MobileHeader title="Financial Copilot" backTo="/" right={<span className="mr-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[13px] font-medium">{data?.budget.monthLabel ?? ''}</span>} />
       <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-24 pt-1">
         {isPending || !data ? (
           <OverviewSkeleton />

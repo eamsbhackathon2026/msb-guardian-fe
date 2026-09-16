@@ -3,7 +3,7 @@ import { Briefcase, FileText, History, LayoutGrid, LineChart, Search, TriangleAl
 import { Link, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoOpsAlerts } from '@/data/demo-scenarios'
-import { getOpsAlerts } from '@/lib/api'
+import { getOpsAlerts, getOpsSession } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 /**
@@ -21,12 +21,16 @@ function buildMenu(firstAlertId: string | undefined, alertCount: number) {
   ]
 }
 
+/** Gateway gửi tone dạng ngữ nghĩa; màu là quyết định của giao diện. */
+const toneVar: Record<'ok' | 'warn' | 'danger', string> = {
+  ok: 'var(--msb-success-bright)',
+  warn: 'var(--msb-warning-bright)',
+  danger: 'var(--msb-danger)',
+}
+
 function SystemStatus() {
-  const rows = [
-    { label: 'API Gateway', value: 'OK', tone: 'var(--msb-success-bright)' },
-    { label: 'Risk Engine', value: 'OK', tone: 'var(--msb-success-bright)' },
-    { label: 'LLM GreenNode', value: 'Chậm', tone: 'var(--msb-warning-bright)' },
-  ]
+  const { data: session } = useQuery({ queryKey: ['ops-session'], queryFn: getOpsSession })
+  const rows = (session?.systemStatus ?? []).map((r) => ({ ...r, tone: toneVar[r.tone] }))
   return (
     <div className="mt-auto flex flex-col gap-2 rounded-xl bg-sidebar-soft p-3">
       <div className="text-[11px] font-semibold uppercase tracking-[.06em] text-muted">Tình trạng hệ thống</div>
@@ -48,6 +52,8 @@ export function DesktopShell({ children, breadcrumb }: { children: ReactNode; br
   const activeKey = location.pathname.startsWith('/ops/alerts') ? 'alerts' : 'overview'
   // Dùng chung queryKey với OpsDashboardPage nên react-query trả cache, không gọi thêm lần nào.
   const { data: alerts } = useQuery({ queryKey: ['ops-alerts'], queryFn: getOpsAlerts })
+  const { data: session } = useQuery({ queryKey: ['ops-session'], queryFn: getOpsSession })
+  const operator = session?.operator
   const menu = buildMenu(alerts?.[0]?.id, alerts?.length ?? 0)
   return (
     <div className="flex min-h-screen bg-app">
@@ -77,10 +83,10 @@ export function DesktopShell({ children, breadcrumb }: { children: ReactNode; br
         })}
         <SystemStatus />
         <div className="mt-3 flex items-center gap-2.5 px-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-soft text-[13px] font-semibold">QB</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-soft text-[13px] font-semibold">{operator?.initials ?? ''}</span>
           <span>
-            <span className="block text-[13px] font-medium">Trần Quốc Bảo</span>
-            <span className="block text-[11px] text-muted">Fraud Ops · Ca sáng</span>
+            <span className="block text-[13px] font-medium">{operator?.name ?? ''}</span>
+            <span className="block text-[11px] text-muted">{operator ? `${operator.role} · ${operator.shift}` : ''}</span>
           </span>
         </div>
       </aside>
@@ -98,17 +104,17 @@ export function DesktopShell({ children, breadcrumb }: { children: ReactNode; br
             </label>
           )}
           <div className="flex items-center gap-4">
-            <span className="text-[13px] text-muted">Thứ Ba, 15/09/2026 · 09:41</span>
+            <span className="text-[13px] text-muted">{session?.nowLabel ?? ''}</span>
             <span className="flex items-center gap-1.5 rounded-full bg-success-soft px-2.5 py-1.5 text-xs font-semibold text-success-deep">
               <span className="block h-[7px] w-[7px] rounded-full bg-success" />
               Live
             </span>
             <span className="h-7 w-px bg-line" />
             <span className="flex items-center gap-2.5">
-              <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-orange-soft text-[13px] font-semibold text-primary">QB</span>
+              <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-orange-soft text-[13px] font-semibold text-primary">{operator?.initials ?? ''}</span>
               <span>
-                <span className="block text-[13px] font-semibold text-ink">Trần Quốc Bảo</span>
-                <span className="block text-xs text-muted">Fraud Ops</span>
+                <span className="block text-[13px] font-semibold text-ink">{operator?.name ?? ''}</span>
+                <span className="block text-xs text-muted">{operator?.role ?? ''}</span>
               </span>
             </span>
           </div>

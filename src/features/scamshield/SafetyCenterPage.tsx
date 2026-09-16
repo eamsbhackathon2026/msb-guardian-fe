@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoSafetyCenter } from '@/data/demo-scenarios'
 import type { SafetyHistoryItem } from '@/data/types'
-import { getSafetyCenter } from '@/lib/api'
+import { getSafetyCenter, patchProtection } from '@/lib/api'
 import { formatDate, formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { BottomNav } from '@/shell/BottomNav'
@@ -57,6 +57,20 @@ export function SafetyCenterPage() {
 function SafetyCenterInner() {
   const container = usePhoneContainer()
   const { protections, toggleProtection, hydrateProtections } = useGuardianStore()
+
+  /**
+   * Bật/tắt lớp bảo vệ: đổi trạng thái tại chỗ cho công tắc phản hồi ngay, rồi
+   * ghi xuống gateway. Lỗi mạng thì trả công tắc về vị trí cũ thay vì để giao
+   * diện nói một đằng còn backend lưu một nẻo.
+   */
+  async function onToggleProtection(key: string, next: boolean) {
+    toggleProtection(key)
+    try {
+      await patchProtection(key, next)
+    } catch {
+      toggleProtection(key)
+    }
+  }
   const [selected, setSelected] = useState<SafetyHistoryItem | null>(null)
   const { data } = useQuery({ queryKey: ['safety-center'], queryFn: getSafetyCenter })
 
@@ -92,7 +106,9 @@ function SafetyCenterInner() {
             <Badge variant="success" size="md" className="w-fit">
               {data.scoreLabel}
             </Badge>
-            <span className="text-xs leading-4 text-muted">Cập nhật 15/09/2026 · Scam Shield đang bật</span>
+            <span className="text-xs leading-4 text-muted">
+              {data.updatedLabel} · Scam Shield {data.shieldEnabled ? 'đang bật' : 'đang tắt'}
+            </span>
           </span>
         </div>
 
@@ -144,7 +160,7 @@ function SafetyCenterInner() {
                 <span className="block text-sm font-medium leading-5">{p.label}</span>
                 <span className="block text-xs text-muted">{p.description}</span>
               </span>
-              <Switch checked={protections[p.key] ?? false} onCheckedChange={() => toggleProtection(p.key)} />
+              <Switch checked={protections[p.key] ?? false} onCheckedChange={(next) => void onToggleProtection(p.key, next)} />
             </span>
           ))}
         </div>

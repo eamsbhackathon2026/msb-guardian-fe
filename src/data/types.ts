@@ -134,6 +134,8 @@ export interface ProtectionLayer {
 export interface SafetyCenter {
   safetyScore: number
   scoreLabel: string
+  updatedLabel: string
+  shieldEnabled: boolean
   blockedCount: number
   warnedCount: number
   reportedCount: number
@@ -185,4 +187,90 @@ export interface OpsDashboard {
   hourlyAlerts: HourlyAlertPoint[]
   scenarioCounts: ScenarioCount[]
   modelInputs: string[]
+}
+
+/* ---- Nội dung màn Home / Copilot ---- */
+
+export interface HomeContent {
+  greeting: string
+  customerName: string
+  productTier: string
+  assistantHint: string
+}
+
+export interface CopilotIntro {
+  greeting: string
+  suggestions: string[]
+  monthLabel: string
+}
+
+/* ---- Chi tiết case cho Ops ---- */
+
+export interface CaseTransaction {
+  channel: string
+  content: string
+  holdStatus: string
+  slaMinutes: number
+}
+
+export interface CaseCustomerProfile {
+  customerSince: string
+  segment: string
+  avgTransferVnd: number
+  alerts90dCount: number
+  alerts90dTopScore: number
+}
+
+export interface CaseModelInfo {
+  version: string
+  method: string
+  scoringMs: number
+  confidencePct: number
+  interveneThreshold: number
+  softWarnMin: number
+  softWarnMax: number
+}
+
+export interface CaseNoteChip {
+  label: string
+  primary: boolean
+}
+
+export interface CaseDetail {
+  transaction: CaseTransaction
+  customerProfile: CaseCustomerProfile
+  model: CaseModelInfo
+  noteChips: CaseNoteChip[]
+}
+
+/* ---- Phiên làm việc của chuyên viên Ops ---- */
+
+export interface SystemStatusRow {
+  label: string
+  value: string
+  /** Ngữ nghĩa, không phải màu — FE tự ánh xạ sang biến CSS */
+  tone: 'ok' | 'warn' | 'danger'
+}
+
+export interface Operator {
+  name: string
+  role: string
+  shift: string
+  initials: string
+}
+
+export interface OpsSession {
+  operator: Operator
+  systemStatus: SystemStatusRow[]
+  nowLabel: string
+}
+
+/* ---- Thao tác ghi ---- */
+
+export type CustomerAction = 'cancelled' | 'proceeded' | 'reported'
+
+export interface TransferActionResult {
+  ok: boolean
+  caseStatus: AlertStatus
+  message: string
 }
