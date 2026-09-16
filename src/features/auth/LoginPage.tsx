@@ -4,12 +4,20 @@ import { Bell, ChevronDown, Eye, EyeOff, Headphones, QrCode, ScanFace, ShieldChe
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
-import { getHomeContent } from '@/lib/api'
+import { getHomeContent, login as apiLogin } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { MobileFrame } from '@/shell/MobileFrame'
 
+const DEMO_USERNAME = 'kh100008'
 const DEMO_PASSWORD = '123456'
 const SPLASH_MS = 1_900
+
+/** Nguyên do đăng nhập thất bại → câu tiếng Việt hiển thị dưới ô mật khẩu. */
+function reasonLabel(reason?: string): string {
+  if (reason === 'locked') return 'Tài khoản đã bị khoá do nhập sai nhiều lần'
+  if (reason === 'disabled') return 'Tài khoản đã bị vô hiệu hoá'
+  return 'Mật khẩu không đúng'
+}
 
 /** Icon chuyển tiền kiểu MSB (mũi tên chéo trong vòng tròn) */
 function TransferIcon({ size = 24 }: { size?: number }) {
@@ -66,13 +74,15 @@ function LoginSplash() {
 
 export function LoginPage() {
   const navigate = useNavigate()
-  const login = useAuthStore((s) => s.login)
+  const authLogin = useAuthStore((s) => s.login)
   const { data: home } = useQuery({ queryKey: ['home-content'], queryFn: getHomeContent })
 
   const [splash, setSplash] = useState(false)
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [focused, setFocused] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Hiệu ứng nhập mật khẩu: tự gõ từng ký tự khi màn hình mở
@@ -92,13 +102,41 @@ export function LoginPage() {
     }
   }, [])
 
+  /** Lối tắt demo (Chuyển tiền / QR): vào thẳng bằng phiên demo, không xác thực. */
   function signIn(to = '/') {
     if (splash) return
     setSplash(true)
     setTimeout(() => {
-      login()
+      authLogin(null)
       navigate(to)
     }, SPLASH_MS)
+  }
+
+  /** Nút "Đăng nhập": xác thực thật với identity-service qua gateway.
+   *  Sai mật khẩu → hiện thông báo, không vào. Gateway không gọi được → rơi về
+   *  đăng nhập demo để buổi trình bày không bị chặn (cùng triết lý guardedCall). */
+  async function signInWithPassword() {
+    if (splash || submitting) return
+    setError(null)
+    setSubmitting(true)
+    try {
+      const res = await apiLogin(DEMO_USERNAME, password)
+      if (!res.authenticated) {
+        setSubmitting(false)
+        setError(reasonLabel(res.reason))
+        return
+      }
+      setSubmitting(false)
+      setSplash(true)
+      setTimeout(() => {
+        authLogin(res.user ?? null)
+        navigate('/')
+      }, SPLASH_MS)
+    } catch {
+      // Gateway hỏng hoàn toàn: giữ luồng demo thay vì kẹt ở màn đăng nhập.
+      setSubmitting(false)
+      signIn('/')
+    }
   }
 
   return (
@@ -156,7 +194,10 @@ export function LoginPage() {
               ref={inputRef}
               type={showPassword ? 'text' : 'password'}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                setError(null)
+              }}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               aria-label="Mật khẩu"
@@ -199,14 +240,30 @@ export function LoginPage() {
             </button>
           </div>
 
+          {/* Thông báo lỗi đăng nhập (sai mật khẩu / tài khoản khoá) */}
+          <AnimatePresence>
+            {error && (
+              <motion.p
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                role="alert"
+                className="text-[13px] font-medium text-[#ffd7cf]"
+              >
+                {error}
+              </motion.p>
+            )}
+          </AnimatePresence>
+
           <button
             type="button"
-            onClick={() => signIn('/')}
-            className="flex h-12 cursor-pointer items-center justify-center gap-2.5 rounded-btn text-base font-semibold active:scale-[.98]"
+            onClick={() => void signInWithPassword()}
+            disabled={submitting}
+            className="flex h-12 cursor-pointer items-center justify-center gap-2.5 rounded-btn text-base font-semibold active:scale-[.98] disabled:opacity-70"
             style={{ background: 'var(--msb-gradient-gold)', color: 'var(--msb-gold-ink)' }}
           >
             <ScanFace size={20} strokeWidth={1.7} />
-            Đăng nhập
+            {submitting ? 'Đang đăng nhập…' : 'Đăng nhập'}
           </button>
 
           <div className="flex items-center justify-between text-[13px] font-medium text-white/85">

@@ -54,6 +54,38 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>
 }
 
+/* ---- Đăng nhập ---- */
+
+import type { AuthUser } from './auth'
+
+export interface LoginResult {
+  authenticated: boolean
+  /** "domain" = xác thực thật qua identity-service; "degraded" = gateway không
+   *  gọi được identity-service nên cho qua bằng hồ sơ demo. */
+  source: 'domain' | 'degraded'
+  user?: AuthUser
+  /** Khi authenticated=false: invalid_credentials | disabled | locked */
+  reason?: string
+}
+
+/**
+ * POST /api/auth/login — xác thực thật tên đăng nhập + mật khẩu.
+ *
+ * Trước đây LoginPage chỉ gọi store.login() phía client, không có backend nào.
+ * Nay gateway so khớp bcrypt với bảng app_user qua identity-service. Đăng nhập
+ * của kịch bản demo là kh100008 / 123456.
+ *
+ * Ở đây KHÔNG dùng fetchJson (nó ném lỗi khi !res.ok): nếu gateway hoàn toàn
+ * không gọi được, LoginPage tự bắt và rơi về đăng nhập demo để buổi trình bày
+ * không bị chặn.
+ */
+export function login(username: string, password: string): Promise<LoginResult> {
+  return fetchJson<LoginResult>('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  })
+}
+
 /* ---- Phiên hiện tại ---- */
 
 export function getSessionCustomer(): Promise<Customer> {
