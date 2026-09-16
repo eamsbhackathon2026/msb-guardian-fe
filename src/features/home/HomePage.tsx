@@ -87,12 +87,12 @@ function QuickAction({ icon, label, onClick }: { icon: React.ReactNode; label: s
 }
 
 const searchFeatures = [
-  { icon: <TransferIcon size={22} />, label: 'Chuyển tiền', desc: 'Chuyển nhanh 24/7 miễn phí', to: '/transfer/review' },
+  { icon: <TransferIcon size={22} />, label: 'Chuyển tiền', desc: 'Chuyển nhanh 24/7 miễn phí', to: '/transfer' },
   { icon: <QrCode size={22} strokeWidth={1.5} />, label: 'Quét QR', desc: 'Thanh toán bằng mã QR' },
   { icon: <PiggyBank size={22} strokeWidth={1.5} />, label: 'Tiền gửi', desc: 'Mở sổ tiết kiệm online', to: '/invest' },
-  { icon: <CreditCard size={22} strokeWidth={1.5} />, label: 'Thẻ', desc: 'Quản lý thẻ ghi nợ, tín dụng' },
+  { icon: <CreditCard size={22} strokeWidth={1.5} />, label: 'Thẻ', desc: 'Quản lý thẻ ghi nợ, tín dụng', to: '/cards' },
   { icon: <ReceiptText size={22} strokeWidth={1.5} />, label: 'Thanh toán hóa đơn', desc: 'Điện, nước, internet…', to: '/payments' },
-  { icon: <HandCoins size={22} strokeWidth={1.5} />, label: 'Vay', desc: 'Vay tiêu dùng lãi suất ưu đãi' },
+  { icon: <HandCoins size={22} strokeWidth={1.5} />, label: 'Vay', desc: 'Vay tiêu dùng lãi suất ưu đãi', to: '/loans' },
   { icon: <MessageSquareText size={22} strokeWidth={1.5} />, label: 'Chat Banking', desc: 'Nhắn một câu, chuyển tiền xong ngay', to: '/copilot/chat' },
   { icon: <ShieldCheck size={22} strokeWidth={1.5} />, label: 'Trung tâm an toàn', desc: 'Scam Shield bảo vệ giao dịch', to: '/safety-center' },
   { icon: <Headphones size={22} strokeWidth={1.5} />, label: 'Trung tâm hỗ trợ', desc: 'Câu hỏi thường gặp, liên hệ MSB', to: '/support' },
@@ -447,15 +447,15 @@ export function HomePage() {
         {/* Lưới tiện ích 2×3 + Rewards/Xem thêm */}
         <motion.div custom={1} variants={blockVariants} initial="hidden" animate="show" className="flex flex-col rounded-card bg-surface px-1 pt-1.5 shadow-card">
           <div className="grid grid-cols-3 py-1.5">
-            <QuickAction icon={<TransferIcon />} label="Chuyển tiền" onClick={() => navigate('/transfer/review')} />
+            <QuickAction icon={<TransferIcon />} label="Chuyển tiền" onClick={() => navigate('/transfer')} />
             <QuickAction icon={<QrCode size={30} strokeWidth={1.5} />} label="Quét QR" />
             <QuickAction icon={<PiggyBank size={30} strokeWidth={1.5} />} label="Tiền gửi" onClick={() => navigate('/invest')} />
           </div>
           <div className="mx-3 h-px bg-divider" />
           <div className="grid grid-cols-3 py-1.5">
-            <QuickAction icon={<CreditCard size={30} strokeWidth={1.5} />} label="Thẻ" />
+            <QuickAction icon={<CreditCard size={30} strokeWidth={1.5} />} label="Thẻ" onClick={() => navigate('/cards')} />
             <QuickAction icon={<ReceiptText size={30} strokeWidth={1.5} />} label="Thanh toán" onClick={() => navigate('/payments')} />
-            <QuickAction icon={<HandCoins size={30} strokeWidth={1.5} />} label="Vay" />
+            <QuickAction icon={<HandCoins size={30} strokeWidth={1.5} />} label="Vay" onClick={() => navigate('/loans')} />
           </div>
           <div className="mx-3 h-px bg-divider" />
           <div className="grid grid-cols-2">
