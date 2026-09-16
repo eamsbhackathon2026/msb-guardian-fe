@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
 import { getHomeContent, login as apiLogin } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
-import { timeGreeting } from '@/lib/format'
+import { fullCustomerName, timeGreeting } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 
 const DEMO_USERNAME = 'kh100008'
@@ -228,7 +228,7 @@ export function LoginPage() {
                 <span className="block text-xl font-semibold leading-7 text-white">Đăng nhập lần đầu</span>
               ) : (
                 <span className="flex items-center gap-2">
-                  <span className="text-xl font-semibold leading-7 text-white">{home?.customerName ?? rememberedUser}</span>
+                  <span className="text-xl font-semibold leading-7 text-white">{fullCustomerName(home?.customerName)}</span>
                   <button
                     type="button"
                     aria-label="Đổi người dùng"
@@ -347,13 +347,7 @@ export function LoginPage() {
           </button>
 
           <div className="flex items-center justify-between text-[13px] font-medium text-white/85">
-            {firstLogin ? (
-              <span>Đăng ký tài khoản</span>
-            ) : (
-              <button type="button" onClick={switchUser} className="cursor-pointer text-white/85 hover:text-white">
-                Đổi người dùng
-              </button>
-            )}
+            <span>Đăng ký tài khoản</span>
             <span className="font-semibold text-gold">Quên mật khẩu?</span>
           </div>
         </div>

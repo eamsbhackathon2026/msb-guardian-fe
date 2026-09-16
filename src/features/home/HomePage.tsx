@@ -40,7 +40,7 @@ import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
 import { getHomeContent, getSessionCustomer } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
-import { formatVnd, fullAccountNumber, timeGreeting } from '@/lib/format'
+import { formatVnd, fullAccountNumber, fullCustomerName, timeGreeting } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame, usePhoneContainer } from '@/shell/MobileFrame'
 
@@ -89,9 +89,9 @@ function QuickAction({ icon, label, onClick }: { icon: React.ReactNode; label: s
 const searchFeatures = [
   { icon: <TransferIcon size={22} />, label: 'Chuyển tiền', desc: 'Chuyển nhanh 24/7 miễn phí', to: '/transfer/review' },
   { icon: <QrCode size={22} strokeWidth={1.5} />, label: 'Quét QR', desc: 'Thanh toán bằng mã QR' },
-  { icon: <PiggyBank size={22} strokeWidth={1.5} />, label: 'Tiền gửi', desc: 'Mở sổ tiết kiệm online' },
+  { icon: <PiggyBank size={22} strokeWidth={1.5} />, label: 'Tiền gửi', desc: 'Mở sổ tiết kiệm online', to: '/invest' },
   { icon: <CreditCard size={22} strokeWidth={1.5} />, label: 'Thẻ', desc: 'Quản lý thẻ ghi nợ, tín dụng' },
-  { icon: <ReceiptText size={22} strokeWidth={1.5} />, label: 'Thanh toán hóa đơn', desc: 'Điện, nước, internet…' },
+  { icon: <ReceiptText size={22} strokeWidth={1.5} />, label: 'Thanh toán hóa đơn', desc: 'Điện, nước, internet…', to: '/payments' },
   { icon: <HandCoins size={22} strokeWidth={1.5} />, label: 'Vay', desc: 'Vay tiêu dùng lãi suất ưu đãi' },
   { icon: <MessageSquareText size={22} strokeWidth={1.5} />, label: 'Chat Banking', desc: 'Nhắn một câu, chuyển tiền xong ngay', to: '/copilot/chat' },
   { icon: <ShieldCheck size={22} strokeWidth={1.5} />, label: 'Trung tâm an toàn', desc: 'Scam Shield bảo vệ giao dịch', to: '/safety-center' },
@@ -314,8 +314,7 @@ function SettingsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o
               <img src="/assets/icon-logo-msb.png" alt="MSB" className="h-5 w-auto" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-[16px] font-bold uppercase tracking-[.02em] text-white">{customer?.name ?? '…'}</span>
-              <span className="block text-[12px] leading-[17px] text-white/90">Tài khoản thanh toán {fullAccountNumber(customer?.maskedAccount)}</span>
+              <span className="block text-[16px] font-bold uppercase tracking-[.02em] text-white">{fullCustomerName(customer?.name)}</span>
               <span className="block text-[13px] font-semibold tracking-[.12em] text-[#ffe1b0]">{home?.productTier ?? ''}</span>
             </span>
             <ChevronRight size={20} strokeWidth={1.8} className="flex-none text-white/85" />
@@ -416,7 +415,7 @@ export function HomePage() {
         {/* Lời chào + tên người dùng sau khi đăng nhập thành công */}
         <motion.div custom={0} variants={blockVariants} initial="hidden" animate="show" className="flex flex-col px-1 pb-0.5">
           <span className="text-[13px] leading-[18px] text-white/85">{timeGreeting()},</span>
-          <span className="text-xl font-bold leading-7 text-white">{customer?.name ?? home?.customerName ?? '…'}</span>
+          <span className="text-xl font-bold leading-7 text-white">{fullCustomerName(customer?.name ?? home?.customerName)}</span>
         </motion.div>
 
         {/* Card tài khoản M-FIRST GOLD */}
@@ -450,12 +449,12 @@ export function HomePage() {
           <div className="grid grid-cols-3 py-1.5">
             <QuickAction icon={<TransferIcon />} label="Chuyển tiền" onClick={() => navigate('/transfer/review')} />
             <QuickAction icon={<QrCode size={30} strokeWidth={1.5} />} label="Quét QR" />
-            <QuickAction icon={<PiggyBank size={30} strokeWidth={1.5} />} label="Tiền gửi" />
+            <QuickAction icon={<PiggyBank size={30} strokeWidth={1.5} />} label="Tiền gửi" onClick={() => navigate('/invest')} />
           </div>
           <div className="mx-3 h-px bg-divider" />
           <div className="grid grid-cols-3 py-1.5">
             <QuickAction icon={<CreditCard size={30} strokeWidth={1.5} />} label="Thẻ" />
-            <QuickAction icon={<ReceiptText size={30} strokeWidth={1.5} />} label="Thanh toán" />
+            <QuickAction icon={<ReceiptText size={30} strokeWidth={1.5} />} label="Thanh toán" onClick={() => navigate('/payments')} />
             <QuickAction icon={<HandCoins size={30} strokeWidth={1.5} />} label="Vay" />
           </div>
           <div className="mx-3 h-px bg-divider" />

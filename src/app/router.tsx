@@ -4,6 +4,8 @@ import { useAuthStore } from '@/lib/auth'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { SupportPage } from '@/features/support/SupportPage'
 import { HomePage } from '@/features/home/HomePage'
+import { PaymentsPage } from '@/features/payments/PaymentsPage'
+import { InvestPage } from '@/features/invest/InvestPage'
 import { CopilotOverviewPage } from '@/features/copilot/CopilotOverviewPage'
 import { CopilotChatPage } from '@/features/copilot/CopilotChatPage'
 import { ScamAlertPage } from '@/features/scamshield/ScamAlertPage'
@@ -23,6 +25,8 @@ export const router = createBrowserRouter([
   // Hỗ trợ vào được từ màn đăng nhập nên không cần auth
   { path: '/support', element: <SupportPage /> },
   { path: '/', element: <RequireAuth><HomePage /></RequireAuth> },
+  { path: '/payments', element: <RequireAuth><PaymentsPage /></RequireAuth> },
+  { path: '/invest', element: <RequireAuth><InvestPage /></RequireAuth> },
   { path: '/copilot', element: <RequireAuth><CopilotOverviewPage /></RequireAuth> },
   { path: '/copilot/chat', element: <RequireAuth><CopilotChatPage /></RequireAuth> },
   { path: '/transfer/review', element: <RequireAuth><ScamAlertPage /></RequireAuth> },

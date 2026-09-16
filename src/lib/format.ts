@@ -50,6 +50,13 @@ export function timeGreeting(): string {
   return 'Chúc ngủ ngon'
 }
 
+/** Tên khách hàng phải hiện đầy đủ, không che. BE có nơi trả tên đã che
+ *  (dạng "Nguyễn V** A**") hoặc chưa kịp tải — khi đó dùng tên demo đầy đủ. */
+export function fullCustomerName(name?: string | null): string {
+  if (!name || /[*•]/.test(name)) return 'Nguyễn Việt Anh'
+  return name
+}
+
 /** BE chỉ trả số tài khoản đã che ("**** 4821"). Màn demo cần hiện số đầy đủ
  *  nên ghép đầu số tài khoản demo cố định với 4 số cuối thật từ BE. */
 export function fullAccountNumber(masked?: string): string {
