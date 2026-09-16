@@ -210,7 +210,7 @@ function ScamAlertInner() {
             </span>
             <DialogTitle className="text-lg font-semibold leading-6">Bạn có chắc chắn muốn tiếp tục?</DialogTitle>
             <DialogDescription className="text-sm leading-5 text-muted">
-              87/100 điểm rủi ro — mức rất cao. Trong các vụ tương tự, <b className="text-danger">tiền đã chuyển gần như không thể thu hồi</b>. MSB sẽ không thể hoàn tiền nếu đây là lừa đảo.
+              {assessment?.score ?? 0}/100 điểm rủi ro — mức rất cao. Trong các vụ tương tự, <b className="text-danger">tiền đã chuyển gần như không thể thu hồi</b>. MSB sẽ không thể hoàn tiền nếu đây là lừa đảo.
             </DialogDescription>
             <label className="flex cursor-pointer items-start gap-2.5 rounded-xl bg-app p-3 text-sm leading-5">
               <input type="checkbox" checked={understood} onChange={(e) => setUnderstood(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[color:var(--msb-danger)]" />
