@@ -80,11 +80,28 @@ export interface ChatChart {
   data: { label: string; value: number }[]
 }
 
+export interface ChatTableRow {
+  label: string
+  amount: number
+  pct: number
+  /** null khi chưa có kỳ trước để so — hiện "—", khác hẳn 0 (không đổi). */
+  trendPct: number | null
+}
+
+/** Bảng số liệu do gateway dựng từ dữ liệu domain (không phải LLM sinh). */
+export interface ChatTable {
+  title: string
+  rows: ChatTableRow[]
+  totalLabel: string
+  totalAmount: number
+}
+
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
   chart?: ChatChart
+  table?: ChatTable
   timestamp: string
 }
 

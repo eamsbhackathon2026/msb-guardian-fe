@@ -22,6 +22,7 @@ import type {
   QuarterlyReport,
   TransferActionResult,
   ChatChart,
+  ChatTable,
   CopilotOverview,
   Customer,
   OpsDashboard,
@@ -116,6 +117,7 @@ export function getQuarterlyReport(quarters = 4): Promise<QuarterlyReport> {
 export interface ChatStreamResult {
   content: string
   chart?: ChatChart
+  table?: ChatTable
 }
 
 /**
@@ -137,6 +139,7 @@ export async function streamChat(question: string, onToken: (token: string) => v
   const decoder = new TextDecoder()
   let full = ''
   let chart: ChatChart | undefined
+  let table: ChatTable | undefined
   let buffer = ''
 
   for (;;) {
@@ -151,10 +154,12 @@ export async function streamChat(question: string, onToken: (token: string) => v
       const payload = line.slice(5).trim()
       if (payload === '[DONE]') continue
       try {
-        const parsed = JSON.parse(payload) as { token?: string; chart?: ChatChart }
+        const parsed = JSON.parse(payload) as { token?: string; chart?: ChatChart; table?: ChatTable }
         if (parsed.token) {
           full += parsed.token
           onToken(parsed.token)
+        } else if (parsed.table) {
+          table = parsed.table
         } else if (parsed.chart) {
           chart = parsed.chart
         }
@@ -166,7 +171,7 @@ export async function streamChat(question: string, onToken: (token: string) => v
     }
   }
 
-  return { content: full, chart }
+  return { content: full, chart, table }
 }
 
 // MOCK CŨ của streamChat: phát lại câu trả lời ghi sẵn ~25ms/token.

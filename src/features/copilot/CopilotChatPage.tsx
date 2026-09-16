@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
-import type { ChatChart, ChatMessage } from '@/data/types'
+import type { ChatChart, ChatMessage, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
 import { formatVnd } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -27,6 +27,60 @@ function MiniBarChart({ chart }: { chart: ChatChart }) {
         </BarChart>
       </ResponsiveContainer>
       <span className="text-[11px] text-muted">Lớn nhất: {chart.data[0]?.label} · {formatVnd(chart.data[0]?.value ?? 0)}</span>
+    </div>
+  )
+}
+
+/** Badge xu hướng: chi tiêu TĂNG là điều cần lưu ý (đỏ), GIẢM là tích cực
+ *  (xanh), 0 trung tính, null = chưa có kỳ trước để so (—). Cùng quy ước với
+ *  khối "Chi tiêu theo quý" ở màn Copilot. */
+function TrendBadge({ pct }: { pct: number | null }) {
+  if (pct === null || pct === undefined) return <span className="text-muted">—</span>
+  if (pct === 0) return <span className="text-muted">0%</span>
+  const up = pct > 0
+  return (
+    <span className={up ? 'text-danger' : 'text-success'}>
+      {up ? '+' : ''}
+      {pct}%
+    </span>
+  )
+}
+
+/** Bảng số liệu chi tiêu do gateway dựng từ dữ liệu domain — số luôn khớp
+ *  database, không phải LLM sinh. */
+function SpendingTable({ table }: { table: ChatTable }) {
+  return (
+    <div className="mt-1.5 overflow-hidden rounded-xl bg-app">
+      <div className="px-3 pt-2.5 pb-1.5 text-xs font-semibold text-muted">{table.title}</div>
+      <table className="w-full border-collapse text-[12.5px]">
+        <thead>
+          <tr className="text-[10px] uppercase tracking-wide text-muted">
+            <th className="px-3 pb-1 text-left font-medium">Nhóm</th>
+            <th className="px-1 pb-1 text-right font-medium">Số tiền</th>
+            <th className="px-1 pb-1 text-right font-medium">%</th>
+            <th className="px-3 pb-1 text-right font-medium">Δ kỳ trước</th>
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((row, i) => (
+            <tr key={row.label} className={i % 2 ? 'bg-black/[0.025]' : ''}>
+              <td className="px-3 py-1.5 text-ink">{row.label}</td>
+              <td className="px-1 py-1.5 text-right tabular-nums text-ink">{formatVnd(row.amount)}</td>
+              <td className="px-1 py-1.5 text-right tabular-nums text-muted">{row.pct}%</td>
+              <td className="px-3 py-1.5 text-right font-medium tabular-nums">
+                <TrendBadge pct={row.trendPct} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr className="border-t border-line font-semibold">
+            <td className="px-3 py-2 text-ink">{table.totalLabel}</td>
+            <td className="px-1 py-2 text-right tabular-nums text-ink">{formatVnd(table.totalAmount)}</td>
+            <td colSpan={2} />
+          </tr>
+        </tfoot>
+      </table>
     </div>
   )
 }
@@ -100,7 +154,7 @@ export function CopilotChatPage() {
     })
     setMessages((prev) => {
       const exists = prev.some((m) => m.id === draft.id)
-      const finalMsg = { ...draft, content: result.content, chart: result.chart }
+      const finalMsg = { ...draft, content: result.content, chart: result.chart, table: result.table }
       return exists ? prev.map((m) => (m.id === draft.id ? finalMsg : m)) : [...prev, finalMsg]
     })
     setWaitingFirstToken(false)
@@ -141,6 +195,7 @@ export function CopilotChatPage() {
               </span>
               <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 text-[15px] leading-[22px] shadow-card">
                 {m.content}
+                {m.table && <SpendingTable table={m.table} />}
                 {m.chart && <MiniBarChart chart={m.chart} />}
               </div>
             </div>
