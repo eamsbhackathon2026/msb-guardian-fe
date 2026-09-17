@@ -237,7 +237,12 @@ export function ChatBankingPage() {
     // trước, thà kém thông minh còn hơn đứng hình giữa lúc khách đang gõ.
     const ai = await parseChatBanking(text).catch(() => null)
     const byAgent = ai?.source === 'agent'
-    const amount = (byAgent ? (ai?.amount ?? undefined) : parseAmount(text)) ?? pending.amount
+    // SỐ TIỀN luôn ưu tiên của gateway, kể cả khi agent hỏng: phần đó do code
+    // tất định tính, không phải mô hình đoán. parseAmount của FE chỉ dùng khi
+    // gọi gateway cũng không được — và nó KHÔNG hiểu "rưỡi", nên "3 triệu rưỡi"
+    // sẽ ra 3.000.000.
+    const amount = (ai?.amount ?? undefined) ?? parseAmount(text) ?? pending.amount
+    // TÊN NGƯỜI NHẬN mới là phần cần mô hình; agent hỏng thì về regex.
     const name = byAgent ? (ai?.recipient ?? null) : recipientName(text)
 
     // Agent hiểu là khách hỏi danh bạ → trả danh sách luôn, khỏi đoán tiếp.
