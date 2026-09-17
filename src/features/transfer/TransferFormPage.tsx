@@ -102,7 +102,7 @@ export function TransferFormPage() {
       })
       return
     }
-    navigate('/transfer/confirm', { state: payload })
+    navigate('/transfer/confirm', { state: { ...payload, level: res?.level, score: res?.score } })
   }
 
   return (
@@ -130,11 +130,14 @@ export function TransferFormPage() {
                 {beneficiary.bank} · {beneficiary.account}
               </span>
               {/* Tín hiệu tin cậy ngầm: "Đã chuyển N lần" là trấn an, "Người
-                  nhận mới" là nhắc nhở — không phải cảnh báo. */}
-              {check?.txCount ? (
-                <span className="block text-[12px] leading-[17px] text-success">Đã chuyển {check.txCount} lần</span>
-              ) : check?.isNew ? (
+                  nhận mới" là nhắc nhở — không phải cảnh báo.
+                  isNew xét TRƯỚC txCount: người nhận mới vẫn có thể đã chuyển
+                  một lần, hiện "Đã chuyển 1 lần" màu xanh ngay cạnh cảnh báo
+                  "chưa từng chuyển" là hai câu chọi nhau trên cùng màn hình. */}
+              {check?.isNew ? (
                 <span className="block text-[12px] leading-[17px] text-warning">Người nhận mới</span>
+              ) : check?.txCount ? (
+                <span className="block text-[12px] leading-[17px] text-success">Đã chuyển {check.txCount} lần</span>
               ) : null}
             </span>
           </div>
@@ -213,7 +216,12 @@ export function TransferFormPage() {
                 !
               </span>
               <div className="min-w-0 flex-1">
-                <div className="text-[12.5px] leading-[18px] text-ink">{check.templateText}</div>
+                {/* Chỉ lấy câu đầu: phần sau "Lý do:" là tên yếu tố thô của
+                    engine (amount deviation, behavior drift...), đọc rất khó.
+                    Bản diễn giải sạch nằm dưới nút "Xem lý do". */}
+                <div className="text-[12.5px] leading-[18px] text-ink">
+                  {check.templateText.split(/\s*Lý do:/)[0]}
+                </div>
                 <button
                   type="button"
                   onClick={() => setShowFactors((v) => !v)}

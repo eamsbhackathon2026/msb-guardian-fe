@@ -1,6 +1,7 @@
-import { ShieldCheck } from 'lucide-react'
+import { ShieldAlert, ShieldCheck } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import type { GuardianLevel } from '@/data/types'
 import { formatVnd } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
@@ -13,6 +14,9 @@ interface ConfirmState {
   afterReview?: boolean
   /** 'chat-banking' khi lệnh bắt nguồn từ chat — màn thành công quay lại chat */
   from?: string
+  /** Mức Guardian của lệnh này, để dòng trấn an không nói sai. */
+  level?: GuardianLevel
+  score?: number
 }
 
 /**
@@ -33,15 +37,23 @@ export function TransferConfirmPage() {
     <MobileFrame statusBar="dark">
       <MobileHeader title="Xác nhận chuyển tiền" backTo="/transfer" />
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6 pt-2">
+        {/* Dòng trấn an/cảnh báo phải khớp mức Guardian vừa chấm. Trước đây mọi
+            lệnh không qua màn cảnh báo đều hiện "người nhận tin cậy" — kể cả
+            lệnh vừa bị chấm 64/100, tức là nói ngược điều hệ thống vừa kết luận. */}
         {state.afterReview ? (
           <div className="flex items-start gap-2 rounded-card bg-warning-soft px-4 py-3 text-[13px] leading-[18px] text-ink">
-            <ShieldCheck size={18} strokeWidth={1.8} className="mt-0.5 flex-none text-warning" />
-            Bạn đã xem cảnh báo Scam Shield và chọn tiếp tục. Hãy chắc chắn bạn tin tưởng người nhận.
+            <ShieldAlert size={18} strokeWidth={1.8} className="mt-0.5 flex-none text-warning" />
+            Bạn đã xem cảnh báo của Guardian và chọn tiếp tục. Hãy chắc chắn bạn tin tưởng người nhận.
+          </div>
+        ) : state.level === 'soft_warn' ? (
+          <div className="flex items-start gap-2 rounded-card bg-warning-soft px-4 py-3 text-[13px] leading-[18px] text-ink">
+            <ShieldAlert size={18} strokeWidth={1.8} className="mt-0.5 flex-none text-warning" />
+            Guardian đã lưu ý về giao dịch này{state.score ? ` (điểm rủi ro ${state.score}/100)` : ''}. Kiểm tra lại tên và số tài khoản trước khi xác nhận.
           </div>
         ) : (
           <div className="flex items-center gap-2 rounded-card bg-success-soft px-4 py-3 text-[13px] leading-[18px] text-success-deep">
             <ShieldCheck size={18} strokeWidth={1.8} className="flex-none" />
-            Người nhận nằm trong danh bạ tin cậy — không cần kiểm tra Scam Shield.
+            Giao dịch nằm trong ngưỡng bình thường của bạn — Guardian không có cảnh báo nào.
           </div>
         )}
 
