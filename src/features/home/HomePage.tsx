@@ -40,7 +40,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
-import { getHomeContent, getSessionCustomer } from '@/lib/api'
+import { getCopilotOverview, getHomeContent, getSessionCustomer } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { formatVnd, fullAccountNumber, fullCustomerName, timeGreeting } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
@@ -397,6 +397,10 @@ export function HomePage() {
   // Cùng queryKey với SettingsSheet nên chỉ có một lời gọi mạng cho cả hai.
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
   const { data: home } = useQuery({ queryKey: ['home-content'], queryFn: getHomeContent })
+  // Cùng queryKey với màn Copilot nên không tốn thêm lời gọi khi đã mở màn đó.
+  const { data: overview } = useQuery({ queryKey: ['copilot-overview'], queryFn: getCopilotOverview })
+  // Tỷ trọng đã chi của ngân sách tháng — Trợ lý AI cảnh báo ngay trên trang chủ
+  const spentPct = overview ? Math.round((overview.budget.spentVnd / overview.budget.budgetVnd) * 100) : null
   const { balanceHidden, toggleBalance } = useGuardianStore()
   const sessionNotis = useGuardianStore((s) => s.notifications)
   const notiToast = useGuardianStore((s) => s.notiToast)
@@ -538,7 +542,14 @@ export function HomePage() {
             onClick={() => navigate('/copilot')}
           >
             <span className="block text-xs font-semibold text-primary">Trợ lý AI Guardian</span>
-            <span className="block text-[13px] leading-[18px]">{home?.assistantHint ?? ''}</span>
+            {spentPct !== null ? (
+              <span className="block text-[13px] leading-[18px]">
+                ⚠️ Tháng này anh đã chi <span className="font-bold text-danger">{spentPct}%</span> ngân sách
+                {overview ? ` (${formatVnd(overview.budget.spentVnd)} / ${formatVnd(overview.budget.budgetVnd)})` : ''}. Bấm vào xem chi tiết nhé.
+              </span>
+            ) : (
+              <span className="block text-[13px] leading-[18px]">{home?.assistantHint ?? ''}</span>
+            )}
             <button
               type="button"
               aria-label="Đóng gợi ý"
