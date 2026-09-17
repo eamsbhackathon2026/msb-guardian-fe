@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { ArrowLeftRight, Calculator, CirclePlus, Coins, Lightbulb, Percent, PiggyBank, ScrollText, TrendingUp } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
 
@@ -9,11 +10,11 @@ const blockVariants = {
   show: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.05, duration: 0.35, ease: 'easeOut' as const } }),
 }
 
-/** 4 lối tắt của trợ lý đầu tư — theo bố cục dautu.jpg */
-const assistantActions = [
+/** 4 lối tắt của trợ lý đầu tư — theo bố cục dautu.jpg; to là đường dẫn nếu đã có màn */
+const assistantActions: { icon: LucideIcon; label: string; to?: string }[] = [
   { icon: Lightbulb, label: 'Gợi ý sản phẩm' },
   { icon: ArrowLeftRight, label: 'So sánh sản phẩm' },
-  { icon: Percent, label: 'Biểu lãi suất' },
+  { icon: Percent, label: 'Biểu lãi suất', to: '/invest/rates' },
   { icon: Calculator, label: 'Tính thử lợi nhuận' },
 ]
 
@@ -54,6 +55,7 @@ const products: Product[] = [
 ]
 
 export function InvestPage() {
+  const navigate = useNavigate()
   return (
     <MobileFrame statusBar="dark">
       <MobileHeader title="Khám phá sản phẩm" backTo="/" />
@@ -75,7 +77,12 @@ export function InvestPage() {
             {assistantActions.map((a) => {
               const Icon = a.icon
               return (
-                <button key={a.label} type="button" className="flex cursor-pointer flex-col items-center gap-2 px-1 py-1.5 text-primary">
+                <button
+                  key={a.label}
+                  type="button"
+                  onClick={() => a.to && navigate(a.to)}
+                  className="flex cursor-pointer flex-col items-center gap-2 px-1 py-1.5 text-primary"
+                >
                   <Icon size={24} strokeWidth={1.5} />
                   <span className="text-center text-[12px] font-medium leading-4 text-ink">{a.label}</span>
                 </button>

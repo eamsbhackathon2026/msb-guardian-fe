@@ -26,6 +26,7 @@ import type {
   ChatTable,
   CopilotOverview,
   Customer,
+  InvestRates,
   OpsDashboard,
   OpsDecision,
   OpsMetrics,
@@ -297,6 +298,19 @@ export function executeTransfer(payload: {
 /** Lịch sử chuyển tiền (FT, chiều OUT) trong 3 tháng gần nhất */
 export function getTransferHistory(): Promise<TransferHistoryItem[]> {
   return fetchJson<TransferHistoryItem[]>('/api/transfer/history')
+}
+
+/* ---- Đầu tư: biểu lãi suất tiết kiệm ---- */
+
+/**
+ * GET /api/invest/rates — biểu lãi suất HIỆN TẠI của sản phẩm tiết kiệm.
+ *
+ * Gateway → transaction-service join 3 bảng product × interest_rate ×
+ * interest_rate_term và chọn đợt hiệu lực mới nhất của từng cặp (sản phẩm,
+ * kỳ hạn). Dữ liệu về đã nhóm sẵn theo kỳ hạn để vẽ bảng + biểu đồ so sánh.
+ */
+export function getInvestRates(): Promise<InvestRates> {
+  return fetchJson<InvestRates>('/api/invest/rates')
 }
 
 /* ---- Nội dung màn Home ---- */

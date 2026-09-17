@@ -381,3 +381,38 @@ export interface TransferPrecheckResult {
   beneficiaryAccount: string
   verdict?: ScamShieldVerdict
 }
+
+
+/* ---- Màn Biểu lãi suất (Khám phá sản phẩm → Biểu lãi suất) ---- */
+
+export interface RateTerm {
+  /** KKH | T01 | T03... — khớp interest_rate_term.term_code phía backend */
+  code: string
+  /** 0 = không kỳ hạn; dùng để xếp trục kỳ hạn */
+  months: number
+  label: string
+}
+
+export interface RateProduct {
+  id: number
+  name: string
+}
+
+export interface RateCell {
+  productId: number
+  /** %/năm — đợt hiệu lực mới nhất của cặp (sản phẩm, kỳ hạn) */
+  ratePct: number
+}
+
+export interface RateRow {
+  term: RateTerm
+  rates: RateCell[]
+}
+
+export interface InvestRates {
+  /** Ngày hiệu lực mới nhất trong biểu — hiển thị "Áp dụng từ ..." */
+  asOf: string
+  products: RateProduct[]
+  /** Mỗi dòng một kỳ hạn — vẽ bảng và biểu đồ so sánh cùng kỳ hạn */
+  rows: RateRow[]
+}

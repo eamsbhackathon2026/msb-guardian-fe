@@ -6,6 +6,7 @@ import { SupportPage } from '@/features/support/SupportPage'
 import { HomePage } from '@/features/home/HomePage'
 import { PaymentsPage } from '@/features/payments/PaymentsPage'
 import { InvestPage } from '@/features/invest/InvestPage'
+import { InvestRatesPage } from '@/features/invest/InvestRatesPage'
 import { LoansPage } from '@/features/loans/LoansPage'
 import { CardsPage } from '@/features/cards/CardsPage'
 import { BeneficiariesPage } from '@/features/transfer/BeneficiariesPage'
@@ -47,6 +48,7 @@ export const router = createBrowserRouter([
   { path: '/transfer/verdict', element: <RequireAuth><ScamShieldVerdictPage /></RequireAuth> },
   { path: '/chat-banking', element: <RequireAuth><ChatBankingPage /></RequireAuth> },
   { path: '/invest', element: <RequireAuth><InvestPage /></RequireAuth> },
+  { path: '/invest/rates', element: <RequireAuth><InvestRatesPage /></RequireAuth> },
   { path: '/copilot', element: <RequireAuth><CopilotOverviewPage /></RequireAuth> },
   { path: '/copilot/chat', element: <RequireAuth><CopilotChatPage /></RequireAuth> },
   { path: '/transfer/review', element: <RequireAuth><ScamAlertPage /></RequireAuth> },
