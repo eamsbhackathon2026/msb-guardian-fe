@@ -105,6 +105,7 @@ function SpendingTable({ table }: { table: ChatTable }) {
 function AgentGrid({ grid }: { grid: ChatGrid }) {
   return (
     <div className="mt-1.5 overflow-x-auto rounded-xl bg-app">
+      {grid.title && <div className="px-3 pt-2.5 text-xs font-semibold text-muted">{grid.title}</div>}
       {/* w-max: bảng lấy đúng bề rộng nội dung rồi cho cuộn ngang. Ép w-full thì
           bong bóng chat hẹp sẽ bóp cột chữ xuống mỗi dòng một tiếng ("Hỗ / trợ /
           gia / đình") và vẫn cắt mất cột cuối. */}

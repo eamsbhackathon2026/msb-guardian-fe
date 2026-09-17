@@ -113,6 +113,8 @@ export interface ChatGridColumn {
 /** Bảng do agent viết bằng markdown, gateway chỉ chuyển thể — dùng cho những
  *  câu hỏi tài chính gateway không tự dựng được bảng chuẩn. */
 export interface ChatGrid {
+  /** Bảng gateway tự dựng có tiêu đề; bảng bóc từ markdown agent thì không. */
+  title?: string | null
   columns: ChatGridColumn[]
   rows: string[][]
 }
@@ -394,12 +396,13 @@ export interface RateTerm {
 }
 
 export interface RateProduct {
-  id: number
+  /** Mã sản phẩm lõi là chuỗi ("RB.TK.LSCN"), không phải số tự tăng. */
+  id: string
   name: string
 }
 
 export interface RateCell {
-  productId: number
+  productId: string
   /** %/năm — đợt hiệu lực mới nhất của cặp (sản phẩm, kỳ hạn) */
   ratePct: number
 }
