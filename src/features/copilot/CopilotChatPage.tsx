@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Send, Sparkles, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
@@ -115,6 +115,7 @@ function makeMessage(role: ChatMessage['role'], content: string, chart?: ChatCha
 
 export function CopilotChatPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   // Gợi ý câu hỏi lấy từ gateway. Khi chưa tải xong thì không hiện chip nào,
   // thay vì hiện danh sách cứng rồi nhảy sang danh sách khác.
   const { data: intro } = useQuery({ queryKey: ['copilot-intro'], queryFn: getCopilotIntro })
@@ -134,6 +135,17 @@ export function CopilotChatPage() {
   const [waitingFirstToken, setWaitingFirstToken] = useState(false)
   const [showChips, setShowChips] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Câu hỏi mang theo từ ô chat ở màn tổng quan Copilot — tự gửi đúng một lần
+  // khi vào (StrictMode mount đôi nên cần cờ ref).
+  const initialQuestion = (location.state as { question?: string } | null)?.question
+  const sentInitialRef = useRef(false)
+  useEffect(() => {
+    if (!initialQuestion || sentInitialRef.current) return
+    sentInitialRef.current = true
+    void send(initialQuestion)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Tự cuộn xuống cuối khi có tin nhắn mới
   useEffect(() => {

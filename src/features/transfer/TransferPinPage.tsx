@@ -71,14 +71,27 @@ export function TransferPinPage() {
   if (phase === 'processing') {
     return (
       <MobileFrame statusBar="dark">
-        <div className="flex flex-1 flex-col items-center justify-center gap-4">
-          <motion.img
-            src="/assets/icon-logo-msb.png"
-            alt="MSB"
-            className="h-14 w-auto"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
-          />
+        <div className="flex flex-1 flex-col items-center justify-center gap-5">
+          {/* Cùng hiệu ứng với splash đăng nhập: logo M nổi giữa, vòng mờ xoay quanh */}
+          <motion.div
+            initial={{ scale: 0.3, opacity: 0, y: 26 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 250, damping: 17 }}
+            className="relative flex h-[76px] w-[76px] items-center justify-center"
+          >
+            <motion.span
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
+              className="absolute inset-0 rounded-full border-[3px] border-primary/20 border-t-primary"
+            />
+            <motion.img
+              src="/assets/icon-logo-msb.png"
+              alt="MSB"
+              animate={{ y: [0, -3, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+              className="h-8 w-auto"
+            />
+          </motion.div>
           <span className="text-[15px] font-medium text-muted">Đang xử lý giao dịch…</span>
         </div>
       </MobileFrame>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeftRight, ChevronRight, CirclePlus, CreditCard, Lock, Wifi } from 'lucide-react'
+import { ArrowLeftRight, ChevronRight, CirclePlus, CreditCard, Lock } from 'lucide-react'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
 
@@ -22,7 +22,7 @@ interface BankCard {
 type TabKey = 'credit' | 'multi' | 'debit'
 
 const cardsByTab: Record<TabKey, BankCard[]> = {
-  credit: [{ id: 'c1', name: 'MSB Visa Online', kind: 'Thẻ vật lý', last4: '7042', available: 80_000_000, limit: 80_000_000, network: 'visa' }],
+  credit: [{ id: 'c1', name: 'M-First Green World', kind: 'Thẻ vật lý', last4: '7042', available: 80_000_000, limit: 80_000_000, network: 'mastercard' }],
   multi: [],
   debit: [{ id: 'd1', name: 'M-First Mastercard', kind: 'Thẻ vật lý', last4: '3151', available: 12_500_000, limit: 50_000_000, network: 'mastercard' }],
 }
@@ -35,34 +35,9 @@ const tabs: { key: TabKey; label: string }[] = [
 
 const vnd = new Intl.NumberFormat('en-US')
 
-/** Hình thẻ vật lý — gradient cam MSB, chip + contactless + logo tổ chức thẻ */
-function CardVisual({ card }: { card: BankCard }) {
-  return (
-    <div
-      className="relative flex aspect-[1.62] w-full flex-col justify-between overflow-hidden rounded-[16px] p-4"
-      style={{ background: 'radial-gradient(120% 160% at 85% 30%, #ff9b3f 0%, #f4581f 45%, #e03410 100%)' }}
-    >
-      <div className="flex items-center justify-between">
-        <img src="/assets/msb-logo-white.png" alt="MSB" className="h-6 w-auto" />
-        <span className="flex items-center gap-2.5 text-white">
-          <span className="text-[13px] font-medium text-white/90">online</span>
-          <Wifi size={18} strokeWidth={2} className="rotate-90" />
-        </span>
-      </div>
-      <span className="block h-8 w-11 rounded-[6px] border border-[#b98a2e]/60" style={{ background: 'linear-gradient(135deg, #f3d27a, #d9a93f)' }} />
-      <div className="flex items-end justify-between">
-        <span className="text-[13px] font-medium tracking-[.14em] text-white/85">•••• {card.last4}</span>
-        {card.network === 'visa' ? (
-          <span className="text-[24px] font-extrabold italic tracking-tight text-white">VISA</span>
-        ) : (
-          <span className="flex">
-            <span className="h-7 w-7 rounded-full bg-[#eb001b]" />
-            <span className="-ml-3 h-7 w-7 rounded-full bg-[#f79e1b]/90" />
-          </span>
-        )}
-      </div>
-    </div>
-  )
+/** Mặt thẻ M-First Green World — dùng thẳng ảnh the.png theo yêu cầu */
+function CardVisual() {
+  return <img src="/assets/card-green-world.png" alt="Thẻ M-First Green World" className="mx-auto w-[230px] rounded-[16px] shadow-card" />
 }
 
 /** Màn Thẻ — theo bố cục the.jpg, tone sáng đồng bộ app */
@@ -118,7 +93,7 @@ export function CardsPage() {
 
         {card && (
           <motion.div custom={0} variants={blockVariants} initial="hidden" animate="show" className="flex flex-col rounded-card bg-surface p-4 shadow-card">
-            <CardVisual card={card} />
+            <CardVisual />
 
             {/* Tên thẻ + số cuối */}
             <div className="flex items-center gap-3 pt-3.5">

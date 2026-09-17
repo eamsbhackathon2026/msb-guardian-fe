@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { MessageCircle, Sparkles, TrendingDown, TrendingUp } from 'lucide-react'
+import { Send, Sparkles, TrendingDown, TrendingUp } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Cell, Pie, PieChart } from 'recharts'
 import { Button } from '@/components/ui/button'
@@ -196,11 +197,19 @@ function QuarterlyBreakdown() {
 export function CopilotOverviewPage() {
   const navigate = useNavigate()
   const { data, isPending } = useQuery({ queryKey: ['copilot-overview'], queryFn: getCopilotOverview })
+  const [question, setQuestion] = useState('')
+
+  /** Gửi câu hỏi → sang màn chat, câu hỏi tự gửi ngay khi vào */
+  function ask() {
+    const q = question.trim()
+    if (!q) return
+    navigate('/copilot/chat', { state: { question: q } })
+  }
 
   return (
     <MobileFrame>
       <MobileHeader title="Financial Copilot" backTo="/" right={<span className="mr-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[13px] font-medium">{data?.budget.monthLabel ?? ''}</span>} />
-      <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-24 pt-1">
+      <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-4 pt-1">
         {isPending || !data ? (
           <OverviewSkeleton />
         ) : (
@@ -222,12 +231,30 @@ export function CopilotOverviewPage() {
           </>
         )}
       </div>
-      {/* CTA nổi */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-8 z-30 flex justify-center">
-        <Button className="pointer-events-auto rounded-full px-6 shadow-primary" onClick={() => navigate('/copilot/chat')}>
-          <MessageCircle size={20} strokeWidth={1.7} />
-          Hỏi Copilot
-        </Button>
+      {/* Ô chat hỏi đáp với Agent — đặt trên bottom nav */}
+      <div className="flex-none border-t border-line bg-surface px-4 pb-2.5 pt-2">
+        <form
+          className="flex items-center gap-2"
+          onSubmit={(e) => {
+            e.preventDefault()
+            ask()
+          }}
+        >
+          <input
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Hỏi Copilot về chi tiêu của bạn…"
+            className="h-11 min-w-0 flex-1 rounded-full bg-app px-4 text-[15px] outline-none placeholder:text-muted"
+          />
+          <button
+            type="submit"
+            aria-label="Gửi"
+            disabled={question.trim().length === 0}
+            className="flex h-11 w-11 flex-none cursor-pointer items-center justify-center rounded-full bg-primary text-white disabled:opacity-40"
+          >
+            <Send size={20} strokeWidth={1.7} />
+          </button>
+        </form>
       </div>
       <BottomNav active="copilot" />
     </MobileFrame>
