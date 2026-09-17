@@ -472,6 +472,16 @@ export interface TransferPrecheckResult {
   txCount: number
 }
 
+/** Ý định chuyển tiền do agent bóc từ một câu của khách. */
+export interface ChatBankingDraft {
+  intent: 'transfer' | 'list_beneficiaries' | 'other'
+  amount?: number | null
+  recipient?: string | null
+  matches: TransferBeneficiary[]
+  /** 'fallback' → agent lỗi/chậm, FE tự dùng bộ luật regex. */
+  source: 'agent' | 'fallback'
+}
+
 export type GuardianLevel = 'pass' | 'soft_warn' | 'intervene'
 export type GuardianActionKey = 'hold' | 'cancel' | 'contact' | 'continue'
 

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, MessageSquareText, Send, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { getTransferBeneficiaries } from '@/lib/api'
+import { getTransferBeneficiaries, parseChatBanking } from '@/lib/api'
 import { formatDate, formatVnd, timeGreeting } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -231,8 +231,19 @@ export function ChatBankingPage() {
     // Chỉ chốt luôn khi danh bạ khớp ĐÚNG MỘT người; khớp nhiều người
     // (2 anh Khánh) là câu mơ hồ, phải qua bước hỏi chọn bên dưới.
     let beneficiary = (local.length === 1 ? local[0] : undefined) ?? pending.beneficiary
-    const amount = parseAmount(text) ?? pending.amount
-    const name = recipientName(text)
+
+    // Agent bóc số tiền và tên người nhận. Bộ luật regex bên dưới GIỮ NGUYÊN
+    // làm đường lui: agent lỗi hoặc quá chậm thì màn chuyển tiền vẫn chạy như
+    // trước, thà kém thông minh còn hơn đứng hình giữa lúc khách đang gõ.
+    const ai = await parseChatBanking(text).catch(() => null)
+    const byAgent = ai?.source === 'agent'
+    const amount = (byAgent ? (ai?.amount ?? undefined) : parseAmount(text)) ?? pending.amount
+    const name = byAgent ? (ai?.recipient ?? null) : recipientName(text)
+
+    // Agent hiểu là khách hỏi danh bạ → trả danh sách luôn, khỏi đoán tiếp.
+    if (byAgent && ai?.intent === 'list_beneficiaries') {
+      return makeMsg('assistant', 'Danh bạ thụ hưởng của anh đây ạ, bấm chọn là em soạn lệnh luôn:', { beneficiaries: book })
+    }
 
     // Tên người nhận KHÔNG đủ thông tin để chỉ đích danh → lọc danh bạ theo
     // tên: trùng nhiều người thì trả danh sách cho khách bấm chọn, đúng một

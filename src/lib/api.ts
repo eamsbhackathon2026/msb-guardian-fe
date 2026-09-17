@@ -44,6 +44,7 @@ import type {
   SafetyCenter,
   ScamAlert,
   TransferBeneficiary,
+  ChatBankingDraft,
   InterveneAdvice,
   InterveneDetail,
   TransferPrecheckResult,
@@ -226,6 +227,15 @@ export function getTransferBeneficiaries(): Promise<TransferBeneficiary[]> {
  * Quyết định luồng: stk quen (requiresReview=false → chuyển thẳng) hay stk mới
  * (requiresReview=true → agent Scam Shield trả verdict). Gateway tự gọi agent.
  */
+/** Agent bóc ý định chuyển tiền từ một câu. Gateway đã đối chiếu danh bạ thật,
+ *  nên matches là người nhận có thật của đúng khách đang đăng nhập. */
+export function parseChatBanking(message: string): Promise<ChatBankingDraft> {
+  return fetchJson<ChatBankingDraft>('/api/chat-banking/parse', {
+    method: 'POST',
+    body: JSON.stringify({ message }),
+  })
+}
+
 /** Lượt 1 màn Guardian — đọc lại quyết định đã chấm, không chấm lại. */
 export function getInterveneDetail(decisionId: string): Promise<InterveneDetail> {
   return fetchJson<InterveneDetail>(`/api/transfer/intervene/${encodeURIComponent(decisionId)}`)
