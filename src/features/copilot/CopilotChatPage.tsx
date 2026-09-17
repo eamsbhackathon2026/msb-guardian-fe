@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
 import type { ChatChart, ChatMessage, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
-import { formatVnd } from '@/lib/format'
+import { formatDate, formatVnd, timeGreeting } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 
 const chartShades = ['var(--msb-primary)', 'var(--msb-orange-300)', 'var(--msb-orange-200)', 'var(--msb-orange-border)', 'var(--msb-border)']
@@ -100,6 +100,13 @@ function TypingDots() {
   )
 }
 
+/** Gateway trả lời chào soạn sẵn với khung giờ cố định; thay bằng khung giờ
+ *  thực của thiết bị để vào buổi tối không bị "Chào buổi sáng". */
+function liveGreeting(raw: string): string {
+  const out = raw.replace(/^(chào buổi (sáng|trưa|chiều|tối)|chúc ngủ ngon|xin chào|chào)/i, timeGreeting())
+  return out === raw ? `${timeGreeting()}! ${raw}` : out
+}
+
 let nextId = 0
 function makeMessage(role: ChatMessage['role'], content: string, chart?: ChatChart): ChatMessage {
   nextId += 1
@@ -120,7 +127,7 @@ export function CopilotChatPage() {
   // refetch giữa cuộc trò chuyện sẽ chèn lại lời chào vào giữa.
   useEffect(() => {
     if (!intro) return
-    setMessages((prev) => (prev.length === 0 ? [makeMessage('assistant', intro.greeting)] : prev))
+    setMessages((prev) => (prev.length === 0 ? [makeMessage('assistant', liveGreeting(intro.greeting))] : prev))
   }, [intro])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
@@ -182,7 +189,7 @@ export function CopilotChatPage() {
 
       {/* Hội thoại */}
       <div ref={scrollRef} className="no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-3">
-        <span className="text-center text-xs text-muted">Hôm nay · 15/09/2026</span>
+        <span className="text-center text-xs text-muted">Hôm nay · {formatDate(new Date().toISOString())}</span>
         {messages.map((m) =>
           m.role === 'user' ? (
             <div key={m.id} className="max-w-[280px] self-end rounded-[16px_16px_4px_16px] bg-primary px-3.5 py-3 text-[15px] leading-[22px] text-white">

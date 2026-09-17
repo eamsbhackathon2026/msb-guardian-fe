@@ -93,7 +93,7 @@ const searchFeatures = [
   { icon: <CreditCard size={22} strokeWidth={1.5} />, label: 'Thẻ', desc: 'Quản lý thẻ ghi nợ, tín dụng', to: '/cards' },
   { icon: <ReceiptText size={22} strokeWidth={1.5} />, label: 'Thanh toán hóa đơn', desc: 'Điện, nước, internet…', to: '/payments' },
   { icon: <HandCoins size={22} strokeWidth={1.5} />, label: 'Vay', desc: 'Vay tiêu dùng lãi suất ưu đãi', to: '/loans' },
-  { icon: <MessageSquareText size={22} strokeWidth={1.5} />, label: 'Chat Banking', desc: 'Nhắn một câu, chuyển tiền xong ngay', to: '/copilot/chat' },
+  { icon: <MessageSquareText size={22} strokeWidth={1.5} />, label: 'Chat Banking', desc: 'Nhắn một câu, chuyển tiền xong ngay', to: '/chat-banking' },
   { icon: <ShieldCheck size={22} strokeWidth={1.5} />, label: 'Trung tâm an toàn', desc: 'Scam Shield bảo vệ giao dịch', to: '/safety-center' },
   { icon: <Headphones size={22} strokeWidth={1.5} />, label: 'Trung tâm hỗ trợ', desc: 'Câu hỏi thường gặp, liên hệ MSB', to: '/support' },
 ]
@@ -430,7 +430,7 @@ export function HomePage() {
           <div className="mx-0 h-px bg-divider" />
           <div className="flex items-end justify-between px-4 pb-4 pt-3">
             <span className="flex flex-col gap-0.5">
-              <span className="text-[13px] leading-[18px] tracking-[.02em] text-muted">Tài khoản thanh toán {fullAccountNumber(customer?.maskedAccount)}</span>
+              <span className="text-[13px] font-semibold leading-[18px] tracking-[.04em] text-ink">{fullAccountNumber(customer?.maskedAccount)}</span>
               <span className="flex items-baseline gap-2">
                 <span className="text-[26px] font-bold leading-8 tracking-[.02em]">
                   {balanceHidden ? '•••••••' : formatVnd(customer?.balance ?? 0).replace(' ₫', '')}
@@ -477,7 +477,7 @@ export function HomePage() {
           initial="hidden"
           animate="show"
           type="button"
-          onClick={() => navigate('/copilot/chat')}
+          onClick={() => navigate('/chat-banking')}
           className="flex cursor-pointer items-center gap-3 rounded-card border border-orange-border bg-surface p-3 text-left shadow-card"
         >
           <span className="flex h-10 w-10 flex-none items-center justify-center rounded-[13px] bg-orange-soft text-primary">

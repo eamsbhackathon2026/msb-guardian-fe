@@ -10,6 +10,7 @@ import { LoansPage } from '@/features/loans/LoansPage'
 import { CardsPage } from '@/features/cards/CardsPage'
 import { BeneficiariesPage } from '@/features/transfer/BeneficiariesPage'
 import { TransferFormPage } from '@/features/transfer/TransferFormPage'
+import { ChatBankingPage } from '@/features/transfer/ChatBankingPage'
 import { CopilotOverviewPage } from '@/features/copilot/CopilotOverviewPage'
 import { CopilotChatPage } from '@/features/copilot/CopilotChatPage'
 import { ScamAlertPage } from '@/features/scamshield/ScamAlertPage'
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
   { path: '/cards', element: <RequireAuth><CardsPage /></RequireAuth> },
   { path: '/transfer', element: <RequireAuth><BeneficiariesPage /></RequireAuth> },
   { path: '/transfer/new', element: <RequireAuth><TransferFormPage /></RequireAuth> },
+  { path: '/chat-banking', element: <RequireAuth><ChatBankingPage /></RequireAuth> },
   { path: '/invest', element: <RequireAuth><InvestPage /></RequireAuth> },
   { path: '/copilot', element: <RequireAuth><CopilotOverviewPage /></RequireAuth> },
   { path: '/copilot/chat', element: <RequireAuth><CopilotChatPage /></RequireAuth> },

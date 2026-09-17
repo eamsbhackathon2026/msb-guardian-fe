@@ -22,11 +22,13 @@ const vnd = new Intl.NumberFormat('en-US')
 export function TransferFormPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const beneficiary: Beneficiary = (location.state as { beneficiary?: Beneficiary } | null)?.beneficiary ?? favoriteBeneficiaries[0]
+  // Chat Banking gửi kèm số tiền đã hiểu từ câu chat để form điền sẵn
+  const state = (location.state as { beneficiary?: Beneficiary; amount?: number } | null) ?? {}
+  const beneficiary: Beneficiary = state.beneficiary ?? favoriteBeneficiaries[0]
 
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
 
-  const [amountDigits, setAmountDigits] = useState('')
+  const [amountDigits, setAmountDigits] = useState(state.amount && state.amount > 0 ? String(Math.floor(state.amount)) : '')
   const [note, setNote] = useState('NGUYEN VIET ANH chuyen tien')
   const [scheduled, setScheduled] = useState(false)
   const [amountFocused, setAmountFocused] = useState(false)
