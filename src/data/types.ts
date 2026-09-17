@@ -105,12 +105,25 @@ export interface ChatTable {
   footnote?: string | null
 }
 
+export interface ChatGridColumn {
+  label: string
+  align: 'left' | 'right'
+}
+
+/** Bảng do agent viết bằng markdown, gateway chỉ chuyển thể — dùng cho những
+ *  câu hỏi tài chính gateway không tự dựng được bảng chuẩn. */
+export interface ChatGrid {
+  columns: ChatGridColumn[]
+  rows: string[][]
+}
+
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
   chart?: ChatChart
   table?: ChatTable
+  grids?: ChatGrid[]
   timestamp: string
 }
 

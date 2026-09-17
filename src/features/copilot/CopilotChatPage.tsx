@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
-import type { ChatChart, ChatMessage, ChatTable } from '@/data/types'
+import type { ChatChart, ChatGrid, ChatMessage, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
 import { formatDate, formatVnd, timeGreeting, formatVndWithSign } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -99,6 +99,44 @@ function SpendingTable({ table }: { table: ChatTable }) {
   )
 }
 
+/** Bảng agent tự kẻ (markdown). Gateway chỉ chuyển thể nên ô đã là chuỗi định
+ *  dạng sẵn — component không diễn giải số, chỉ trình bày cho dễ đọc. Nhờ vậy
+ *  câu hỏi tài chính nào agent kẻ bảng được thì ở đây cũng ra bảng. */
+function AgentGrid({ grid }: { grid: ChatGrid }) {
+  return (
+    <div className="mt-1.5 overflow-x-auto rounded-xl bg-app">
+      <table className="w-full border-collapse text-[12.5px]">
+        <thead>
+          <tr className="text-[10px] uppercase tracking-wide text-muted">
+            {grid.columns.map((c, i) => (
+              <th
+                key={`${c.label}-${i}`}
+                className={`whitespace-nowrap px-3 pb-1 pt-2.5 font-medium ${c.align === 'right' ? 'text-right' : 'text-left'}`}
+              >
+                {c.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {grid.rows.map((row, ri) => (
+            <tr key={ri} className={ri % 2 ? 'bg-black/[0.025]' : ''}>
+              {row.map((o, ci) => (
+                <td
+                  key={ci}
+                  className={`px-3 py-1.5 text-ink ${grid.columns[ci]?.align === 'right' ? 'whitespace-nowrap text-right tabular-nums' : 'text-left'}`}
+                >
+                  {o}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 function TypingDots() {
   return (
     <div className="flex w-fit items-center gap-1.5 rounded-[16px_16px_16px_4px] bg-surface px-4 py-3.5 shadow-card">
@@ -187,7 +225,7 @@ export function CopilotChatPage() {
     })
     setMessages((prev) => {
       const exists = prev.some((m) => m.id === draft.id)
-      const finalMsg = { ...draft, content: result.content, chart: result.chart, table: result.table }
+      const finalMsg = { ...draft, content: result.content, chart: result.chart, table: result.table, grids: result.grids }
       return exists ? prev.map((m) => (m.id === draft.id ? finalMsg : m)) : [...prev, finalMsg]
     })
     setWaitingFirstToken(false)
@@ -229,6 +267,7 @@ export function CopilotChatPage() {
               <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 text-[15px] leading-[22px] shadow-card">
                 {m.content}
                 {m.table && <SpendingTable table={m.table} />}
+                {m.grids?.map((g, i) => <AgentGrid key={i} grid={g} />)}
                 {m.chart && <MiniBarChart chart={m.chart} />}
               </div>
             </div>
