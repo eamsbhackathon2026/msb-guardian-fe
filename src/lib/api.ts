@@ -29,6 +29,7 @@ import type {
   CopilotOverview,
   Customer,
   InvestRates,
+  MaturingDeposits,
   OpsAuditLog,
   OpsCase,
   OpsCaseStatus,
@@ -124,6 +125,15 @@ export function getCopilotIntro(): Promise<CopilotIntro> {
  */
 export function getCopilotNotifications(): Promise<CopilotNotification[]> {
   return fetchJson<CopilotNotification[]>('/api/copilot/notifications')
+}
+
+/**
+ * GET /api/invest/maturing-deposits — CHECK sổ tiết kiệm đến hạn: backend so
+ * maturity_date của từng sổ với ngày HÔM NAY (giờ VN). days=0 (mặc định) là
+ * đến hạn đúng hôm nay, kèm cả sổ đã quá hạn chưa tái tục.
+ */
+export function getMaturingDeposits(days = 0): Promise<MaturingDeposits> {
+  return fetchJson<MaturingDeposits>(`/api/invest/maturing-deposits?days=${days}`)
 }
 
 /**

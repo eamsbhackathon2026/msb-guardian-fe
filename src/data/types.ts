@@ -554,3 +554,27 @@ export interface CopilotNotification {
   body: string
   ctaLabel?: string
 }
+
+
+/* ---- Sổ tiết kiệm đến hạn (check maturity_date với hôm nay) ---- */
+
+export interface MaturingDeposit {
+  depositId: number
+  productName?: string
+  amount: number
+  /** %/năm đang hưởng (lãi gốc + biên) */
+  ratePct: number
+  termMonths?: number
+  /** ISO yyyy-mm-dd */
+  maturityDate: string
+  dueToday: boolean
+  /** Đã qua ngày đáo hạn mà chưa tái tục */
+  overdue: boolean
+}
+
+export interface MaturingDeposits {
+  /** Ngày (giờ VN) backend dùng để so maturity_date */
+  asOf: string
+  count: number
+  deposits: MaturingDeposit[]
+}

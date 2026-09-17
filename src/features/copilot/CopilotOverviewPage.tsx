@@ -7,7 +7,7 @@ import { Cell, Pie, PieChart } from 'recharts'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { CopilotNotification, CopilotOverview, Insight, SpendingCategory } from '@/data/types'
-import { getCopilotNotifications, getCopilotOverview, getQuarterlyReport } from '@/lib/api'
+import { getCopilotNotifications, getCopilotOverview, getMaturingDeposits, getQuarterlyReport } from '@/lib/api'
 import { formatPct, formatVnd, formatVndWithSign } from '@/lib/format'
 import { BottomNav } from '@/shell/BottomNav'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -132,7 +132,25 @@ const NOTIFICATION_STYLE: Record<CopilotNotification['kind'], { icon: typeof Pig
 function NotificationsSection() {
   const navigate = useNavigate()
   const { data } = useQuery({ queryKey: ['copilot-notifications'], queryFn: getCopilotNotifications })
+  // Check thật sổ đến hạn: /api/invest/maturing-deposits so maturity_date của
+  // từng sổ với ngày HÔM NAY. Có kết quả thì mục "sổ đến hạn" hiển thị đúng
+  // tên sổ + số tiền + ngày từ database thay cho nội dung mặc định.
+  const { data: maturing } = useQuery({ queryKey: ['maturing-deposits'], queryFn: () => getMaturingDeposits(0) })
   if (!data || data.length === 0) return null
+
+  const due = maturing?.deposits ?? []
+
+  function savingTitle(fallback: string): string {
+    if (due.length === 0) return fallback
+    const d = due[0]
+    const when = d.overdue ? 'đã quá hạn chưa tái tục' : 'đến hạn hôm nay'
+    return `Sổ ${d.productName ?? 'tiết kiệm'} ${formatVnd(d.amount)} ${when}`
+  }
+
+  function savingBody(fallback: string): string {
+    if (due.length <= 1) return fallback
+    return `${fallback} Anh còn ${due.length - 1} sổ khác cũng đến hạn trong hôm nay.`
+  }
 
   return (
     <div className="flex flex-col gap-2 rounded-card bg-surface px-4 py-3 shadow-card">
@@ -150,8 +168,8 @@ function NotificationsSection() {
                 <Icon size={17} strokeWidth={1.8} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold leading-snug">{n.title}</span>
-                <span className="block pt-0.5 text-[13px] leading-relaxed text-muted">{n.body}</span>
+                <span className="block text-sm font-semibold leading-snug">{n.kind === 'saving' ? savingTitle(n.title) : n.title}</span>
+                <span className="block pt-0.5 text-[13px] leading-relaxed text-muted">{n.kind === 'saving' ? savingBody(n.body) : n.body}</span>
               </span>
             </span>
             {n.ctaLabel && (
