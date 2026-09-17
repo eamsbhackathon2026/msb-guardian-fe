@@ -16,6 +16,7 @@ import { NewAccountPage } from '@/features/transfer/NewAccountPage'
 import { TransferPinPage } from '@/features/transfer/TransferPinPage'
 import { TransferHistoryPage } from '@/features/transfer/TransferHistoryPage'
 import { ScamShieldVerdictPage } from '@/features/transfer/ScamShieldVerdictPage'
+import { GuardianPage } from '@/features/transfer/GuardianPage'
 import { ChatBankingPage } from '@/features/transfer/ChatBankingPage'
 import { CopilotOverviewPage } from '@/features/copilot/CopilotOverviewPage'
 import { CopilotChatPage } from '@/features/copilot/CopilotChatPage'
@@ -46,6 +47,7 @@ export const router = createBrowserRouter([
   { path: '/transfer/pin', element: <RequireAuth><TransferPinPage /></RequireAuth> },
   { path: '/transactions', element: <RequireAuth><TransferHistoryPage /></RequireAuth> },
   { path: '/transfer/verdict', element: <RequireAuth><ScamShieldVerdictPage /></RequireAuth> },
+  { path: '/transfer/guardian', element: <RequireAuth><GuardianPage /></RequireAuth> },
   { path: '/chat-banking', element: <RequireAuth><ChatBankingPage /></RequireAuth> },
   { path: '/invest', element: <RequireAuth><InvestPage /></RequireAuth> },
   { path: '/invest/rates', element: <RequireAuth><InvestRatesPage /></RequireAuth> },

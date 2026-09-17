@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 // MOCK CŨ: import { demoSafetyCenter } from '@/data/demo-scenarios'
-import type { AlertStatus, ProtectionLayer } from '@/data/types'
+import type { CustomerAction, AlertStatus, ProtectionLayer } from '@/data/types'
 
 /** Giao dịch chuyển tiền đã thực hiện trong phiên — nguồn cho bảng lịch sử */
 export interface TransferRecord {
@@ -36,8 +36,8 @@ interface GuardianState {
   setAlertStatus: (id: string, status: AlertStatus) => void
 
   /** Kết quả luồng Scam Shield của khách (huỷ / vẫn chuyển / báo cáo) */
-  lastShieldOutcome: 'cancelled' | 'proceeded' | 'reported' | null
-  setShieldOutcome: (outcome: 'cancelled' | 'proceeded' | 'reported') => void
+  lastShieldOutcome: CustomerAction | null
+  setShieldOutcome: (outcome: CustomerAction) => void
 
   /** Lịch sử giao dịch trong phiên, giao dịch mới nhất đứng đầu */
   transactions: TransferRecord[]

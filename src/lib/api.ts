@@ -36,6 +36,8 @@ import type {
   SafetyCenter,
   ScamAlert,
   TransferBeneficiary,
+  InterveneAdvice,
+  InterveneDetail,
   TransferPrecheckResult,
 } from '@/data/types'
 
@@ -198,6 +200,23 @@ export function getTransferBeneficiaries(): Promise<TransferBeneficiary[]> {
  * Quyết định luồng: stk quen (requiresReview=false → chuyển thẳng) hay stk mới
  * (requiresReview=true → agent Scam Shield trả verdict). Gateway tự gọi agent.
  */
+/** Lượt 1 màn Guardian — đọc lại quyết định đã chấm, không chấm lại. */
+export function getInterveneDetail(decisionId: string): Promise<InterveneDetail> {
+  return fetchJson<InterveneDetail>(`/api/transfer/intervene/${encodeURIComponent(decisionId)}`)
+}
+
+/** Lượt 2 — gửi lựa chọn của khách, nhận khuyến cáo và bốn hành động. */
+export function postIntervene(payload: {
+  decisionId: string
+  selectedOption: string
+  freeText?: string
+}): Promise<InterveneAdvice> {
+  return fetchJson<InterveneAdvice>('/api/transfer/intervene', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
 export function precheckTransfer(payload: {
   bankCode: string
   accountNo: string
@@ -325,10 +344,11 @@ export function getHomeContent(): Promise<HomeContent> {
  * Trước đây ba nút Huỷ / Vẫn chuyển / Báo cáo chỉ đổi state zustand, backend
  * không hề biết. Nay mỗi hành động cập nhật case và dòng thời gian bên Ops.
  */
-export function postTransferAction(action: CustomerAction): Promise<TransferActionResult> {
+export function postTransferAction(action: CustomerAction, decisionId?: string): Promise<TransferActionResult> {
   return fetchJson<TransferActionResult>('/api/transfer/action', {
     method: 'POST',
-    body: JSON.stringify({ action }),
+    // decisionId chỉ có ở màn Guardian; bỏ trống thì gateway dùng lần chấm gần nhất.
+    body: JSON.stringify(decisionId ? { action, decisionId } : { action }),
   })
 }
 

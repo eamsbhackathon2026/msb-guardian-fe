@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Switch } from '@/components/ui/switch'
 import { getSessionCustomer, precheckTransfer } from '@/lib/api'
+import type { TransferPrecheckResult } from '@/data/types'
 import { fullAccountNumber } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
@@ -34,6 +35,10 @@ export function TransferFormPage() {
   const [scheduled, setScheduled] = useState(false)
   const [amountFocused, setAmountFocused] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  // Kết quả chấm điểm Guardian của số tiền đang nhập. Chạy khi rời ô số tiền để
+  // banner cảnh báo hiện ngay tại chỗ, đúng như wireframe, chứ không đợi bấm nút.
+  const [check, setCheck] = useState<TransferPrecheckResult | null>(null)
+  const [showFactors, setShowFactors] = useState(false)
 
   const canContinue = amountDigits.length > 0 && Number(amountDigits) > 0
 
@@ -45,6 +50,22 @@ export function TransferFormPage() {
     amountDigits.length > 0 && amountDigits.length < 6 && amountValue > 0
       ? [amountValue * 1_000, amountValue * 10_000, amountValue * 100_000].filter((v) => String(v).length <= 12)
       : []
+
+  /** Chấm điểm lệnh đang nhập. Lỗi thì trả null — không bao giờ chặn khách. */
+  async function runPrecheck(amount: number): Promise<TransferPrecheckResult | null> {
+    if (!amount) return null
+    try {
+      return await precheckTransfer({
+        bankCode: beneficiary.bankCode ?? beneficiary.bank,
+        accountNo: beneficiary.account,
+        amount,
+        note,
+        holderName: beneficiary.name,
+      })
+    } catch {
+      return null
+    }
+  }
 
   /**
    * "Tiếp tục" rẽ nhánh theo yêu cầu:
@@ -61,29 +82,27 @@ export function TransferFormPage() {
       note,
       from: state.from,
     }
-    if (beneficiary.trusted) {
-      navigate('/transfer/confirm', { state: payload })
+    setSubmitting(true)
+    const res = await runPrecheck(amount)
+    setSubmitting(false)
+    setCheck(res)
+    // Chỉ mức intervene mới chèn màn Guardian. pass và soft_warn đi thẳng sang
+    // xác nhận — soft_warn đã cảnh báo bằng banner ngay trên màn này rồi.
+    // Engine im lặng (res null) cũng đi tiếp: không chặn vì Guardian lỗi.
+    if (res?.level === 'intervene') {
+      navigate('/transfer/guardian', {
+        state: {
+          ...payload,
+          decisionId: res.decisionId,
+          score: res.score,
+          reasons: res.topFactors,
+          question: res.question,
+          options: res.options,
+        },
+      })
       return
     }
-    setSubmitting(true)
-    try {
-      const res = await precheckTransfer({
-        bankCode: beneficiary.bankCode ?? beneficiary.bank,
-        accountNo: beneficiary.account,
-        amount,
-        note,
-        holderName: beneficiary.name,
-      })
-      setSubmitting(false)
-      if (res.requiresReview && res.verdict && res.verdict.level !== 'safe') {
-        navigate('/transfer/verdict', { state: { ...payload, verdict: res.verdict } })
-      } else {
-        navigate('/transfer/confirm', { state: payload })
-      }
-    } catch {
-      setSubmitting(false)
-      navigate('/transfer/confirm', { state: payload })
-    }
+    navigate('/transfer/confirm', { state: payload })
   }
 
   return (
@@ -110,6 +129,13 @@ export function TransferFormPage() {
               <span className="block text-[13px] leading-[18px] text-muted">
                 {beneficiary.bank} · {beneficiary.account}
               </span>
+              {/* Tín hiệu tin cậy ngầm: "Đã chuyển N lần" là trấn an, "Người
+                  nhận mới" là nhắc nhở — không phải cảnh báo. */}
+              {check?.txCount ? (
+                <span className="block text-[12px] leading-[17px] text-success">Đã chuyển {check.txCount} lần</span>
+              ) : check?.isNew ? (
+                <span className="block text-[12px] leading-[17px] text-warning">Người nhận mới</span>
+              ) : null}
             </span>
           </div>
         </motion.div>
@@ -145,7 +171,10 @@ export function TransferFormPage() {
                 value={amountDigits ? vnd.format(Number(amountDigits)) : ''}
                 onChange={(e) => setAmountDigits(e.target.value.replace(/\D/g, '').slice(0, 12))}
                 onFocus={() => setAmountFocused(true)}
-                onBlur={() => setAmountFocused(false)}
+                onBlur={() => {
+                  setAmountFocused(false)
+                  void runPrecheck(Number(amountDigits)).then(setCheck)
+                }}
                 inputMode="numeric"
                 placeholder="Nhập số tiền"
                 aria-label="Số tiền"
@@ -174,6 +203,37 @@ export function TransferFormPage() {
               </div>
             )}
           </div>
+
+          {/* Cảnh báo mức soft-warn: hiện ngay tại chỗ, KHÔNG thêm bước nào.
+              Chữ là template rule-based của engine nên hiện tức thì, không chờ
+              LLM. Mức intervene không dùng banner mà chèn hẳn màn Guardian. */}
+          {check?.level === 'soft_warn' && check.templateText && (
+            <div className="flex items-start gap-2.5 rounded-btn border border-warning bg-warning-soft px-3 py-2.5">
+              <span className="mt-0.5 flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full border-[1.5px] border-warning text-[11px] font-bold text-warning">
+                !
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[12.5px] leading-[18px] text-ink">{check.templateText}</div>
+                <button
+                  type="button"
+                  onClick={() => setShowFactors((v) => !v)}
+                  className="mt-1 cursor-pointer text-[11px] text-warning underline underline-offset-2"
+                >
+                  Điểm rủi ro {check.score}/100 · {showFactors ? 'Thu gọn' : 'Xem lý do'}
+                </button>
+                {showFactors && (
+                  <div className="mt-1.5 flex flex-col gap-1">
+                    {check.topFactors.map((f, i) => (
+                      <div key={i} className="flex items-start gap-1.5 text-[11.5px] leading-[16px] text-muted">
+                        <span className="mt-[6px] h-1 w-1 flex-none rounded-full bg-warning" />
+                        {f}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Nội dung */}
           <div className="flex flex-col gap-2">

@@ -309,7 +309,9 @@ export interface OpsSession {
 
 /* ---- Thao tác ghi ---- */
 
-export type CustomerAction = 'cancelled' | 'proceeded' | 'reported'
+// 'held' và 'contacted' thêm cho màn Guardian (bốn nút: khóa tạm · huỷ ·
+// gọi MSB · vẫn tiếp tục).
+export type CustomerAction = 'cancelled' | 'proceeded' | 'reported' | 'held' | 'contacted'
 
 export interface TransferActionResult {
   ok: boolean
@@ -382,6 +384,55 @@ export interface TransferPrecheckResult {
   beneficiaryBank: string
   beneficiaryAccount: string
   verdict?: ScamShieldVerdict
+
+  /* ---- Guardian 3 mức (wireframe màn Transfer) ---- */
+  /** <40 pass · 40–74 soft_warn · >=75 intervene — do risk engine chấm. */
+  score: number
+  level: GuardianLevel
+  /** Ba yếu tố nặng nhất, đã là câu hoàn chỉnh của engine. */
+  topFactors: string[]
+  /** Câu cảnh báo rule-based, hiện ngay không chờ LLM. */
+  templateText: string
+  decisionId: string
+  question?: string
+  options: string[]
+  scenarioId?: string
+  /** "Đã chuyển N lần" — tín hiệu tin cậy ngầm ở mức pass. */
+  txCount: number
+}
+
+export type GuardianLevel = 'pass' | 'soft_warn' | 'intervene'
+export type GuardianActionKey = 'hold' | 'cancel' | 'contact' | 'continue'
+
+/** Lượt 1 màn Guardian: vì sao dừng và câu cần hỏi khách. */
+export interface InterveneDetail {
+  decisionId: string
+  score: number
+  level: GuardianLevel
+  amount: number
+  beneficiaryLabel: string
+  reasons: string[]
+  question: string
+  options: string[]
+  scenarioId?: string
+}
+
+export interface GuardianAction {
+  key: GuardianActionKey
+  label: string
+  /** Nút engine khuyến nghị — tô đậm. Do engine chọn, không phải LLM. */
+  recommended: boolean
+}
+
+/** Lượt 2 màn Guardian: khuyến cáo và bốn hành động. */
+export interface InterveneAdvice {
+  decisionId: string
+  selectedOption: string
+  adviceTitle: string
+  adviceBody: string
+  recommendedAction: GuardianActionKey
+  actions: GuardianAction[]
+  source: 'agent' | 'playbook'
 }
 
 
