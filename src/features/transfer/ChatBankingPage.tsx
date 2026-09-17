@@ -86,57 +86,22 @@ function matchByName(list: Beneficiary[], name: string): Beneficiary[] {
   })
 }
 
-/**
- * GỌI API danh bạ thật (GET /api/transfer/beneficiaries — toàn bộ BEN của khách
- * từ customer-profile-service) rồi lọc theo tên. Đây là bước tra cứu khi tên
- * khách nhắn không đủ thông tin để chỉ đích danh một người.
- *
- * API được GỘP với danh bạ demo (đã có 2 anh Khánh khớp seed) trước khi lọc:
- * gateway/DB chưa nạp đủ dữ liệu thì khách vẫn được hỏi chọn giữa các anh Khánh
- * thay vì bị báo "chưa có trong danh bạ". Trùng số tài khoản thì ưu tiên bản API.
- */
-async function queryBeneficiariesByName(name: string): Promise<Beneficiary[]> {
-  let api: Beneficiary[] = []
-  try {
-    api = (await getTransferBeneficiaries()).map((b) => ({
-      id: b.id,
-      name: b.name,
-      bank: b.bank,
-      account: b.account,
-      trusted: b.trusted,
-      bankCode: b.bank,
-    }))
-  } catch {
-    // API lỗi → còn danh bạ demo bên dưới, luồng hỏi-chọn vẫn chạy được
-  }
-  const merged = [...api]
-  const seen = new Set(api.map((b) => b.account.replace(/\s/g, '')))
-  for (const b of favoriteBeneficiaries) {
-    const key = b.account.replace(/\s/g, '')
-    if (!seen.has(key)) {
-      seen.add(key)
-      merged.push(b)
-    }
-  }
-  return matchByName(merged, name)
-}
-
-/** Khớp người nhận theo tên (bỏ dấu) hoặc số tài khoản trong danh bạ demo —
+/** Khớp người nhận theo tên (bỏ dấu) hoặc số tài khoản trong danh bạ đưa vào —
  *  trả về MỌI người khớp: 2 người cùng tên (anh Khánh) là câu mơ hồ, phần gọi
  *  phải hỏi lại thay vì lặng lẽ lấy người đầu tiên.
  *  Token "msb" bị loại khi so từng từ vì gần như tên nào cũng chứa nó. */
-function findBeneficiaries(text: string): Beneficiary[] {
+function findBeneficiaries(text: string, book: Beneficiary[]): Beneficiary[] {
   const t = stripDiacritics(text)
-  const whole = favoriteBeneficiaries.filter((b) => t.includes(stripDiacritics(b.name)) || t.includes(b.account))
+  const whole = book.filter((b) => t.includes(stripDiacritics(b.name)) || t.includes(b.account))
   if (whole.length > 0) return whole
-  return favoriteBeneficiaries.filter((b) =>
+  return book.filter((b) =>
     stripDiacritics(b.name)
       .split(/\s+/)
       .some((w) => w.length >= 3 && w !== 'msb' && t.includes(w)),
   )
 }
 
-const chipSuggestions = ['Chuyển 500k cho anh Khánh', 'Chuyển 2 triệu cho MSB Thái', 'Chuyển 1,5 triệu cho My Account']
+const fallbackChips = ['Chuyển 500k cho anh Khánh', 'Chuyển 2 triệu cho MSB Thái', 'Chuyển 1,5 triệu cho My Account']
 
 function TypingDots() {
   return (
@@ -193,7 +158,7 @@ export function ChatBankingPage() {
   const [messages, setMessages] = useState<BankingMessage[]>([
     makeMsg(
       'assistant',
-      `${timeGreeting()} anh! Em là Chat Banking MSB — anh nhắn một câu là em soạn lệnh chuyển tiền ngay. Ví dụ: “Chuyển 500k cho LongPD MSB”.`,
+      `${timeGreeting()} anh! Em là Chat Banking MSB — anh nhắn một câu là em soạn lệnh chuyển tiền ngay. Ví dụ: “Chuyển 500k cho anh Khánh”.`,
     ),
   ])
   const [input, setInput] = useState('')
@@ -204,6 +169,38 @@ export function ChatBankingPage() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const transactions = useGuardianStore((s) => s.transactions)
   const announcedRef = useRef(false)
+  // Danh bạ của KHÁCH ĐANG ĐĂNG NHẬP (API theo cookie phiên) — nguồn duy nhất
+  // để bot liệt kê và khớp tên. Danh bạ demo chỉ dùng khi gateway chết.
+  const bookRef = useRef<Beneficiary[] | null>(null)
+  const [chips, setChips] = useState<string[]>(fallbackChips)
+
+  async function loadBook(): Promise<Beneficiary[]> {
+    if (bookRef.current) return bookRef.current
+    try {
+      const api = await getTransferBeneficiaries()
+      if (api.length > 0) {
+        bookRef.current = api.map((b) => ({
+          id: b.id, name: b.name, bank: b.bank, account: b.account,
+          trusted: b.trusted, bankCode: b.bank, relationship: b.relationship,
+        }))
+        return bookRef.current
+      }
+    } catch {
+      // gateway lỗi → dùng danh bạ demo để chat không chết hẳn
+    }
+    bookRef.current = favoriteBeneficiaries
+    return bookRef.current
+  }
+
+  // Chip gợi ý dựng theo danh bạ thật để bấm vào là khớp được ngay
+  useEffect(() => {
+    void loadBook().then((book) => {
+      if (book !== favoriteBeneficiaries && book.length >= 2) {
+        setChips([`Chuyển 500k cho ${book[0].name}`, `Chuyển 2 triệu cho ${book[1].name}`, 'Xem danh bạ thụ hưởng'])
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -226,25 +223,22 @@ export function ChatBankingPage() {
   }, [])
 
   async function reply(text: string): Promise<BankingMessage> {
-    const local = findBeneficiaries(text)
-    // Chỉ chốt luôn khi danh bạ demo khớp ĐÚNG MỘT người; khớp nhiều người
-    // (2 anh Khánh) là câu mơ hồ, phải qua bước tra cứu + hỏi chọn bên dưới.
+    // Danh bạ của khách đang đăng nhập — mọi bước liệt kê/khớp tên đều dùng nó,
+    // hết cảnh bot liệt kê danh bạ demo của người khác hay soạn lệnh tới ben
+    // không thuộc khách.
+    const book = await loadBook()
+    const local = findBeneficiaries(text, book)
+    // Chỉ chốt luôn khi danh bạ khớp ĐÚNG MỘT người; khớp nhiều người
+    // (2 anh Khánh) là câu mơ hồ, phải qua bước hỏi chọn bên dưới.
     let beneficiary = (local.length === 1 ? local[0] : undefined) ?? pending.beneficiary
     const amount = parseAmount(text) ?? pending.amount
     const name = recipientName(text)
 
-    // Tên người nhận KHÔNG đủ thông tin để chỉ đích danh → query danh sách BEN
-    // (API + danh bạ demo) theo tên: trùng nhiều người thì trả danh sách cho
-    // khách bấm chọn, đúng một người thì dùng luôn.
+    // Tên người nhận KHÔNG đủ thông tin để chỉ đích danh → lọc danh bạ theo
+    // tên: trùng nhiều người thì trả danh sách cho khách bấm chọn, đúng một
+    // người thì dùng luôn.
     if (!beneficiary && (name || local.length >= 2)) {
-      let matches = local
-      if (name) {
-        try {
-          matches = await queryBeneficiariesByName(name)
-        } catch {
-          matches = local
-        }
-      }
+      const matches = name ? matchByName(book, name) : local
       if (matches.length >= 2) {
         setPending({ amount })
         const display = (name ?? matches[0].name).replace(/(^|\s)\S/g, (c) => c.toUpperCase())
@@ -284,15 +278,15 @@ export function ChatBankingPage() {
     }
     if (amount) {
       setPending({ amount })
-      return makeMsg('assistant', `${formatVnd(amount)} — anh muốn chuyển cho ai ạ? Anh bấm chọn trong danh bạ nhé:`, { beneficiaries: favoriteBeneficiaries })
+      return makeMsg('assistant', `${formatVnd(amount)} — anh muốn chuyển cho ai ạ? Anh bấm chọn trong danh bạ nhé:`, { beneficiaries: book })
     }
     if (/danh bạ|danh ba|người thụ hưởng|nguoi thu huong|người nhận|nguoi nhan/i.test(text)) {
-      return makeMsg('assistant', 'Danh bạ thụ hưởng của anh đây ạ, bấm chọn là em soạn lệnh luôn:', { beneficiaries: favoriteBeneficiaries })
+      return makeMsg('assistant', 'Danh bạ thụ hưởng của anh đây ạ, bấm chọn là em soạn lệnh luôn:', { beneficiaries: book })
     }
     if (/chi tiêu|chi tieu|tài chính|tai chinh|phân tích|phan tich|ngân sách|ngan sach/i.test(text)) {
       return makeMsg('assistant', 'Câu hỏi về chi tiêu, tài chính anh hỏi Trợ lý AI Financial Copilot sẽ chuẩn hơn ạ — anh bấm vào bạn bot ở trang chủ nhé. Ở đây em lo phần chuyển tiền cho anh.')
     }
-    return makeMsg('assistant', 'Anh nhắn giúp em tên người nhận và số tiền trong một câu nhé, ví dụ: “Chuyển 2 triệu cho MSB Thái”.')
+    return makeMsg('assistant', 'Anh nhắn giúp em tên người nhận và số tiền trong một câu nhé, ví dụ: “Chuyển 2 triệu cho anh Khánh” — hoặc nhắn “danh bạ” để chọn người nhận.')
   }
 
   function send(text: string) {
@@ -416,7 +410,7 @@ export function ChatBankingPage() {
         )}
         {showChips && (
           <div className="flex max-w-[320px] flex-col gap-2 self-start pl-9">
-            {chipSuggestions.map((q) => (
+            {chips.map((q) => (
               <button
                 key={q}
                 type="button"
