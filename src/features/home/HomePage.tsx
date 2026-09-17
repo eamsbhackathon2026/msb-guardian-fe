@@ -457,10 +457,7 @@ export function HomePage() {
             <span className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
               <Sun size={18} strokeWidth={1.5} />
             </span>
-            <span className="flex flex-1 items-center gap-2">
-              <span className="text-[15px] font-semibold tracking-[.01em] text-primary">{home?.productTier ?? ''}</span>
-              <Badge variant="primary">NEW</Badge>
-            </span>
+            <span className="flex-1 text-[15px] font-semibold tracking-[.01em] text-primary">{home?.productTier ?? ''}</span>
             <ChevronRight size={20} strokeWidth={1.6} className="text-muted" />
           </button>
           <div className="mx-0 h-px bg-divider" />
