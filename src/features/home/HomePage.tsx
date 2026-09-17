@@ -148,7 +148,7 @@ function SearchSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (ope
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-1.5">
                     <span className="truncate text-[15px] font-medium leading-5">{f.label}</span>
-                    {f.isNew && <Badge variant="primary">Mới</Badge>}
+                    {f.isNew && <Badge variant="primary">NEW</Badge>}
                   </span>
                   <span className="block truncate text-[13px] leading-[18px] text-muted">{f.desc}</span>
                 </span>
@@ -442,7 +442,8 @@ export function HomePage() {
       </div>
 
       {/* Nội dung cuộn */}
-      <div className="no-scrollbar relative z-[5] flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-[110px] pt-4">
+      {/* pb đủ lớn để banner Chat Banking cuộn thoát khỏi bot AI nổi góc phải */}
+      <div className="no-scrollbar relative z-[5] flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-[190px] pt-4">
         {/* Lời chào + tên người dùng sau khi đăng nhập thành công */}
         <motion.div custom={0} variants={blockVariants} initial="hidden" animate="show" className="flex flex-col px-1 pb-0.5">
           <span className="text-[13px] leading-[18px] text-white/85">{timeGreeting()},</span>
@@ -458,7 +459,7 @@ export function HomePage() {
             </span>
             <span className="flex flex-1 items-center gap-2">
               <span className="text-[15px] font-semibold tracking-[.01em] text-primary">{home?.productTier ?? ''}</span>
-              <Badge variant="primary">Mới</Badge>
+              <Badge variant="primary">NEW</Badge>
             </span>
             <ChevronRight size={20} strokeWidth={1.6} className="text-muted" />
           </button>
@@ -521,7 +522,7 @@ export function HomePage() {
           <span className="min-w-0 flex-1">
             <span className="flex items-center gap-2">
               <span className="text-[15px] font-semibold leading-[21px]">Chat Banking</span>
-              <Badge variant="primary">Mới</Badge>
+              <Badge variant="primary">NEW</Badge>
             </span>
             <span className="block text-[13px] leading-[18px] text-muted">Nhắn một câu, chuyển tiền xong ngay.</span>
           </span>
@@ -539,10 +540,7 @@ export function HomePage() {
             className="relative max-w-[196px] cursor-pointer rounded-[16px_16px_4px_16px] bg-surface p-3 shadow-float"
             onClick={() => navigate('/copilot')}
           >
-            <span className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-primary">Trợ lý AI Guardian</span>
-              <Badge variant="primary">Mới</Badge>
-            </span>
+            <span className="block text-xs font-semibold text-primary">Trợ lý AI Guardian</span>
             <span className="block text-[13px] leading-[18px]">{home?.assistantHint ?? ''}</span>
             <button
               type="button"
@@ -582,9 +580,12 @@ export function HomePage() {
           <Home size={20} strokeWidth={1.6} />
           <span className="text-[13px] font-semibold">Trang chủ</span>
         </span>
-        <button type="button" onClick={() => navigate('/safety-center')} className="flex h-12 cursor-pointer items-center justify-center gap-2 text-muted">
+        <button type="button" onClick={() => navigate('/safety-center')} className="relative flex h-12 cursor-pointer items-center justify-center gap-2 text-muted">
           <CreditCard size={20} strokeWidth={1.6} />
           <span className="text-[13px] font-medium">Tài khoản</span>
+          <span className="absolute right-1 top-0 rounded-full bg-primary px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[.04em] text-white">
+            NEW
+          </span>
         </button>
         <button type="button" onClick={() => setSettingsOpen(true)} className="flex h-12 cursor-pointer items-center justify-center gap-2 text-muted">
           <Settings size={21} strokeWidth={1.6} />
