@@ -21,18 +21,30 @@ export interface Beneficiary {
   trusted?: boolean
   /** Mã ngân hàng để gọi precheck (VCB/ACB/MSB…); mặc định dùng `bank`. */
   bankCode?: string
+  /** Nhóm quan hệ: FAMILY | FRIEND | EMPLOYER | MERCHANT | SELF | UNKNOWN */
+  relationship?: string
+  /** true → hiện trong nhóm Yêu thích trên cùng (danh bạ hay chuyển nhất) */
+  favorite?: boolean
 }
 
 /** Danh bạ thụ hưởng demo — theo ben.jpg */
 export const favoriteBeneficiaries: Beneficiary[] = [
-  { id: 'b1', name: 'LongNV Hạ Tầng', bank: 'MSB', account: '0982541740', trusted: true },
-  { id: 'b2', name: 'LongPD MSB', bank: 'MSB', account: '03301011939831', trusted: true },
-  { id: 'b3', name: 'MSB Thái', bank: 'MSB', account: '03101016725958', trusted: true },
-  { id: 'b4', name: 'My Account', bank: 'Techcombank', account: '19025711047011', trusted: true },
+  { id: 'b1', name: 'LongNV Hạ Tầng', bank: 'MSB', account: '0982541740', trusted: true, relationship: 'FRIEND', favorite: true },
+  { id: 'b2', name: 'LongPD MSB', bank: 'MSB', account: '03301011939831', trusted: true, relationship: 'FRIEND', favorite: true },
+  { id: 'b3', name: 'MSB Thái', bank: 'MSB', account: '03101016725958', trusted: true, relationship: 'FRIEND', favorite: true },
+  { id: 'b4', name: 'My Account', bank: 'Techcombank', account: '19025711047011', trusted: true, relationship: 'SELF', favorite: true },
+  { id: 'b5', name: 'Do Van Duc', bank: 'MSB', account: '0362554873', trusted: false, relationship: 'UNKNOWN' },
 ]
 
-const otherBeneficiaries: { letter: string; items: Beneficiary[] }[] = [
-  { letter: 'D', items: [{ id: 'b5', name: 'Do Van Duc', bank: 'MSB', account: '0362554873', trusted: false }] },
+/** Thứ tự và nhãn tiếng Việt của các nhóm trên màn danh bạ — Yêu thích trên cùng */
+const RELATIONSHIP_GROUPS: { key: string; label: string }[] = [
+  { key: 'FAVORITE', label: 'Yêu thích' },
+  { key: 'FAMILY', label: 'Người thân' },
+  { key: 'FRIEND', label: 'Bạn bè' },
+  { key: 'EMPLOYER', label: 'Công việc' },
+  { key: 'MERCHANT', label: 'Dịch vụ & cửa hàng' },
+  { key: 'SELF', label: 'Tài khoản của tôi' },
+  { key: 'UNKNOWN', label: 'Khác' },
 ]
 
 
@@ -45,9 +57,10 @@ function BankAvatar({ bank }: { bank: string }) {
       </span>
     )
   }
+  // Ngân hàng khác: hiện thẳng mã (TCB/VCB/ACB/MBB…) — mỗi bank chưa cần logo riêng
   return (
     <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#fdecec] text-[10px] font-bold text-[#e11b22]">
-      TCB
+      {bank.slice(0, 4).toUpperCase()}
     </span>
   )
 }
@@ -71,16 +84,26 @@ export function BeneficiariesPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState<'saved' | 'recent'>('saved')
   const [query, setQuery] = useState('')
-  // Danh bạ thật từ gateway (kèm cờ trusted). Lỗi/rỗng thì dùng danh bạ demo.
+  // Danh bạ thật từ gateway (kèm trusted + relationship), GỘP với danh bạ demo
+  // local — loại trùng theo số tài khoản — để liệt kê toàn bộ người thụ hưởng.
   const { data: apiList } = useQuery({ queryKey: ['transfer-beneficiaries'], queryFn: getTransferBeneficiaries })
-  const savedList: Beneficiary[] = apiList && apiList.length > 0
-    ? apiList.map((b) => ({ id: b.id, name: b.name, bank: b.bank, account: b.account, trusted: b.trusted, bankCode: b.bank }))
-    : favoriteBeneficiaries
+  const fromApi: Beneficiary[] = (apiList ?? []).map((b) => ({
+    id: b.id, name: b.name, bank: b.bank, account: b.account,
+    trusted: b.trusted, bankCode: b.bank, relationship: b.relationship,
+  }))
+  const apiAccounts = new Set(fromApi.map((b) => b.account.replace(/\D/g, '')))
+  const savedList: Beneficiary[] = [...fromApi, ...favoriteBeneficiaries.filter((b) => !apiAccounts.has(b.account.replace(/\D/g, '')))]
 
   const q = query.trim().toLowerCase()
   const matches = (b: Beneficiary) => !q || b.name.toLowerCase().includes(q) || b.account.includes(q) || b.bank.toLowerCase().includes(q)
-  const favorites = savedList.filter(matches)
-  const others = otherBeneficiaries.map((g) => ({ ...g, items: g.items.filter(matches) })).filter((g) => g.items.length > 0)
+  // Chia nhóm: Yêu thích trên cùng, rồi Người thân → Bạn bè → … → Khác. Người
+  // đã nằm trong Yêu thích không lặp lại ở nhóm quan hệ; nhóm rỗng tự ẩn.
+  const grouped = RELATIONSHIP_GROUPS.map((g) => ({
+    ...g,
+    items: savedList.filter(
+      (b) => (g.key === 'FAVORITE' ? b.favorite === true : !b.favorite && (b.relationship ?? 'UNKNOWN') === g.key) && matches(b),
+    ),
+  })).filter((g) => g.items.length > 0)
   const recents = savedList.slice(0, 2).filter(matches)
 
   const pick = (b: Beneficiary) => navigate('/transfer/new', { state: { beneficiary: b } })
@@ -160,19 +183,12 @@ export function BeneficiariesPage() {
 
           {tab === 'saved' ? (
             <div className="flex flex-col pb-2">
-              {favorites.length > 0 && (
-                <>
-                  <span className="bg-app px-4 py-2 text-[13px] font-semibold text-muted">Yêu thích</span>
-                  <div className="flex flex-col px-2">
-                    {favorites.map((b) => (
-                      <BeneficiaryRow key={b.id} b={b} onClick={() => pick(b)} />
-                    ))}
-                  </div>
-                </>
-              )}
-              {others.map((g) => (
-                <div key={g.letter} className="flex flex-col">
-                  <span className="bg-app px-4 py-2 text-[13px] font-semibold text-muted">{g.letter}</span>
+              {grouped.map((g) => (
+                <div key={g.key} className="flex flex-col">
+                  <span className="flex items-baseline justify-between bg-app px-4 py-2 text-[13px] font-semibold text-muted">
+                    {g.label}
+                    <span className="text-[11px] font-medium">{g.items.length}</span>
+                  </span>
                   <div className="flex flex-col px-2">
                     {g.items.map((b) => (
                       <BeneficiaryRow key={b.id} b={b} onClick={() => pick(b)} />
@@ -180,7 +196,7 @@ export function BeneficiariesPage() {
                   </div>
                 </div>
               ))}
-              {favorites.length === 0 && others.length === 0 && (
+              {grouped.length === 0 && (
                 <span className="py-6 text-center text-[13px] text-muted">Không tìm thấy người thụ hưởng</span>
               )}
             </div>
