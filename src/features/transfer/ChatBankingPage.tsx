@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, MessageSquareText, Send, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { getTransferBeneficiaries } from '@/lib/api'
 import { formatDate, formatVnd, timeGreeting } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -59,6 +60,50 @@ function parseAmount(text: string): number | null {
   return null
 }
 
+/** Từ xưng hô đứng trước tên — bỏ đi để lấy đúng tên cần tìm trong danh bạ */
+const HONORIFICS = new Set(['anh', 'chi', 'em', 'co', 'chu', 'bac', 'ong', 'ba', 'ban', 'thay', 'sep'])
+
+/**
+ * Tách phần TÊN người nhận sau "cho/đến/tới/gửi/tặng": "chuyển 500k đến anh
+ * khánh" → "khánh". Bỏ từ xưng hô và từ chứa số (số tiền đứng sau tên).
+ * Trả null khi câu không nêu người nhận.
+ */
+function recipientName(text: string): string | null {
+  const m = text.toLowerCase().match(/\b(?:cho|đến|den|tới|toi|gửi|gui|tặng|tang|sang)\s+(.+)$/)
+  if (!m) return null
+  const words = m[1].split(/\s+/).filter((w) => !HONORIFICS.has(stripDiacritics(w)) && !/\d/.test(w))
+  const name = words.join(' ').replace(/[.,!?]+$/, '').trim()
+  return name.length >= 2 ? name : null
+}
+
+/** Lọc danh bạ theo tên: mọi từ của tên cần tìm đều xuất hiện trong tên BEN (so không dấu) */
+function matchByName(list: Beneficiary[], name: string): Beneficiary[] {
+  const words = stripDiacritics(name).split(/\s+/).filter((w) => w.length >= 2)
+  if (words.length === 0) return []
+  return list.filter((b) => {
+    const n = stripDiacritics(b.name)
+    return words.every((w) => n.includes(w))
+  })
+}
+
+/**
+ * GỌI API danh bạ thật (GET /api/transfer/beneficiaries — toàn bộ BEN của khách
+ * từ customer-profile-service) rồi lọc theo tên. Đây là bước tra cứu khi tên
+ * khách nhắn không đủ thông tin để chỉ đích danh một người.
+ */
+async function queryBeneficiariesByName(name: string): Promise<Beneficiary[]> {
+  const all = await getTransferBeneficiaries()
+  const mapped: Beneficiary[] = all.map((b) => ({
+    id: b.id,
+    name: b.name,
+    bank: b.bank,
+    account: b.account,
+    trusted: b.trusted,
+    bankCode: b.bank,
+  }))
+  return matchByName(mapped, name)
+}
+
 /** Khớp người nhận theo tên (bỏ dấu) hoặc số tài khoản trong danh bạ demo.
  *  Token "msb" bị loại khi so từng từ vì gần như tên nào cũng chứa nó. */
 function findBeneficiary(text: string): Beneficiary | null {
@@ -74,7 +119,7 @@ function findBeneficiary(text: string): Beneficiary | null {
   )
 }
 
-const chipSuggestions = ['Chuyển 500k cho LongPD MSB', 'Chuyển 2 triệu cho MSB Thái', 'Chuyển 1,5 triệu cho My Account']
+const chipSuggestions = ['Chuyển 500k cho anh Khánh', 'Chuyển 2 triệu cho MSB Thái', 'Chuyển 1,5 triệu cho My Account']
 
 function TypingDots() {
   return (
@@ -163,12 +208,35 @@ export function ChatBankingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function reply(text: string) {
-    const beneficiary = findBeneficiary(text) ?? pending.beneficiary
+  async function reply(text: string): Promise<BankingMessage> {
+    let beneficiary = findBeneficiary(text) ?? pending.beneficiary
     const amount = parseAmount(text) ?? pending.amount
+    const name = recipientName(text)
+
+    // Tên người nhận KHÔNG đủ thông tin để chỉ đích danh (không khớp danh bạ
+    // demo) → gọi API query toàn bộ BEN của khách theo tên: trùng nhiều người
+    // thì hỏi lại khách chọn ai, đúng một người thì dùng luôn.
+    if (!beneficiary && name) {
+      try {
+        const matches = await queryBeneficiariesByName(name)
+        if (matches.length >= 2) {
+          setPending({ amount })
+          const display = name.replace(/(^|\s)\S/g, (c) => c.toUpperCase())
+          return makeMsg(
+            'assistant',
+            `Danh bạ của anh có ${matches.length} người tên “${display}”. Anh muốn chuyển${amount ? ` ${formatVnd(amount)}` : ''} đến ai ạ, bấm chọn giúp em nhé:`,
+            { beneficiaries: matches },
+          )
+        }
+        if (matches.length === 1) beneficiary = matches[0]
+      } catch {
+        // API lỗi → coi như không tìm thấy, rơi xuống nhánh người nhận mới bên dưới
+      }
+    }
+
     // Khách nêu đích danh người nhận ("cho ai đó" / một dãy số dài như stk)
     // nhưng không khớp danh bạ → người nhận MỚI, rẽ sang màn chuyển thường.
-    const namesRecipient = /\bcho\s+\S/.test(stripDiacritics(text)) || /\d{6,}/.test(text)
+    const namesRecipient = name != null || /\d{6,}/.test(text)
 
     if (!beneficiary && namesRecipient && (amount || /\bchuyen\b|\bck\b/.test(stripDiacritics(text)))) {
       setPending({})
@@ -211,9 +279,35 @@ export function ChatBankingPage() {
     setInput('')
     setMessages((prev) => [...prev, makeMsg('user', trimmed)])
     setTyping(true)
-    // Nhịp gõ ngắn cho tự nhiên — bot chạy hoàn toàn ở FE, không có mạng thật
+    // Giữ nhịp gõ tối thiểu ~550ms cho tự nhiên; câu cần tra danh bạ thì reply
+    // còn chờ thêm API thật nên Promise.all lấy mốc lâu hơn trong hai việc.
+    const beat = new Promise((resolve) => setTimeout(resolve, 550))
+    Promise.all([reply(trimmed), beat]).then(([msg]) => {
+      setMessages((prev) => [...prev, msg])
+      setTyping(false)
+    })
+  }
+
+  /** Khách bấm chọn một người trong danh sách bot liệt kê — ghép với số tiền
+   *  đã nhớ (vd 500k của câu trước) và soạn lệnh luôn, không đi vòng qua text
+   *  vì tên từ API có thể không nằm trong danh bạ demo của findBeneficiary. */
+  function pick(b: Beneficiary) {
+    if (typing) return
+    const amount = pending.amount
+    setMessages((prev) => [...prev, makeMsg('user', `Chuyển cho ${b.name}`)])
+    setTyping(true)
     setTimeout(() => {
-      setMessages((prev) => [...prev, reply(trimmed)])
+      setMessages((prev) => [
+        ...prev,
+        amount
+          ? makeMsg(
+              'assistant',
+              `Em đã soạn lệnh chuyển ${formatVnd(amount)} tới ${b.name}. Anh kiểm tra rồi bấm xác nhận nhé — giao dịch vẫn được Scam Shield kiểm tra như thường.`,
+              { transfer: { beneficiary: b, amount } },
+            )
+          : makeMsg('assistant', `Chuyển cho ${b.name} (${b.bank} · ${b.account}) — anh muốn chuyển bao nhiêu tiền ạ?`),
+      ])
+      setPending(amount ? {} : { beneficiary: b })
       setTyping(false)
     }, 550)
   }
@@ -269,7 +363,7 @@ export function ChatBankingPage() {
                       <button
                         key={b.id}
                         type="button"
-                        onClick={() => send(`Chuyển cho ${b.name}`)}
+                        onClick={() => pick(b)}
                         className={`flex cursor-pointer items-center gap-2.5 px-3 py-2.5 text-left hover:bg-black/[.03] ${i > 0 ? 'border-t border-line' : ''}`}
                       >
                         <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-line bg-surface">
