@@ -90,32 +90,49 @@ function matchByName(list: Beneficiary[], name: string): Beneficiary[] {
  * GỌI API danh bạ thật (GET /api/transfer/beneficiaries — toàn bộ BEN của khách
  * từ customer-profile-service) rồi lọc theo tên. Đây là bước tra cứu khi tên
  * khách nhắn không đủ thông tin để chỉ đích danh một người.
+ *
+ * API được GỘP với danh bạ demo (đã có 2 anh Khánh khớp seed) trước khi lọc:
+ * gateway/DB chưa nạp đủ dữ liệu thì khách vẫn được hỏi chọn giữa các anh Khánh
+ * thay vì bị báo "chưa có trong danh bạ". Trùng số tài khoản thì ưu tiên bản API.
  */
 async function queryBeneficiariesByName(name: string): Promise<Beneficiary[]> {
-  const all = await getTransferBeneficiaries()
-  const mapped: Beneficiary[] = all.map((b) => ({
-    id: b.id,
-    name: b.name,
-    bank: b.bank,
-    account: b.account,
-    trusted: b.trusted,
-    bankCode: b.bank,
-  }))
-  return matchByName(mapped, name)
+  let api: Beneficiary[] = []
+  try {
+    api = (await getTransferBeneficiaries()).map((b) => ({
+      id: b.id,
+      name: b.name,
+      bank: b.bank,
+      account: b.account,
+      trusted: b.trusted,
+      bankCode: b.bank,
+    }))
+  } catch {
+    // API lỗi → còn danh bạ demo bên dưới, luồng hỏi-chọn vẫn chạy được
+  }
+  const merged = [...api]
+  const seen = new Set(api.map((b) => b.account.replace(/\s/g, '')))
+  for (const b of favoriteBeneficiaries) {
+    const key = b.account.replace(/\s/g, '')
+    if (!seen.has(key)) {
+      seen.add(key)
+      merged.push(b)
+    }
+  }
+  return matchByName(merged, name)
 }
 
-/** Khớp người nhận theo tên (bỏ dấu) hoặc số tài khoản trong danh bạ demo.
+/** Khớp người nhận theo tên (bỏ dấu) hoặc số tài khoản trong danh bạ demo —
+ *  trả về MỌI người khớp: 2 người cùng tên (anh Khánh) là câu mơ hồ, phần gọi
+ *  phải hỏi lại thay vì lặng lẽ lấy người đầu tiên.
  *  Token "msb" bị loại khi so từng từ vì gần như tên nào cũng chứa nó. */
-function findBeneficiary(text: string): Beneficiary | null {
+function findBeneficiaries(text: string): Beneficiary[] {
   const t = stripDiacritics(text)
-  const whole = favoriteBeneficiaries.find((b) => t.includes(stripDiacritics(b.name)) || t.includes(b.account))
-  if (whole) return whole
-  return (
-    favoriteBeneficiaries.find((b) =>
-      stripDiacritics(b.name)
-        .split(/\s+/)
-        .some((w) => w.length >= 3 && w !== 'msb' && t.includes(w)),
-    ) ?? null
+  const whole = favoriteBeneficiaries.filter((b) => t.includes(stripDiacritics(b.name)) || t.includes(b.account))
+  if (whole.length > 0) return whole
+  return favoriteBeneficiaries.filter((b) =>
+    stripDiacritics(b.name)
+      .split(/\s+/)
+      .some((w) => w.length >= 3 && w !== 'msb' && t.includes(w)),
   )
 }
 
@@ -209,29 +226,35 @@ export function ChatBankingPage() {
   }, [])
 
   async function reply(text: string): Promise<BankingMessage> {
-    let beneficiary = findBeneficiary(text) ?? pending.beneficiary
+    const local = findBeneficiaries(text)
+    // Chỉ chốt luôn khi danh bạ demo khớp ĐÚNG MỘT người; khớp nhiều người
+    // (2 anh Khánh) là câu mơ hồ, phải qua bước tra cứu + hỏi chọn bên dưới.
+    let beneficiary = (local.length === 1 ? local[0] : undefined) ?? pending.beneficiary
     const amount = parseAmount(text) ?? pending.amount
     const name = recipientName(text)
 
-    // Tên người nhận KHÔNG đủ thông tin để chỉ đích danh (không khớp danh bạ
-    // demo) → gọi API query toàn bộ BEN của khách theo tên: trùng nhiều người
-    // thì hỏi lại khách chọn ai, đúng một người thì dùng luôn.
-    if (!beneficiary && name) {
-      try {
-        const matches = await queryBeneficiariesByName(name)
-        if (matches.length >= 2) {
-          setPending({ amount })
-          const display = name.replace(/(^|\s)\S/g, (c) => c.toUpperCase())
-          return makeMsg(
-            'assistant',
-            `Danh bạ của anh có ${matches.length} người tên “${display}”. Anh muốn chuyển${amount ? ` ${formatVnd(amount)}` : ''} đến ai ạ, bấm chọn giúp em nhé:`,
-            { beneficiaries: matches },
-          )
+    // Tên người nhận KHÔNG đủ thông tin để chỉ đích danh → query danh sách BEN
+    // (API + danh bạ demo) theo tên: trùng nhiều người thì trả danh sách cho
+    // khách bấm chọn, đúng một người thì dùng luôn.
+    if (!beneficiary && (name || local.length >= 2)) {
+      let matches = local
+      if (name) {
+        try {
+          matches = await queryBeneficiariesByName(name)
+        } catch {
+          matches = local
         }
-        if (matches.length === 1) beneficiary = matches[0]
-      } catch {
-        // API lỗi → coi như không tìm thấy, rơi xuống nhánh người nhận mới bên dưới
       }
+      if (matches.length >= 2) {
+        setPending({ amount })
+        const display = (name ?? matches[0].name).replace(/(^|\s)\S/g, (c) => c.toUpperCase())
+        return makeMsg(
+          'assistant',
+          `Danh bạ của anh có ${matches.length} người tên “${display}”. Anh muốn chuyển${amount ? ` ${formatVnd(amount)}` : ''} đến ai ạ, bấm chọn giúp em nhé:`,
+          { beneficiaries: matches },
+        )
+      }
+      if (matches.length === 1) beneficiary = matches[0]
     }
 
     // Khách nêu đích danh người nhận ("cho ai đó" / một dãy số dài như stk)

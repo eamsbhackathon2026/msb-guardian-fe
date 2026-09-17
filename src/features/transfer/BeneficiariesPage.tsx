@@ -34,6 +34,10 @@ export const favoriteBeneficiaries: Beneficiary[] = [
   { id: 'b3', name: 'MSB Thái', bank: 'MSB', account: '03101016725958', trusted: true, relationship: 'FRIEND', favorite: true },
   { id: 'b4', name: 'My Account', bank: 'Techcombank', account: '19025711047011', trusted: true, relationship: 'SELF', favorite: true },
   { id: 'b5', name: 'Do Van Duc', bank: 'MSB', account: '0362554873', trusted: false, relationship: 'UNKNOWN' },
+  // Hai người cùng tên Khánh — khớp seed 6b (300901/300902) phía BE: câu
+  // "chuyển 500k cho anh Khánh" là mơ hồ, Chat Banking phải hỏi lại chọn ai.
+  { id: 'b6', name: 'Pham Quoc Khanh', bank: 'MSB', account: '0330168839210', trusted: true, relationship: 'FRIEND' },
+  { id: 'b7', name: 'Tran Duy Khanh', bank: 'VCB', account: '9704229981', trusted: true, bankCode: 'VCB', relationship: 'FAMILY' },
 ]
 
 /** Thứ tự và nhãn tiếng Việt của các nhóm trên màn danh bạ — Yêu thích trên cùng */
@@ -84,15 +88,17 @@ export function BeneficiariesPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState<'saved' | 'recent'>('saved')
   const [query, setQuery] = useState('')
-  // Danh bạ thật từ gateway (kèm trusted + relationship), GỘP với danh bạ demo
-  // local — loại trùng theo số tài khoản — để liệt kê toàn bộ người thụ hưởng.
+  // Danh bạ thật từ gateway — ĐÚNG theo khách đang đăng nhập (customer_id của
+  // phiên). KHÔNG gộp danh bạ demo local vào nữa: khách thật sẽ thấy người
+  // không thuộc danh bạ của mình. Demo local chỉ là fallback khi gateway lỗi.
+  // Gateway sort theo lần chuyển gần nhất → 4 người đầu làm nhóm Yêu thích.
   const { data: apiList } = useQuery({ queryKey: ['transfer-beneficiaries'], queryFn: getTransferBeneficiaries })
-  const fromApi: Beneficiary[] = (apiList ?? []).map((b) => ({
+  const fromApi: Beneficiary[] = (apiList ?? []).map((b, i) => ({
     id: b.id, name: b.name, bank: b.bank, account: b.account,
     trusted: b.trusted, bankCode: b.bank, relationship: b.relationship,
+    favorite: i < 4,
   }))
-  const apiAccounts = new Set(fromApi.map((b) => b.account.replace(/\D/g, '')))
-  const savedList: Beneficiary[] = [...fromApi, ...favoriteBeneficiaries.filter((b) => !apiAccounts.has(b.account.replace(/\D/g, '')))]
+  const savedList: Beneficiary[] = fromApi.length > 0 ? fromApi : favoriteBeneficiaries
 
   const q = query.trim().toLowerCase()
   const matches = (b: Beneficiary) => !q || b.name.toLowerCase().includes(q) || b.account.includes(q) || b.bank.toLowerCase().includes(q)
