@@ -16,6 +16,7 @@ import type {
   CaseDetail,
   CaseTimelineStep,
   CopilotIntro,
+  CopilotNotification,
   CustomerAction,
   HomeContent,
   Operator,
@@ -114,6 +115,15 @@ export function getCopilotOverview(): Promise<CopilotOverview> {
 
 export function getCopilotIntro(): Promise<CopilotIntro> {
   return fetchJson<CopilotIntro>('/api/copilot/intro')
+}
+
+/**
+ * GET /api/copilot/notifications — 3 nhắc việc dưới nhóm chi tiêu: sổ tiết kiệm
+ * đến hạn hôm nay (CTA mở biểu lãi suất chọn sản phẩm tái gửi), sao kê thẻ chưa
+ * thanh toán, và kỳ trả nợ khoản vay. Số tiền sổ lấy từ portfolio khi domain sống.
+ */
+export function getCopilotNotifications(): Promise<CopilotNotification[]> {
+  return fetchJson<CopilotNotification[]>('/api/copilot/notifications')
 }
 
 /**

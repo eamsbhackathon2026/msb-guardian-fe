@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Send, Sparkles, TrendingDown, TrendingUp } from 'lucide-react'
+import { ArrowUpRight, BellRing, CreditCard, HandCoins, PiggyBank, Send, Sparkles, TrendingDown, TrendingUp } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Cell, Pie, PieChart } from 'recharts'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { CopilotOverview, Insight, SpendingCategory } from '@/data/types'
-import { getCopilotOverview, getQuarterlyReport } from '@/lib/api'
+import type { CopilotNotification, CopilotOverview, Insight, SpendingCategory } from '@/data/types'
+import { getCopilotNotifications, getCopilotOverview, getQuarterlyReport } from '@/lib/api'
 import { formatPct, formatVnd, formatVndWithSign } from '@/lib/format'
 import { BottomNav } from '@/shell/BottomNav'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -112,6 +112,61 @@ function InsightCard({ insight }: { insight: Insight }) {
       </span>
       <span className="text-sm font-semibold leading-snug">{insight.title}</span>
       <span className="text-[13px] leading-relaxed text-muted">{insight.body}</span>
+    </div>
+  )
+}
+
+/** Biểu tượng + đường dẫn CTA cho từng loại nhắc việc */
+const NOTIFICATION_STYLE: Record<CopilotNotification['kind'], { icon: typeof PiggyBank; to: string }> = {
+  // Sổ đến hạn → màn Biểu lãi suất để chọn sản phẩm tái gửi tối ưu
+  saving: { icon: PiggyBank, to: '/invest/rates' },
+  card: { icon: CreditCard, to: '/cards' },
+  loan: { icon: HandCoins, to: '/loans' },
+}
+
+/**
+ * Thông báo dưới nhóm chi tiêu — GET /api/copilot/notifications: sổ tiết kiệm
+ * đến hạn hôm nay, sao kê thẻ chưa thanh toán, kỳ trả nợ khoản vay. Mục sổ tiết
+ * kiệm dẫn sang Biểu lãi suất để khách chọn sản phẩm tiết kiệm mới tối ưu.
+ */
+function NotificationsSection() {
+  const navigate = useNavigate()
+  const { data } = useQuery({ queryKey: ['copilot-notifications'], queryFn: getCopilotNotifications })
+  if (!data || data.length === 0) return null
+
+  return (
+    <div className="flex flex-col gap-2 rounded-card bg-surface px-4 py-3 shadow-card">
+      <span className="flex items-center gap-1.5 pb-0.5">
+        <BellRing size={16} strokeWidth={1.9} className="text-primary" />
+        <span className="text-[15px] font-semibold">Thông báo</span>
+        <span className="ml-auto rounded-full bg-orange-soft px-2 py-0.5 text-[11px] font-semibold text-primary">{data.length}</span>
+      </span>
+      {data.map((n, i) => {
+        const { icon: Icon, to } = NOTIFICATION_STYLE[n.kind]
+        return (
+          <div key={n.id} className={`flex flex-col gap-1.5 ${i > 0 ? 'border-t border-divider pt-2.5' : ''} pb-1`}>
+            <span className="flex items-start gap-2.5">
+              <span className="mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
+                <Icon size={17} strokeWidth={1.8} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold leading-snug">{n.title}</span>
+                <span className="block pt-0.5 text-[13px] leading-relaxed text-muted">{n.body}</span>
+              </span>
+            </span>
+            {n.ctaLabel && (
+              <button
+                type="button"
+                onClick={() => navigate(to)}
+                className="ml-[42px] flex h-9 w-fit cursor-pointer items-center gap-1.5 rounded-btn bg-primary px-3.5 text-[13px] font-semibold text-white active:scale-[.99]"
+              >
+                {n.ctaLabel}
+                <ArrowUpRight size={15} strokeWidth={2} />
+              </button>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -224,6 +279,7 @@ export function CopilotOverviewPage() {
                 <CategoryRow key={cat.key} cat={cat} index={i} />
               ))}
             </div>
+            <NotificationsSection />
             <QuarterlyBreakdown />
             {data.insights.map((insight) => (
               <InsightCard key={insight.id} insight={insight} />

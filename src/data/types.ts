@@ -541,3 +541,16 @@ export interface InvestRates {
   /** Mỗi dòng một kỳ hạn — vẽ bảng và biểu đồ so sánh cùng kỳ hạn */
   rows: RateRow[]
 }
+
+
+/* ---- Màn Financial Copilot: thông báo dưới nhóm chi tiêu ---- */
+
+export interface CopilotNotification {
+  id: string
+  /** saving = sổ tiết kiệm đến hạn (CTA mở biểu lãi suất) · card = sao kê thẻ
+   *  chưa thanh toán · loan = đến kỳ trả nợ khoản vay */
+  kind: 'saving' | 'card' | 'loan'
+  title: string
+  body: string
+  ctaLabel?: string
+}
