@@ -328,3 +328,36 @@ export interface QuarterlyReport {
   quarters: QuarterSummary[]
   categoryTotals: CategoryTotal[]
 }
+
+/* ---- Luồng chuyển tiền: favorite (bỏ Scam Shield) vs stk mới (agent check) ---- */
+
+export interface TransferBeneficiary {
+  id: string
+  name: string
+  bank: string
+  account: string
+  relationship: string
+  /** true → chuyển thẳng, không cần Scam Shield (stk quen, không bị nghi ngờ). */
+  trusted: boolean
+}
+
+export interface ScamShieldVerdict {
+  level: 'safe' | 'suspect' | 'danger'
+  title: string
+  summary: string
+  reasons: string[]
+  recommendation: string
+  /** "agent" = do agent Scam Shield (LLM) kết luận; "fallback" = suy từ tín hiệu khi agent lỗi. */
+  source: 'agent' | 'fallback'
+}
+
+export interface TransferPrecheckResult {
+  /** false → stk quen, đi thẳng màn xác nhận; true → stk mới/nghi ngờ, hiện verdict. */
+  requiresReview: boolean
+  trusted: boolean
+  isNew: boolean
+  beneficiaryName: string
+  beneficiaryBank: string
+  beneficiaryAccount: string
+  verdict?: ScamShieldVerdict
+}

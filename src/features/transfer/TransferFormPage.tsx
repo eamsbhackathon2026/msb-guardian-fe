@@ -4,7 +4,7 @@ import { ChevronDown, House, Info, X } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Switch } from '@/components/ui/switch'
-import { getSessionCustomer } from '@/lib/api'
+import { getSessionCustomer, precheckTransfer } from '@/lib/api'
 import { fullAccountNumber } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
@@ -32,8 +32,48 @@ export function TransferFormPage() {
   const [note, setNote] = useState('NGUYEN VIET ANH chuyen tien')
   const [scheduled, setScheduled] = useState(false)
   const [amountFocused, setAmountFocused] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const canContinue = amountDigits.length > 0 && Number(amountDigits) > 0
+
+  /**
+   * "Tiếp tục" rẽ nhánh theo yêu cầu:
+   *  - stk QUEN (trusted) → thẳng màn xác nhận, KHÔNG cần Scam Shield.
+   *  - stk MỚI → gọi precheck, agent Scam Shield kiểm tra; nguy hiểm/nghi ngờ
+   *    thì hiện màn verdict, an toàn thì tới xác nhận. Gateway lỗi → không chặn.
+   */
+  async function onContinue() {
+    if (!canContinue || submitting) return
+    const amount = Number(amountDigits)
+    const payload = {
+      beneficiary: { name: beneficiary.name, bank: beneficiary.bank, account: beneficiary.account },
+      amount,
+      note,
+    }
+    if (beneficiary.trusted) {
+      navigate('/transfer/confirm', { state: payload })
+      return
+    }
+    setSubmitting(true)
+    try {
+      const res = await precheckTransfer({
+        bankCode: beneficiary.bankCode ?? beneficiary.bank,
+        accountNo: beneficiary.account,
+        amount,
+        note,
+        holderName: beneficiary.name,
+      })
+      setSubmitting(false)
+      if (res.requiresReview && res.verdict && res.verdict.level !== 'safe') {
+        navigate('/transfer/verdict', { state: { ...payload, verdict: res.verdict } })
+      } else {
+        navigate('/transfer/confirm', { state: payload })
+      }
+    } catch {
+      setSubmitting(false)
+      navigate('/transfer/confirm', { state: payload })
+    }
+  }
 
   return (
     <MobileFrame statusBar="dark">
@@ -132,13 +172,13 @@ export function TransferFormPage() {
         {/* Tiếp tục → vào luồng kiểm tra Scam Shield */}
         <button
           type="button"
-          disabled={!canContinue}
-          onClick={() => navigate('/transfer/review')}
+          disabled={!canContinue || submitting}
+          onClick={() => void onContinue()}
           className={`flex h-12 flex-none cursor-pointer items-center justify-center rounded-btn text-base font-semibold transition-colors ${
             canContinue ? 'bg-primary text-white active:scale-[.99]' : 'cursor-default bg-line text-muted'
           }`}
         >
-          Tiếp tục
+          {submitting ? 'Đang kiểm tra…' : 'Tiếp tục'}
         </button>
       </div>
     </MobileFrame>

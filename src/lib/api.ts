@@ -33,6 +33,8 @@ import type {
   RiskExplain,
   SafetyCenter,
   ScamAlert,
+  TransferBeneficiary,
+  TransferPrecheckResult,
 } from '@/data/types'
 
 // MOCK CŨ — không còn được gọi, giữ để đối chiếu với dữ liệu gateway trả về:
@@ -179,6 +181,29 @@ export async function streamChat(question: string, onToken: (token: string) => v
 //   await new Promise((resolve) => setTimeout(resolve, 600))
 //   await replayAsStream(reply.content, onToken)
 //   return { content: reply.content, chart: reply.chart }
+
+/* ---- Chuyển tiền: danh bạ + precheck (favorite vs stk mới) ---- */
+
+export function getTransferBeneficiaries(): Promise<TransferBeneficiary[]> {
+  return fetchJson<TransferBeneficiary[]>('/api/transfer/beneficiaries')
+}
+
+/**
+ * Quyết định luồng: stk quen (requiresReview=false → chuyển thẳng) hay stk mới
+ * (requiresReview=true → agent Scam Shield trả verdict). Gateway tự gọi agent.
+ */
+export function precheckTransfer(payload: {
+  bankCode: string
+  accountNo: string
+  amount: number
+  note?: string
+  holderName?: string
+}): Promise<TransferPrecheckResult> {
+  return fetchJson<TransferPrecheckResult>('/api/transfer/precheck', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
 
 /* ---- Scam Shield ---- */
 

@@ -1,0 +1,97 @@
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { CheckCircle2, ShieldCheck } from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { formatVnd } from '@/lib/format'
+import { MobileFrame } from '@/shell/MobileFrame'
+import { MobileHeader } from '@/shell/MobileHeader'
+
+interface ConfirmState {
+  beneficiary?: { name: string; bank: string; account: string }
+  amount?: number
+  note?: string
+  /** true khi tới đây từ màn cảnh báo Scam Shield (khách chọn "vẫn chuyển"). */
+  afterReview?: boolean
+}
+
+/**
+ * Màn xác nhận chuyển tiền — điểm cuối của luồng (theo yêu cầu: DỪNG ở xác nhận,
+ * chưa tạo giao dịch thật). Tới đây theo hai đường:
+ *  - stk quen (favorite) → thẳng từ màn nhập lệnh, không qua Scam Shield.
+ *  - stk mới → sau khi Scam Shield cảnh báo và khách vẫn chọn tiếp tục.
+ */
+export function TransferConfirmPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const state = (location.state as ConfirmState | null) ?? {}
+  const [done, setDone] = useState(false)
+
+  const amount = state.amount ?? 0
+  const b = state.beneficiary
+
+  if (done) {
+    return (
+      <MobileFrame statusBar="dark">
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8">
+          <motion.span
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+            className="flex h-20 w-20 items-center justify-center rounded-full bg-success-soft text-success"
+          >
+            <CheckCircle2 size={40} strokeWidth={1.6} />
+          </motion.span>
+          <span className="text-center text-[22px] font-semibold leading-7">Đã ghi nhận lệnh chuyển</span>
+          <span className="text-[30px] font-bold text-ink">{formatVnd(amount)}</span>
+          {b && <span className="text-center text-[13px] text-muted">tới {b.name} · {b.bank} {b.account}</span>}
+          <span className="text-center text-[12px] text-muted">Bản demo dừng ở bước xác nhận, chưa thực hiện giao dịch thật.</span>
+          <Button className="mt-2 w-full" onClick={() => navigate('/')}>Về trang chủ</Button>
+        </div>
+      </MobileFrame>
+    )
+  }
+
+  return (
+    <MobileFrame statusBar="dark">
+      <MobileHeader title="Xác nhận chuyển tiền" backTo="/transfer" />
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6 pt-2">
+        {state.afterReview ? (
+          <div className="flex items-start gap-2 rounded-card bg-warning-soft px-4 py-3 text-[13px] leading-[18px] text-ink">
+            <ShieldCheck size={18} strokeWidth={1.8} className="mt-0.5 flex-none text-warning" />
+            Bạn đã xem cảnh báo Scam Shield và chọn tiếp tục. Hãy chắc chắn bạn tin tưởng người nhận.
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 rounded-card bg-success-soft px-4 py-3 text-[13px] leading-[18px] text-success-deep">
+            <ShieldCheck size={18} strokeWidth={1.8} className="flex-none" />
+            Người nhận nằm trong danh bạ tin cậy — không cần kiểm tra Scam Shield.
+          </div>
+        )}
+
+        <div className="flex flex-col gap-3 rounded-card bg-surface p-4 shadow-card">
+          <Row label="Người nhận" value={b?.name ?? '—'} />
+          <Row label="Ngân hàng" value={`${b?.bank ?? ''} · ${b?.account ?? ''}`} />
+          <div className="h-px bg-divider" />
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] text-muted">Số tiền</span>
+            <span className="text-[22px] font-bold text-primary">{formatVnd(amount)}</span>
+          </div>
+          {state.note && <Row label="Nội dung" value={state.note} />}
+        </div>
+      </div>
+
+      <div className="flex-none border-t border-line bg-surface px-4 py-3">
+        <Button className="w-full" onClick={() => setDone(true)}>Xác nhận chuyển</Button>
+      </div>
+    </MobileFrame>
+  )
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <span className="text-[13px] text-muted">{label}</span>
+      <span className="max-w-[62%] text-right text-[15px] font-semibold text-ink">{value}</span>
+    </div>
+  )
+}

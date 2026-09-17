@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, CalendarClock, QrCode, Search, UserRoundPlus, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { getTransferBeneficiaries } from '@/lib/api'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
 
@@ -15,21 +17,24 @@ export interface Beneficiary {
   name: string
   bank: string
   account: string
+  /** true → chuyển thẳng, không cần Scam Shield (stk quen, tin cậy). */
+  trusted?: boolean
+  /** Mã ngân hàng để gọi precheck (VCB/ACB/MSB…); mặc định dùng `bank`. */
+  bankCode?: string
 }
 
 /** Danh bạ thụ hưởng demo — theo ben.jpg */
 export const favoriteBeneficiaries: Beneficiary[] = [
-  { id: 'b1', name: 'LongNV Hạ Tầng', bank: 'MSB', account: '0982541740' },
-  { id: 'b2', name: 'LongPD MSB', bank: 'MSB', account: '03301011939831' },
-  { id: 'b3', name: 'MSB Thái', bank: 'MSB', account: '03101016725958' },
-  { id: 'b4', name: 'My Account', bank: 'Techcombank', account: '19025711047011' },
+  { id: 'b1', name: 'LongNV Hạ Tầng', bank: 'MSB', account: '0982541740', trusted: true },
+  { id: 'b2', name: 'LongPD MSB', bank: 'MSB', account: '03301011939831', trusted: true },
+  { id: 'b3', name: 'MSB Thái', bank: 'MSB', account: '03101016725958', trusted: true },
+  { id: 'b4', name: 'My Account', bank: 'Techcombank', account: '19025711047011', trusted: true },
 ]
 
 const otherBeneficiaries: { letter: string; items: Beneficiary[] }[] = [
-  { letter: 'D', items: [{ id: 'b5', name: 'Do Van Duc', bank: 'MSB', account: '0362554873' }] },
+  { letter: 'D', items: [{ id: 'b5', name: 'Do Van Duc', bank: 'MSB', account: '0362554873', trusted: false }] },
 ]
 
-const recentBeneficiaries: Beneficiary[] = [favoriteBeneficiaries[0], favoriteBeneficiaries[3]]
 
 /** Logo ngân hàng của người thụ hưởng */
 function BankAvatar({ bank }: { bank: string }) {
@@ -66,12 +71,17 @@ export function BeneficiariesPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState<'saved' | 'recent'>('saved')
   const [query, setQuery] = useState('')
+  // Danh bạ thật từ gateway (kèm cờ trusted). Lỗi/rỗng thì dùng danh bạ demo.
+  const { data: apiList } = useQuery({ queryKey: ['transfer-beneficiaries'], queryFn: getTransferBeneficiaries })
+  const savedList: Beneficiary[] = apiList && apiList.length > 0
+    ? apiList.map((b) => ({ id: b.id, name: b.name, bank: b.bank, account: b.account, trusted: b.trusted, bankCode: b.bank }))
+    : favoriteBeneficiaries
 
   const q = query.trim().toLowerCase()
   const matches = (b: Beneficiary) => !q || b.name.toLowerCase().includes(q) || b.account.includes(q) || b.bank.toLowerCase().includes(q)
-  const favorites = favoriteBeneficiaries.filter(matches)
+  const favorites = savedList.filter(matches)
   const others = otherBeneficiaries.map((g) => ({ ...g, items: g.items.filter(matches) })).filter((g) => g.items.length > 0)
-  const recents = recentBeneficiaries.filter(matches)
+  const recents = savedList.slice(0, 2).filter(matches)
 
   const pick = (b: Beneficiary) => navigate('/transfer/new', { state: { beneficiary: b } })
 
