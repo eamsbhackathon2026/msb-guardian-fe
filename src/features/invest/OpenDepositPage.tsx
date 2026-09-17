@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Check, CheckCircle2, ChevronDown, Delete, House, Info, Lock } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
-import { getSessionCustomer } from '@/lib/api'
+import { getSessionCustomer, openDeposit } from '@/lib/api'
 import { formatDate, formatTime, formatVnd, fullAccountNumber, fullCustomerName } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame, usePhoneContainer } from '@/shell/MobileFrame'
@@ -55,6 +55,7 @@ export function OpenDepositPage() {
 function OpenDepositInner() {
   const navigate = useNavigate()
   const container = usePhoneContainer()
+  const queryClient = useQueryClient()
   const pushNotification = useGuardianStore((s) => s.pushNotification)
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
 
@@ -93,17 +94,34 @@ function OpenDepositInner() {
     </div>
   )
 
-  function confirmOpen() {
+  async function confirmOpen() {
     if (!term || !agreed) return
     const openedAt = new Date()
-    const deposit: OpenedDeposit = {
-      // Số sổ tiền gửi giả lập dạng 2000xxxxxxx như mẫu tk4
+    // Bản dự phòng khi gateway lỗi — demo không bị chặn, số sổ giả lập
+    let deposit: OpenedDeposit = {
       depositNo: `2000${String(openedAt.getTime()).slice(-7)}`,
       amount,
       months: term.months,
       rate: term.rate,
       openedAt,
       maturity: addMonths(openedAt, term.months),
+    }
+    try {
+      // HẠCH TOÁN THẬT: gateway ghi nợ TK nguồn + tạo sổ + ghi bút toán
+      const res = await openDeposit({ amount, months: term.months, rate: term.rate })
+      if (res.ok && res.depositNo) {
+        deposit = {
+          ...deposit,
+          depositNo: res.depositNo,
+          openedAt: res.startDate ? new Date(res.startDate) : openedAt,
+          maturity: res.maturityDate ? new Date(res.maturityDate) : deposit.maturity,
+        }
+        // Số dư đã bị ghi nợ — refetch để trang chủ/tài khoản nguồn hiện đúng
+        void queryClient.invalidateQueries({ queryKey: ['session-customer'] })
+        void queryClient.invalidateQueries({ queryKey: ['transfer-history'] })
+      }
+    } catch {
+      // Gateway không gọi được: dùng bản dự phòng ở trên
     }
     setOpened(deposit)
     pushNotification({

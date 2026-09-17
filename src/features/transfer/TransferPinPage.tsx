@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { CheckCircle2, Delete, Lock } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { executeTransfer } from '@/lib/api'
 import { formatTime, formatVnd } from '@/lib/format'
@@ -29,6 +30,7 @@ export function TransferPinPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const state = (location.state as PinState | null) ?? {}
+  const queryClient = useQueryClient()
   const { addTransaction, pushNotification } = useGuardianStore()
 
   const [pin, setPin] = useState('')
@@ -54,7 +56,8 @@ export function TransferPinPage() {
       title: `Biến động số dư: -${formatVnd(amount)} đến ${b?.name ?? 'người nhận'}`,
       timeLabel: `Hôm nay · ${formatTime(iso)}`,
     })
-    // Ghi về backend (bảng transaction_history) để lịch sử truy vấn lại được;
+    // Ghi về backend: gateway hạch toán ghi nợ tài khoản nguồn + ghi bút toán
+    // vào transaction_history. Xong thì refetch số dư + lịch sử cho khớp sổ;
     // gateway lỗi thì giao dịch trong phiên vẫn còn ở store nên không chặn UI.
     void executeTransfer({
       bankCode: b?.bank ?? '',
@@ -62,7 +65,12 @@ export function TransferPinPage() {
       holderName: b?.name ?? '',
       amount,
       note: state.note,
-    }).catch(() => {})
+    })
+      .then(() => {
+        void queryClient.invalidateQueries({ queryKey: ['session-customer'] })
+        void queryClient.invalidateQueries({ queryKey: ['transfer-history'] })
+      })
+      .catch(() => {})
     setPhase('done')
   }
 

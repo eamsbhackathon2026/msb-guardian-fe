@@ -325,6 +325,18 @@ export function getTransferHistory(): Promise<TransferHistoryItem[]> {
   return fetchJson<TransferHistoryItem[]>('/api/transfer/history')
 }
 
+/** Mở tiền gửi CÓ HẠCH TOÁN: gateway ghi nợ tài khoản nguồn, tạo sổ deposit,
+ *  ghi bút toán OUT/INVESTMENT vào transaction_history. */
+export function openDeposit(payload: { amount: number; months: number; rate: number }): Promise<{
+  ok: boolean
+  depositNo?: string
+  startDate?: string
+  maturityDate?: string
+  balanceAfter?: number
+}> {
+  return fetchJson('/api/invest/open', { method: 'POST', body: JSON.stringify(payload) })
+}
+
 /* ---- Đầu tư: biểu lãi suất tiết kiệm ---- */
 
 /**
