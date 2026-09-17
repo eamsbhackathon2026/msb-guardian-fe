@@ -544,8 +544,7 @@ export function HomePage() {
             <span className="block text-xs font-semibold text-primary">Trợ lý AI Guardian</span>
             {spentPct !== null ? (
               <span className="block text-[13px] leading-[18px]">
-                ⚠️ Tháng này anh đã chi <span className="font-bold text-danger">{spentPct}%</span> ngân sách
-                {overview ? ` (${formatVnd(overview.budget.spentVnd)} / ${formatVnd(overview.budget.budgetVnd)})` : ''}. Bấm vào xem chi tiết nhé.
+                ⚠️ Đã chi <span className="font-bold text-danger">{spentPct}%</span> ngân sách tháng này. Bấm xem chi tiết.
               </span>
             ) : (
               <span className="block text-[13px] leading-[18px]">{home?.assistantHint ?? ''}</span>
