@@ -13,6 +13,9 @@ import { MobileFrame } from '@/shell/MobileFrame'
 const chartShades = ['var(--msb-primary)', 'var(--msb-orange-300)', 'var(--msb-orange-200)', 'var(--msb-orange-border)', 'var(--msb-border)']
 
 function MiniBarChart({ chart }: { chart: ChatChart }) {
+  // Cột cao nhất phải TÌM ra, không lấy cột đầu: bảng chi tiêu xếp giảm dần nên
+  // cột đầu đúng là lớn nhất, nhưng bảng tiền dư xếp theo tháng thì không.
+  const dinh = chart.data.length ? chart.data.reduce((a, b) => (b.value > a.value ? b : a)) : undefined
   return (
     <div className="mt-1 flex flex-col gap-1 rounded-xl bg-app p-3">
       <span className="text-xs font-semibold text-muted">{chart.title}</span>
@@ -26,7 +29,7 @@ function MiniBarChart({ chart }: { chart: ChatChart }) {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-      <span className="text-[11px] text-muted">Lớn nhất: {chart.data[0]?.label} · {formatVnd(chart.data[0]?.value ?? 0)}</span>
+      {dinh && <span className="text-[11px] text-muted">Lớn nhất: {dinh.label} · {formatVnd(dinh.value)}</span>}
     </div>
   )
 }
@@ -46,9 +49,19 @@ function TrendBadge({ pct }: { pct: number | null }) {
   )
 }
 
+/** Số âm: formatVnd dùng Math.abs nên tự nó bỏ mất dấu trừ — bảng tiền dư có
+ *  tháng chi vượt thu, hiện "115.000 ₫" thay vì "−115.000 ₫" là đọc ngược hẳn. */
+function formatVndCoDau(n: number) {
+  return `${n < 0 ? '−' : ''}${formatVnd(n)}`
+}
+
 /** Bảng số liệu chi tiêu do gateway dựng từ dữ liệu domain — số luôn khớp
  *  database, không phải LLM sinh. */
 function SpendingTable({ table }: { table: ChatTable }) {
+  // Bảng lộ trình tiết kiệm nói về tương lai nên không có "kỳ trước" để so:
+  // gateway gửi trendHeader = null và cột Δ biến mất, thay vì thành một cột
+  // toàn dấu "—".
+  const coCotTrend = table.trendHeader !== null && table.trendHeader !== undefined
   return (
     <div className="mt-1.5 overflow-hidden rounded-xl bg-app">
       <div className="px-3 pt-2.5 pb-1.5 text-xs font-semibold text-muted">{table.title}</div>
@@ -56,31 +69,38 @@ function SpendingTable({ table }: { table: ChatTable }) {
         <thead>
           <tr className="text-[10px] uppercase tracking-wide text-muted">
             <th className="px-3 pb-1 text-left font-medium">{table.rowHeader ?? 'Nhóm'}</th>
-            <th className="px-1 pb-1 text-right font-medium">Số tiền</th>
-            <th className="px-1 pb-1 text-right font-medium">%</th>
-            <th className="px-3 pb-1 text-right font-medium">Δ kỳ trước</th>
+            <th className="px-1 pb-1 text-right font-medium">{table.amountHeader ?? 'Số tiền'}</th>
+            <th className="px-1 pb-1 text-right font-medium">{table.pctHeader ?? '%'}</th>
+            {coCotTrend && <th className="px-3 pb-1 text-right font-medium">{table.trendHeader}</th>}
           </tr>
         </thead>
         <tbody>
           {table.rows.map((row, i) => (
             <tr key={row.label} className={i % 2 ? 'bg-black/[0.025]' : ''}>
               <td className="px-3 py-1.5 text-ink">{row.label}</td>
-              <td className="whitespace-nowrap px-1 py-1.5 text-right tabular-nums text-ink">{formatVnd(row.amount)}</td>
-              <td className="px-1 py-1.5 text-right tabular-nums text-muted">{row.pct}%</td>
-              <td className="px-3 py-1.5 text-right font-medium tabular-nums">
-                <TrendBadge pct={row.trendPct} />
+              <td className={`whitespace-nowrap px-1 py-1.5 text-right tabular-nums ${row.amount < 0 ? 'text-danger' : 'text-ink'}`}>
+                {formatVndCoDau(row.amount)}
               </td>
+              <td className="px-1 py-1.5 text-right tabular-nums text-muted">{row.pct}%</td>
+              {coCotTrend && (
+                <td className="px-3 py-1.5 text-right font-medium tabular-nums">
+                  <TrendBadge pct={row.trendPct} />
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
         <tfoot>
           <tr className="border-t border-line font-semibold">
             <td className="px-3 py-2 text-ink">{table.totalLabel}</td>
-            <td className="whitespace-nowrap px-1 py-2 text-right tabular-nums text-ink">{formatVnd(table.totalAmount)}</td>
-            <td colSpan={2} />
+            <td className="whitespace-nowrap px-1 py-2 text-right tabular-nums text-ink">{formatVndCoDau(table.totalAmount)}</td>
+            <td colSpan={coCotTrend ? 2 : 1} />
           </tr>
         </tfoot>
       </table>
+      {table.footnote && (
+        <p className="px-3 pb-2.5 pt-1 text-[11px] leading-[15px] text-muted">{table.footnote}</p>
+      )}
     </div>
   )
 }

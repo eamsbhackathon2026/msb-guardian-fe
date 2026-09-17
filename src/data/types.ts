@@ -96,6 +96,13 @@ export interface ChatTable {
   totalAmount: number
   /** Nhãn cột đầu: "Nhóm" (mặc định) hoặc "Tháng" cho bảng so sánh tháng. */
   rowHeader?: string
+  /** Nhãn hai cột giữa — bảng tư vấn đổi thành "Cần/tháng", "% thu nhập". */
+  amountHeader?: string
+  pctHeader?: string
+  /** null → bỏ hẳn cột Δ (bảng kịch bản không có kỳ trước để so). */
+  trendHeader?: string | null
+  /** Chú thích dưới bảng: con số suy ra từ đâu. */
+  footnote?: string | null
 }
 
 export interface ChatMessage {
