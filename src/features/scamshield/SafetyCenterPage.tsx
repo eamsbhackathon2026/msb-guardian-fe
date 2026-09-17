@@ -106,7 +106,7 @@ function SafetyCenterInner() {
             <Badge variant="success" size="md" className="w-fit">
               {data.scoreLabel}
             </Badge>
-            <span className="text-xs leading-4 text-muted">
+            <span className="text-xs font-medium leading-4 text-success">
               {data.updatedLabel} · Scam Shield {data.shieldEnabled ? 'đang bật' : 'đang tắt'}
             </span>
           </span>
@@ -191,7 +191,7 @@ function SafetyCenterInner() {
                   <Badge variant={historyStatusMeta[selected.status].variant}>{historyStatusMeta[selected.status].label}</Badge>
                 </span>
               </div>
-              <span className="text-[13px] leading-5 text-muted">
+              <span className="text-[13px] leading-5 text-success">
                 Cảnh báo được tạo bởi Scam Shield dựa trên tín hiệu tài khoản nhận và mẫu hành vi. Mọi quyết định cuối cùng thuộc về bạn — MSB không tự động chặn giao dịch hợp lệ.
               </span>
             </div>

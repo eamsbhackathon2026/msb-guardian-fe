@@ -26,7 +26,7 @@ function AnalyzingState() {
     <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8">
       <LoaderCircle size={44} strokeWidth={1.6} className="animate-spin text-primary" />
       <span className="text-[15px] font-medium text-muted">Đang phân tích giao dịch...</span>
-      <span className="text-center text-[13px] text-muted">Scam Shield kiểm tra người nhận, lịch sử và mẫu hành vi giao dịch.</span>
+      <span className="text-center text-[13px] font-medium text-success">Scam Shield kiểm tra người nhận, lịch sử và mẫu hành vi giao dịch.</span>
     </div>
   )
 }

@@ -12,6 +12,8 @@ interface VerdictState {
   beneficiary?: { name: string; bank: string; account: string }
   amount?: number
   note?: string
+  /** 'chat-banking' khi lệnh bắt nguồn từ chat — chuyền tiếp cho màn xác nhận */
+  from?: string
 }
 
 const THEME = {
@@ -40,7 +42,7 @@ export function ScamShieldVerdictPage() {
   const t = THEME[v.level]
   const proceed = () =>
     navigate('/transfer/confirm', {
-      state: { beneficiary: state.beneficiary, amount: state.amount, note: state.note, afterReview: true },
+      state: { beneficiary: state.beneficiary, amount: state.amount, note: state.note, afterReview: true, from: state.from },
     })
 
   return (

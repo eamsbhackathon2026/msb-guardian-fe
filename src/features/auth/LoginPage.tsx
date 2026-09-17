@@ -81,8 +81,8 @@ function LoginSplash() {
           className="h-8 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,.35)]"
         />
       </motion.div>
-      <span className="flex items-center gap-2 text-[13px] text-white/85">
-        <ShieldCheck size={15} strokeWidth={1.7} className="text-success-bright" />
+      <span className="flex items-center gap-2 text-[13px] font-medium text-success-bright">
+        <ShieldCheck size={15} strokeWidth={1.7} />
         Đăng nhập an toàn cùng Scam Shield…
       </span>
     </motion.div>

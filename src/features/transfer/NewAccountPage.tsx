@@ -82,8 +82,8 @@ export function NewAccountPage() {
       <MobileHeader title="Chuyển tới số tài khoản" backTo="/transfer" />
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6 pt-2">
-        <div className="flex items-start gap-2 rounded-card bg-orange-soft px-4 py-3 text-[13px] leading-[18px] text-ink">
-          <Landmark size={18} strokeWidth={1.8} className="mt-0.5 flex-none text-primary" />
+        <div className="flex items-start gap-2 rounded-card bg-success-soft px-4 py-3 text-[13px] leading-[18px] text-success-deep">
+          <Landmark size={18} strokeWidth={1.8} className="mt-0.5 flex-none text-success" />
           Số tài khoản mới sẽ được Scam Shield kiểm tra dấu hiệu lừa đảo trước khi chuyển.
         </div>
 
@@ -159,7 +159,7 @@ export function NewAccountPage() {
         </motion.div>
       </div>
 
-      <div className="flex-none border-t border-line bg-surface px-4 py-3">
+      <div className="flex-none border-t border-line bg-surface px-4 pb-9 pt-3">
         <button
           type="button"
           disabled={!canContinue}

@@ -13,6 +13,8 @@ interface PinState {
   beneficiary?: { name: string; bank: string; account: string }
   amount?: number
   note?: string
+  /** 'chat-banking' khi lệnh bắt nguồn từ chat — màn thành công có nút quay lại chat */
+  from?: string
 }
 
 const PIN_LENGTH = 6
@@ -127,7 +129,11 @@ export function TransferPinPage() {
               tới {b.name} · {b.bank} {b.account}
             </span>
           )}
-          <Button className="mt-2 w-full" onClick={() => navigate('/')}>Về trang chủ</Button>
+          {state.from === 'chat-banking' ? (
+            <Button className="mt-2 w-full" onClick={() => navigate('/chat-banking')}>Quay lại Chat Banking</Button>
+          ) : (
+            <Button className="mt-2 w-full" onClick={() => navigate('/')}>Về trang chủ</Button>
+          )}
           <button
             type="button"
             onClick={() => navigate('/transactions')}

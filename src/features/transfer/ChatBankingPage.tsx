@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ArrowUpRight, MessageSquareText, Send, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { formatDate, formatVnd, timeGreeting } from '@/lib/format'
+import { useGuardianStore } from '@/lib/store'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { favoriteBeneficiaries, type Beneficiary } from './BeneficiariesPage'
 
@@ -19,10 +20,16 @@ interface BankingMessage {
   transfer?: DraftTransfer
   /** Danh bạ bot liệt kê để khách bấm chọn — tên + số tài khoản đầy đủ, không che */
   beneficiaries?: Beneficiary[]
+  /** Nút hành động dưới tin nhắn (mở màn chuyển thường, xem lịch sử…) */
+  action?: { label: string; to: string }
 }
 
 let nextId = 0
-function makeMsg(role: BankingMessage['role'], content: string, extra?: { transfer?: DraftTransfer; beneficiaries?: Beneficiary[] }): BankingMessage {
+function makeMsg(
+  role: BankingMessage['role'],
+  content: string,
+  extra?: { transfer?: DraftTransfer; beneficiaries?: Beneficiary[]; action?: { label: string; to: string } },
+): BankingMessage {
   nextId += 1
   return { id: `cb-${nextId}`, role, content, ...extra }
 }
@@ -106,7 +113,7 @@ function TransferCard({ transfer }: { transfer: DraftTransfer }) {
       </span>
       <button
         type="button"
-        onClick={() => navigate('/transfer/new', { state: { beneficiary: transfer.beneficiary, amount: transfer.amount } })}
+        onClick={() => navigate('/transfer/new', { state: { beneficiary: transfer.beneficiary, amount: transfer.amount, from: 'chat-banking' } })}
         className="flex h-10 cursor-pointer items-center justify-center gap-1.5 rounded-btn bg-primary text-[14px] font-semibold text-white active:scale-[.99]"
       >
         Tạo lệnh chuyển
@@ -133,14 +140,44 @@ export function ChatBankingPage() {
   // Nhớ mảnh lệnh đã hiểu ở các câu trước: khách nói tên trước, số tiền sau vẫn ghép được
   const [pending, setPending] = useState<{ beneficiary?: Beneficiary; amount?: number }>({})
   const scrollRef = useRef<HTMLDivElement>(null)
+  const transactions = useGuardianStore((s) => s.transactions)
+  const announcedRef = useRef(false)
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, typing])
 
+  // Khách vừa chuyển tiền xong (< 5 phút) quay lại chat → báo thành công ngay
+  // trong hội thoại kèm nút xem lại lịch sử giao dịch.
+  useEffect(() => {
+    if (announcedRef.current) return
+    const last = transactions[0]
+    if (!last || Date.now() - new Date(last.datetime).getTime() > 5 * 60_000) return
+    announcedRef.current = true
+    setMessages((prev) => [
+      ...prev,
+      makeMsg('assistant', `✅ Chuyển tiền thành công ${formatVnd(last.amount)} tới ${last.name} (${last.bank} · ${last.account}).`, {
+        action: { label: 'Xem lại lịch sử giao dịch', to: '/transactions' },
+      }),
+    ])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   function reply(text: string) {
     const beneficiary = findBeneficiary(text) ?? pending.beneficiary
     const amount = parseAmount(text) ?? pending.amount
+    // Khách nêu đích danh người nhận ("cho ai đó" / một dãy số dài như stk)
+    // nhưng không khớp danh bạ → người nhận MỚI, rẽ sang màn chuyển thường.
+    const namesRecipient = /\bcho\s+\S/.test(stripDiacritics(text)) || /\d{6,}/.test(text)
+
+    if (!beneficiary && namesRecipient && (amount || /\bchuyen\b|\bck\b/.test(stripDiacritics(text)))) {
+      setPending({})
+      return makeMsg(
+        'assistant',
+        'Người nhận này chưa có trong danh bạ của anh. Với tài khoản mới, anh thao tác trên màn chuyển tiền thông thường để nhập số tài khoản và được Scam Shield kiểm tra đầy đủ nhé.',
+        { action: { label: 'Chuyển tới tài khoản mới', to: '/transfer/account' } },
+      )
+    }
 
     if (beneficiary && amount) {
       setPending({})
@@ -216,6 +253,16 @@ export function ChatBankingPage() {
               <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 text-[15px] leading-[22px] shadow-card">
                 {m.content}
                 {m.transfer && <TransferCard transfer={m.transfer} />}
+                {m.action && (
+                  <button
+                    type="button"
+                    onClick={() => navigate(m.action!.to)}
+                    className="mt-2 flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 rounded-btn bg-primary text-[14px] font-semibold text-white active:scale-[.99]"
+                  >
+                    {m.action.label}
+                    <ArrowUpRight size={16} strokeWidth={2} />
+                  </button>
+                )}
                 {m.beneficiaries && (
                   <div className="mt-1.5 flex flex-col overflow-hidden rounded-xl bg-app">
                     {m.beneficiaries.map((b, i) => (
@@ -268,7 +315,7 @@ export function ChatBankingPage() {
 
       {/* Footer nhập */}
       <div className="flex-none border-t border-line bg-surface px-4 pb-7 pt-2">
-        <div className="pb-1.5 text-center text-[11px] text-muted">Lệnh chuyển luôn được Scam Shield kiểm tra trước khi thực hiện.</div>
+        <div className="pb-1.5 text-center text-[11px] font-medium text-success">Lệnh chuyển luôn được Scam Shield kiểm tra trước khi thực hiện.</div>
         <form
           className="flex items-center gap-2"
           onSubmit={(e) => {

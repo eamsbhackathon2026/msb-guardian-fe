@@ -22,8 +22,9 @@ const vnd = new Intl.NumberFormat('en-US')
 export function TransferFormPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  // Chat Banking gửi kèm số tiền đã hiểu từ câu chat để form điền sẵn
-  const state = (location.state as { beneficiary?: Beneficiary; amount?: number } | null) ?? {}
+  // Chat Banking gửi kèm số tiền đã hiểu từ câu chat để form điền sẵn;
+  // from='chat-banking' được chuyền suốt luồng để màn thành công quay lại chat.
+  const state = (location.state as { beneficiary?: Beneficiary; amount?: number; from?: string } | null) ?? {}
   const beneficiary: Beneficiary = state.beneficiary ?? favoriteBeneficiaries[0]
 
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
@@ -35,6 +36,15 @@ export function TransferFormPage() {
   const [submitting, setSubmitting] = useState(false)
 
   const canContinue = amountDigits.length > 0 && Number(amountDigits) > 0
+
+  // Gõ "50" gợi ý 50.000 / 500.000 / 5.000.000 — nhân theo bậc nghìn như các
+  // app ngân hàng. Không gợi ý nữa khi số đã đủ lớn (≥ 6 chữ số coi như đã là
+  // số tiền thật) hoặc vượt trần 12 chữ số của ô nhập.
+  const amountValue = Number(amountDigits)
+  const amountSuggestions =
+    amountDigits.length > 0 && amountDigits.length < 6 && amountValue > 0
+      ? [amountValue * 1_000, amountValue * 10_000, amountValue * 100_000].filter((v) => String(v).length <= 12)
+      : []
 
   /**
    * "Tiếp tục" rẽ nhánh theo yêu cầu:
@@ -49,6 +59,7 @@ export function TransferFormPage() {
       beneficiary: { name: beneficiary.name, bank: beneficiary.bank, account: beneficiary.account },
       amount,
       note,
+      from: state.from,
     }
     if (beneficiary.trusted) {
       navigate('/transfer/confirm', { state: payload })
@@ -147,6 +158,21 @@ export function TransferFormPage() {
               )}
               <span className="flex-none text-[15px] font-medium text-muted">VND</span>
             </label>
+            {/* Gợi ý số tiền theo con số đang gõ: 50 → 50.000 / 500.000 / 5.000.000 */}
+            {amountSuggestions.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {amountSuggestions.map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setAmountDigits(String(v))}
+                    className="cursor-pointer rounded-full border border-line bg-surface px-3.5 py-2 text-[13px] font-semibold text-ink hover:border-primary hover:text-primary"
+                  >
+                    {vnd.format(v)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Nội dung */}

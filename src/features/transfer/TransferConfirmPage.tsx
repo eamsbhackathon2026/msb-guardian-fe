@@ -11,6 +11,8 @@ interface ConfirmState {
   note?: string
   /** true khi tới đây từ màn cảnh báo Scam Shield (khách chọn "vẫn chuyển"). */
   afterReview?: boolean
+  /** 'chat-banking' khi lệnh bắt nguồn từ chat — màn thành công quay lại chat */
+  from?: string
 }
 
 /**
@@ -56,7 +58,7 @@ export function TransferConfirmPage() {
       </div>
 
       <div className="flex-none border-t border-line bg-surface px-4 py-3">
-        <Button className="w-full" onClick={() => navigate('/transfer/pin', { state: { beneficiary: b, amount, note: state.note } })}>
+        <Button className="w-full" onClick={() => navigate('/transfer/pin', { state: { beneficiary: b, amount, note: state.note, from: state.from } })}>
           Xác nhận chuyển
         </Button>
       </div>
