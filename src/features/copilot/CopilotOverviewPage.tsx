@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { CopilotOverview, Insight, SpendingCategory } from '@/data/types'
 import { getCopilotOverview, getQuarterlyReport } from '@/lib/api'
-import { formatPct, formatVnd } from '@/lib/format'
+import { formatPct, formatVnd, formatVndWithSign } from '@/lib/format'
 import { BottomNav } from '@/shell/BottomNav'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
@@ -157,7 +157,7 @@ function QuarterlyBreakdown() {
           </span>
           <span className="flex items-baseline justify-between text-[11px] text-muted">
             <span>{q.count} giao dịch</span>
-            <span>Thu {formatVnd(q.income)} · Dư {formatVnd(q.net)}</span>
+            <span>Thu {formatVnd(q.income)} · Dư {formatVndWithSign(q.net)}</span>
           </span>
 
           {q.byCategory.map((c) => (

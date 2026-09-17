@@ -6,6 +6,12 @@ export function formatVnd(amount: number): string {
 }
 
 /** Có dấu +/- cho danh sách giao dịch: -128.000 ₫ / +28.500.000 ₫ */
+/** formatVnd dùng Math.abs nên số âm hiện y như số dương — "dư -4,6 triệu"
+ *  thành "dư 4,6 triệu", đọc ngược hẳn ý nghĩa. Dùng hàm này cho mọi chỗ giá
+ *  trị có thể âm (tiền dư = thu - chi). */
+export function formatVndWithSign(amount: number): string {
+  return `${amount < 0 ? '−' : ''}${formatVnd(amount)}`
+}
 export function formatVndSigned(amount: number, direction: 'in' | 'out'): string {
   return `${direction === 'in' ? '+' : '-'}${formatVnd(amount)}`
 }

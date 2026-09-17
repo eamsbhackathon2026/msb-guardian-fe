@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
 import type { ChatChart, ChatMessage, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
-import { formatDate, formatVnd, timeGreeting } from '@/lib/format'
+import { formatDate, formatVnd, timeGreeting, formatVndWithSign } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 
 const chartShades = ['var(--msb-primary)', 'var(--msb-orange-300)', 'var(--msb-orange-200)', 'var(--msb-orange-border)', 'var(--msb-border)']
@@ -49,12 +49,6 @@ function TrendBadge({ pct }: { pct: number | null }) {
   )
 }
 
-/** Số âm: formatVnd dùng Math.abs nên tự nó bỏ mất dấu trừ — bảng tiền dư có
- *  tháng chi vượt thu, hiện "115.000 ₫" thay vì "−115.000 ₫" là đọc ngược hẳn. */
-function formatVndCoDau(n: number) {
-  return `${n < 0 ? '−' : ''}${formatVnd(n)}`
-}
-
 /** Bảng số liệu chi tiêu do gateway dựng từ dữ liệu domain — số luôn khớp
  *  database, không phải LLM sinh. */
 function SpendingTable({ table }: { table: ChatTable }) {
@@ -79,7 +73,7 @@ function SpendingTable({ table }: { table: ChatTable }) {
             <tr key={row.label} className={i % 2 ? 'bg-black/[0.025]' : ''}>
               <td className="px-3 py-1.5 text-ink">{row.label}</td>
               <td className={`whitespace-nowrap px-1 py-1.5 text-right tabular-nums ${row.amount < 0 ? 'text-danger' : 'text-ink'}`}>
-                {formatVndCoDau(row.amount)}
+                {formatVndWithSign(row.amount)}
               </td>
               <td className="px-1 py-1.5 text-right tabular-nums text-muted">{row.pct}%</td>
               {coCotTrend && (
@@ -93,7 +87,7 @@ function SpendingTable({ table }: { table: ChatTable }) {
         <tfoot>
           <tr className="border-t border-line font-semibold">
             <td className="px-3 py-2 text-ink">{table.totalLabel}</td>
-            <td className="whitespace-nowrap px-1 py-2 text-right tabular-nums text-ink">{formatVndCoDau(table.totalAmount)}</td>
+            <td className="whitespace-nowrap px-1 py-2 text-right tabular-nums text-ink">{formatVndWithSign(table.totalAmount)}</td>
             <td colSpan={coCotTrend ? 2 : 1} />
           </tr>
         </tfoot>
