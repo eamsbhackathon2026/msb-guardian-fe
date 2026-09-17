@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, CheckCircle2, ChevronDown, House, Info } from 'lucide-react'
+import { Check, CheckCircle2, ChevronDown, Delete, House, Info, Lock } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
@@ -22,6 +22,9 @@ const TERMS = [
 ]
 
 const MATURITY_OPTIONS = ['Quay vòng gốc, nhận lãi về tài khoản thanh toán', 'Quay vòng gốc và lãi']
+
+const OTP_LENGTH = 6
+const KEYPAD = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'] as const
 
 function addMonths(d: Date, months: number): Date {
   const x = new Date(d)
@@ -55,7 +58,8 @@ function OpenDepositInner() {
   const pushNotification = useGuardianStore((s) => s.pushNotification)
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
 
-  const [phase, setPhase] = useState<'form' | 'confirm' | 'done'>('form')
+  const [phase, setPhase] = useState<'form' | 'confirm' | 'otp' | 'processing' | 'done'>('form')
+  const [otp, setOtp] = useState('')
   const [amountDigits, setAmountDigits] = useState('')
   const [term, setTerm] = useState<(typeof TERMS)[number] | null>(null)
   const [termSheetOpen, setTermSheetOpen] = useState(false)
@@ -115,6 +119,89 @@ function OpenDepositInner() {
     setAmountDigits('')
     setTerm(null)
     setOpened(null)
+    setOtp('')
+  }
+
+  /** Bàn phím OTP — đủ 6 số thì sang màn xử lý (logo M xoay 1s) rồi hoàn tất */
+  function pressOtp(key: (typeof KEYPAD)[number]) {
+    if (phase !== 'otp' || key === '') return
+    if (key === 'del') {
+      setOtp((p) => p.slice(0, -1))
+      return
+    }
+    const next = (otp + key).slice(0, OTP_LENGTH)
+    setOtp(next)
+    if (next.length === OTP_LENGTH) {
+      setPhase('processing')
+      setTimeout(confirmOpen, 1000)
+    }
+  }
+
+  /* ---- Màn xử lý — logo M xoay như luồng chuyển tiền ---- */
+  if (phase === 'processing') {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-5">
+        <motion.div
+          initial={{ scale: 0.3, opacity: 0, y: 26 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 250, damping: 17 }}
+          className="relative flex h-[76px] w-[76px] items-center justify-center"
+        >
+          <motion.span
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
+            className="absolute inset-0 rounded-full border-[3px] border-primary/20 border-t-primary"
+          />
+          <motion.img
+            src="/assets/icon-logo-msb.png"
+            alt="MSB"
+            animate={{ y: [0, -3, 0] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+            className="h-8 w-auto"
+          />
+        </motion.div>
+        <span className="text-[15px] font-medium text-muted">Đang mở tiền gửi…</span>
+      </div>
+    )
+  }
+
+  /* ---- Màn xác thực OTP — cùng kiểu bàn phím với màn chuyển tiền ---- */
+  if (phase === 'otp') {
+    return (
+      <>
+        <MobileHeader title="Xác thực giao dịch" onBack={() => { setOtp(''); setPhase('confirm') }} />
+        <div className="flex min-h-0 flex-1 flex-col items-center px-6 pt-6">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-soft text-primary">
+            <Lock size={26} strokeWidth={1.6} />
+          </span>
+          <span className="mt-3 text-[17px] font-semibold">Nhập mã OTP</span>
+          <span className="mt-1 text-center text-[13px] leading-[18px] text-muted">
+            Mã xác thực đã gửi tới số điện thoại của anh — mở tiền gửi {vnd.format(amount)} VND, kỳ hạn {term?.months} tháng
+          </span>
+          <div className="mt-6 flex gap-3">
+            {Array.from({ length: OTP_LENGTH }, (_, i) => (
+              <span key={i} className={`h-3.5 w-3.5 rounded-full border ${i < otp.length ? 'border-primary bg-primary' : 'border-line bg-transparent'}`} />
+            ))}
+          </div>
+        </div>
+        <div className="grid flex-none grid-cols-3 gap-2 px-6 pb-8">
+          {KEYPAD.map((k, i) => (
+            <button
+              key={i}
+              type="button"
+              disabled={k === ''}
+              aria-label={k === 'del' ? 'Xóa' : k}
+              onClick={() => pressOtp(k)}
+              className={`flex h-14 items-center justify-center rounded-card text-[22px] font-semibold text-ink ${
+                k === '' ? '' : 'cursor-pointer bg-app active:bg-orange-soft'
+              }`}
+            >
+              {k === 'del' ? <Delete size={24} strokeWidth={1.6} /> : k}
+            </button>
+          ))}
+        </div>
+      </>
+    )
   }
 
   /* ---- Màn thành công — theo tk4, tone sáng ---- */
@@ -220,7 +307,7 @@ function OpenDepositInner() {
               Tôi đã đọc, hiểu rõ và đồng ý với <span className="font-medium text-primary">Điều khoản & Điều kiện</span> của dịch vụ
             </span>
           </button>
-          <Button className="w-full font-semibold" disabled={!agreed} onClick={confirmOpen}>
+          <Button className="w-full font-semibold" disabled={!agreed} onClick={() => setPhase('otp')}>
             Xác nhận
           </Button>
         </div>
