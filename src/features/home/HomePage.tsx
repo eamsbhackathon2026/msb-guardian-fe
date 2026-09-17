@@ -538,53 +538,48 @@ export function HomePage() {
           </span>
           <ChevronRight size={20} strokeWidth={1.5} className="flex-none text-muted" />
         </motion.button>
-      </div>
 
-      {/* Trợ lý AI Guardian nổi */}
-      <div className="absolute bottom-[104px] right-4 z-20 flex items-end gap-2">
-        {botBubble && (
+        {/* Card cảnh báo ngân sách của Trợ lý AI — theo design aibot.PNG, nằm
+            trong luồng cuộn để không đè lên banner nào */}
+        {botBubble && spentPct !== null && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.85, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.3 }}
-            className="relative max-w-[262px] cursor-pointer rounded-[16px_16px_4px_16px] bg-surface p-3 shadow-float"
+            custom={3}
+            variants={blockVariants}
+            initial="hidden"
+            animate="show"
+            className="relative flex cursor-pointer items-center gap-3 rounded-card bg-surface p-3 shadow-card"
             onClick={() => navigate('/copilot')}
           >
-            {spentPct !== null ? (
-              <div className="flex items-center gap-3">
-                <span className="flex h-[62px] w-[62px] flex-none flex-col items-center justify-center gap-0.5 rounded-[14px] bg-danger/10">
-                  <span className="text-[19px] font-extrabold leading-5 text-danger">{spentPct}%</span>
-                  <span className="text-[9px] font-bold tracking-[.06em] text-danger">ĐÃ CHI</span>
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[11px] font-semibold leading-4 text-muted">Trợ lý AI Guardian</span>
-                  <span className="block text-[14px] font-bold leading-[19px] text-ink">
-                    Ngân sách tháng {now.getMonth() + 1} {budgetState}
-                  </span>
-                  <span className="block text-[12px] leading-[17px] text-muted">
-                    Còn {remainingLabel} cho {daysLeft} ngày · <span className="font-bold text-danger">Xem chi tiết</span>
-                  </span>
-                </span>
-              </div>
-            ) : (
-              <>
-                <span className="block text-xs font-semibold text-primary">Trợ lý AI Guardian</span>
-                <span className="block text-[13px] leading-[18px]">{home?.assistantHint ?? ''}</span>
-              </>
-            )}
+            <span className="flex h-[62px] w-[62px] flex-none flex-col items-center justify-center gap-0.5 rounded-[14px] bg-danger/10">
+              <span className="text-[19px] font-extrabold leading-5 text-danger">{spentPct}%</span>
+              <span className="text-[9px] font-bold tracking-[.06em] text-danger">ĐÃ CHI</span>
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[11px] font-semibold leading-4 text-muted">Trợ lý AI Guardian</span>
+              <span className="block text-[14px] font-bold leading-[19px] text-ink">
+                Ngân sách tháng {now.getMonth() + 1} {budgetState}
+              </span>
+              <span className="block text-[12px] leading-[17px] text-muted">
+                Còn {remainingLabel} cho {daysLeft} ngày · <span className="font-bold text-danger">Xem chi tiết</span>
+              </span>
+            </span>
             <button
               type="button"
-              aria-label="Đóng gợi ý"
+              aria-label="Đóng cảnh báo"
               onClick={(e) => {
                 e.stopPropagation()
                 setBotBubble(false)
               }}
-              className="absolute -right-2 -top-2 flex h-[22px] w-[22px] cursor-pointer items-center justify-center rounded-full border border-line bg-surface text-muted"
+              className="absolute right-2 top-2 flex h-[22px] w-[22px] cursor-pointer items-center justify-center rounded-full bg-app text-muted"
             >
               <X size={11} strokeWidth={2.4} />
             </button>
           </motion.div>
         )}
+      </div>
+
+      {/* Trợ lý AI Guardian nổi — chỉ còn logo bot, card cảnh báo nằm trong luồng cuộn */}
+      <div className="absolute bottom-[104px] right-4 z-20 flex items-end gap-2">
         <motion.span
           className="relative block cursor-pointer"
           initial={{ opacity: 0, scale: 0.7 }}
