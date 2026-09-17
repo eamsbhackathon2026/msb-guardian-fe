@@ -105,7 +105,10 @@ function SpendingTable({ table }: { table: ChatTable }) {
 function AgentGrid({ grid }: { grid: ChatGrid }) {
   return (
     <div className="mt-1.5 overflow-x-auto rounded-xl bg-app">
-      <table className="w-full border-collapse text-[12.5px]">
+      {/* w-max: bảng lấy đúng bề rộng nội dung rồi cho cuộn ngang. Ép w-full thì
+          bong bóng chat hẹp sẽ bóp cột chữ xuống mỗi dòng một tiếng ("Hỗ / trợ /
+          gia / đình") và vẫn cắt mất cột cuối. */}
+      <table className="w-max min-w-full border-collapse text-[12.5px]">
         <thead>
           <tr className="text-[10px] uppercase tracking-wide text-muted">
             {grid.columns.map((c, i) => (
@@ -124,7 +127,7 @@ function AgentGrid({ grid }: { grid: ChatGrid }) {
               {row.map((o, ci) => (
                 <td
                   key={ci}
-                  className={`px-3 py-1.5 text-ink ${grid.columns[ci]?.align === 'right' ? 'whitespace-nowrap text-right tabular-nums' : 'text-left'}`}
+                  className={`whitespace-nowrap px-3 py-1.5 text-ink ${grid.columns[ci]?.align === 'right' ? 'text-right tabular-nums' : 'text-left'}`}
                 >
                   {o}
                 </td>
