@@ -11,6 +11,7 @@ import { CardsPage } from '@/features/cards/CardsPage'
 import { BeneficiariesPage } from '@/features/transfer/BeneficiariesPage'
 import { TransferFormPage } from '@/features/transfer/TransferFormPage'
 import { TransferConfirmPage } from '@/features/transfer/TransferConfirmPage'
+import { NewAccountPage } from '@/features/transfer/NewAccountPage'
 import { TransferPinPage } from '@/features/transfer/TransferPinPage'
 import { TransferHistoryPage } from '@/features/transfer/TransferHistoryPage'
 import { ScamShieldVerdictPage } from '@/features/transfer/ScamShieldVerdictPage'
@@ -39,6 +40,7 @@ export const router = createBrowserRouter([
   { path: '/cards', element: <RequireAuth><CardsPage /></RequireAuth> },
   { path: '/transfer', element: <RequireAuth><BeneficiariesPage /></RequireAuth> },
   { path: '/transfer/new', element: <RequireAuth><TransferFormPage /></RequireAuth> },
+  { path: '/transfer/account', element: <RequireAuth><NewAccountPage /></RequireAuth> },
   { path: '/transfer/confirm', element: <RequireAuth><TransferConfirmPage /></RequireAuth> },
   { path: '/transfer/pin', element: <RequireAuth><TransferPinPage /></RequireAuth> },
   { path: '/transactions', element: <RequireAuth><TransferHistoryPage /></RequireAuth> },

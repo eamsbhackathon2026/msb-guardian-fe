@@ -100,7 +100,7 @@ export function BeneficiariesPage() {
       <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6 pt-2">
         {/* Hai lối tắt chuyển tiền */}
         <motion.div custom={0} variants={blockVariants} initial="hidden" animate="show" className="grid grid-cols-2 rounded-card bg-surface py-3.5 shadow-card">
-          <button type="button" className="flex cursor-pointer flex-col items-center gap-2 px-3 text-primary">
+          <button type="button" onClick={() => navigate('/transfer/account')} className="flex cursor-pointer flex-col items-center gap-2 px-3 text-primary">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-orange-soft">
               <ArrowUpRight size={22} strokeWidth={1.7} />
             </span>
