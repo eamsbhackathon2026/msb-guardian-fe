@@ -28,6 +28,7 @@ import {
   Settings,
   ShieldAlert,
   ShieldCheck,
+  Sparkles,
   Star,
   Sun,
   Wallet,
@@ -95,7 +96,8 @@ const searchFeatures = [
   { icon: <ReceiptText size={22} strokeWidth={1.5} />, label: 'Thanh toán hóa đơn', desc: 'Điện, nước, internet…', to: '/payments' },
   { icon: <History size={22} strokeWidth={1.5} />, label: 'Lịch sử giao dịch', desc: 'Các lệnh chuyển đã thực hiện', to: '/transactions' },
   { icon: <HandCoins size={22} strokeWidth={1.5} />, label: 'Vay', desc: 'Vay tiêu dùng lãi suất ưu đãi', to: '/loans' },
-  { icon: <MessageSquareText size={22} strokeWidth={1.5} />, label: 'Chat Banking', desc: 'Nhắn một câu, chuyển tiền xong ngay', to: '/chat-banking' },
+  { icon: <MessageSquareText size={22} strokeWidth={1.5} />, label: 'Chat Banking', desc: 'Nhắn một câu, chuyển tiền xong ngay', to: '/chat-banking', isNew: true },
+  { icon: <Sparkles size={22} strokeWidth={1.5} />, label: 'Trợ lý AI Financial Copilot', desc: 'Phân tích chi tiêu, hỏi đáp tài chính', to: '/copilot', isNew: true },
   { icon: <ShieldCheck size={22} strokeWidth={1.5} />, label: 'Trung tâm an toàn', desc: 'Scam Shield bảo vệ giao dịch', to: '/safety-center' },
   { icon: <Headphones size={22} strokeWidth={1.5} />, label: 'Trung tâm hỗ trợ', desc: 'Câu hỏi thường gặp, liên hệ MSB', to: '/support' },
 ]
@@ -144,7 +146,10 @@ function SearchSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (ope
               >
                 <span className="flex h-10 w-10 flex-none items-center justify-center rounded-[13px] bg-orange-soft text-primary">{f.icon}</span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-medium leading-5">{f.label}</span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="truncate text-[15px] font-medium leading-5">{f.label}</span>
+                    {f.isNew && <Badge variant="primary">Mới</Badge>}
+                  </span>
                   <span className="block truncate text-[13px] leading-[18px] text-muted">{f.desc}</span>
                 </span>
                 <ChevronRight size={18} strokeWidth={1.6} className="flex-none text-muted" />
@@ -451,7 +456,10 @@ export function HomePage() {
             <span className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
               <Sun size={18} strokeWidth={1.5} />
             </span>
-            <span className="flex-1 text-[15px] font-semibold tracking-[.01em] text-primary">{home?.productTier ?? ''}</span>
+            <span className="flex flex-1 items-center gap-2">
+              <span className="text-[15px] font-semibold tracking-[.01em] text-primary">{home?.productTier ?? ''}</span>
+              <Badge variant="primary">Mới</Badge>
+            </span>
             <ChevronRight size={20} strokeWidth={1.6} className="text-muted" />
           </button>
           <div className="mx-0 h-px bg-divider" />
@@ -531,7 +539,10 @@ export function HomePage() {
             className="relative max-w-[196px] cursor-pointer rounded-[16px_16px_4px_16px] bg-surface p-3 shadow-float"
             onClick={() => navigate('/copilot')}
           >
-            <span className="block text-xs font-semibold text-primary">Trợ lý AI Guardian</span>
+            <span className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-primary">Trợ lý AI Guardian</span>
+              <Badge variant="primary">Mới</Badge>
+            </span>
             <span className="block text-[13px] leading-[18px]">{home?.assistantHint ?? ''}</span>
             <button
               type="button"
@@ -546,16 +557,23 @@ export function HomePage() {
             </button>
           </motion.div>
         )}
-        <motion.img
-          src="/assets/msb-bot.png"
-          alt="Trợ lý AI MSB"
-          className="block h-[68px] w-[68px] cursor-pointer"
-          style={{ filter: 'drop-shadow(0 6px 14px rgba(240,90,40,.38))' }}
+        <motion.span
+          className="relative block cursor-pointer"
           initial={{ opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.35, type: 'spring', stiffness: 260, damping: 18 }}
           onClick={() => navigate('/copilot')}
-        />
+        >
+          <img
+            src="/assets/msb-bot.png"
+            alt="Trợ lý AI MSB"
+            className="block h-[68px] w-[68px]"
+            style={{ filter: 'drop-shadow(0 6px 14px rgba(240,90,40,.38))' }}
+          />
+          <span className="absolute -right-1 -top-1 rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[.04em] text-white shadow-primary">
+            New
+          </span>
+        </motion.span>
       </div>
 
       {/* Bottom nav dạng pill nổi */}
