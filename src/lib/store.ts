@@ -2,6 +2,24 @@ import { create } from 'zustand'
 // MOCK CŨ: import { demoSafetyCenter } from '@/data/demo-scenarios'
 import type { AlertStatus, ProtectionLayer } from '@/data/types'
 
+/** Giao dịch chuyển tiền đã thực hiện trong phiên — nguồn cho bảng lịch sử */
+export interface TransferRecord {
+  id: string
+  datetime: string
+  name: string
+  bank: string
+  account: string
+  amount: number
+  note?: string
+}
+
+/** Thông báo trong app (quả chuông + toast) sinh ra trong phiên */
+export interface AppNotification {
+  id: string
+  title: string
+  timeLabel: string
+}
+
 interface GuardianState {
   /** Ẩn/hiện số dư trên Home */
   balanceHidden: boolean
@@ -20,6 +38,17 @@ interface GuardianState {
   /** Kết quả luồng Scam Shield của khách (huỷ / vẫn chuyển / báo cáo) */
   lastShieldOutcome: 'cancelled' | 'proceeded' | 'reported' | null
   setShieldOutcome: (outcome: 'cancelled' | 'proceeded' | 'reported') => void
+
+  /** Lịch sử giao dịch trong phiên, giao dịch mới nhất đứng đầu */
+  transactions: TransferRecord[]
+  addTransaction: (t: TransferRecord) => void
+
+  /** Thông báo mới trong phiên (hiện trên quả chuông, trước danh sách mock) */
+  notifications: AppNotification[]
+  /** Thông báo vừa phát để trang chủ hiện toast; null khi đã tắt */
+  notiToast: AppNotification | null
+  pushNotification: (n: AppNotification) => void
+  clearNotiToast: () => void
 }
 
 export const useGuardianStore = create<GuardianState>((set) => ({
@@ -44,4 +73,12 @@ export const useGuardianStore = create<GuardianState>((set) => ({
 
   lastShieldOutcome: null,
   setShieldOutcome: (outcome) => set({ lastShieldOutcome: outcome }),
+
+  transactions: [],
+  addTransaction: (t) => set((s) => ({ transactions: [t, ...s.transactions] })),
+
+  notifications: [],
+  notiToast: null,
+  pushNotification: (n) => set((s) => ({ notifications: [n, ...s.notifications], notiToast: n })),
+  clearNotiToast: () => set({ notiToast: null }),
 }))

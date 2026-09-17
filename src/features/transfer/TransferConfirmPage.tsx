@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { CheckCircle2, ShieldCheck } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { formatVnd } from '@/lib/format'
@@ -16,41 +14,18 @@ interface ConfirmState {
 }
 
 /**
- * Màn xác nhận chuyển tiền — điểm cuối của luồng (theo yêu cầu: DỪNG ở xác nhận,
- * chưa tạo giao dịch thật). Tới đây theo hai đường:
+ * Màn xác nhận chuyển tiền. Tới đây theo hai đường:
  *  - stk quen (favorite) → thẳng từ màn nhập lệnh, không qua Scam Shield.
  *  - stk mới → sau khi Scam Shield cảnh báo và khách vẫn chọn tiếp tục.
+ * "Xác nhận chuyển" → màn nhập mật khẩu (/transfer/pin) rồi mới hoàn tất.
  */
 export function TransferConfirmPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const state = (location.state as ConfirmState | null) ?? {}
-  const [done, setDone] = useState(false)
 
   const amount = state.amount ?? 0
   const b = state.beneficiary
-
-  if (done) {
-    return (
-      <MobileFrame statusBar="dark">
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8">
-          <motion.span
-            initial={{ scale: 0.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-            className="flex h-20 w-20 items-center justify-center rounded-full bg-success-soft text-success"
-          >
-            <CheckCircle2 size={40} strokeWidth={1.6} />
-          </motion.span>
-          <span className="text-center text-[22px] font-semibold leading-7">Đã ghi nhận lệnh chuyển</span>
-          <span className="text-[30px] font-bold text-ink">{formatVnd(amount)}</span>
-          {b && <span className="text-center text-[13px] text-muted">tới {b.name} · {b.bank} {b.account}</span>}
-          <span className="text-center text-[12px] text-muted">Bản demo dừng ở bước xác nhận, chưa thực hiện giao dịch thật.</span>
-          <Button className="mt-2 w-full" onClick={() => navigate('/')}>Về trang chủ</Button>
-        </div>
-      </MobileFrame>
-    )
-  }
 
   return (
     <MobileFrame statusBar="dark">
@@ -81,7 +56,9 @@ export function TransferConfirmPage() {
       </div>
 
       <div className="flex-none border-t border-line bg-surface px-4 py-3">
-        <Button className="w-full" onClick={() => setDone(true)}>Xác nhận chuyển</Button>
+        <Button className="w-full" onClick={() => navigate('/transfer/pin', { state: { beneficiary: b, amount, note: state.note } })}>
+          Xác nhận chuyển
+        </Button>
       </div>
     </MobileFrame>
   )

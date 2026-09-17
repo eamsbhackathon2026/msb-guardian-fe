@@ -9,6 +9,7 @@ import {
   Gift,
   Headphones,
   HandCoins,
+  History,
   Home,
   Languages,
   LayoutGrid,
@@ -92,6 +93,7 @@ const searchFeatures = [
   { icon: <PiggyBank size={22} strokeWidth={1.5} />, label: 'Tiền gửi', desc: 'Mở sổ tiết kiệm online', to: '/invest' },
   { icon: <CreditCard size={22} strokeWidth={1.5} />, label: 'Thẻ', desc: 'Quản lý thẻ ghi nợ, tín dụng', to: '/cards' },
   { icon: <ReceiptText size={22} strokeWidth={1.5} />, label: 'Thanh toán hóa đơn', desc: 'Điện, nước, internet…', to: '/payments' },
+  { icon: <History size={22} strokeWidth={1.5} />, label: 'Lịch sử giao dịch', desc: 'Các lệnh chuyển đã thực hiện', to: '/transactions' },
   { icon: <HandCoins size={22} strokeWidth={1.5} />, label: 'Vay', desc: 'Vay tiêu dùng lãi suất ưu đãi', to: '/loans' },
   { icon: <MessageSquareText size={22} strokeWidth={1.5} />, label: 'Chat Banking', desc: 'Nhắn một câu, chuyển tiền xong ngay', to: '/chat-banking' },
   { icon: <ShieldCheck size={22} strokeWidth={1.5} />, label: 'Trung tâm an toàn', desc: 'Scam Shield bảo vệ giao dịch', to: '/safety-center' },
@@ -246,15 +248,29 @@ const mockNotifications = [
 /** Sheet Thông báo (mockup) */
 function NotificationsSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const container = usePhoneContainer()
+  // Thông báo sinh trong phiên (vd chuyển tiền thành công) đứng trước danh sách mock
+  const sessionNotis = useGuardianStore((s) => s.notifications)
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent container={container}>
         <div className="flex flex-col gap-3">
           <span className="flex items-center gap-2">
             <SheetTitle className="text-lg font-semibold">Thông báo</SheetTitle>
-            <Badge variant="primary">9 mới</Badge>
+            <Badge variant="primary">{9 + sessionNotis.length} mới</Badge>
           </span>
           <div className="no-scrollbar flex max-h-[420px] flex-col overflow-y-auto">
+            {sessionNotis.map((n) => (
+              <span key={n.id} className="flex items-start gap-3 rounded-card px-2 py-3 hover:bg-app">
+                <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
+                  <Wallet size={19} strokeWidth={1.7} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14px] font-semibold leading-5">{n.title}</span>
+                  <span className="block text-[12px] leading-[18px] text-muted">{n.timeLabel}</span>
+                </span>
+                <span className="mt-2 h-2 w-2 flex-none rounded-full bg-primary" />
+              </span>
+            ))}
             {mockNotifications.map((n) => (
               <span key={n.id} className="flex items-start gap-3 rounded-card px-2 py-3 hover:bg-app">
                 <span className={`flex h-10 w-10 flex-none items-center justify-center rounded-full ${n.tone}`}>{n.icon}</span>
@@ -377,11 +393,21 @@ export function HomePage() {
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
   const { data: home } = useQuery({ queryKey: ['home-content'], queryFn: getHomeContent })
   const { balanceHidden, toggleBalance } = useGuardianStore()
+  const sessionNotis = useGuardianStore((s) => s.notifications)
+  const notiToast = useGuardianStore((s) => s.notiToast)
+  const clearNotiToast = useGuardianStore((s) => s.clearNotiToast)
   const [botBubble, setBotBubble] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [hotlineOpen, setHotlineOpen] = useState(false)
   const [notiOpen, setNotiOpen] = useState(false)
+
+  // Toast tự trôi sau 4s; bấm vào thì mở luôn quả chuông
+  useEffect(() => {
+    if (!notiToast) return
+    const id = setTimeout(clearNotiToast, 4000)
+    return () => clearTimeout(id)
+  }, [notiToast, clearNotiToast])
 
   return (
     <MobileFrame statusBar="light" indicator="dark">
@@ -404,7 +430,7 @@ export function HomePage() {
           <GlassIcon label="Gọi tổng đài" onClick={() => setHotlineOpen(true)}>
             <Headphones size={19} strokeWidth={1.6} />
           </GlassIcon>
-          <GlassIcon badge="9" label="Thông báo" onClick={() => setNotiOpen(true)}>
+          <GlassIcon badge={String(9 + sessionNotis.length)} label="Thông báo" onClick={() => setNotiOpen(true)}>
             <Bell size={19} strokeWidth={1.6} />
           </GlassIcon>
         </div>
@@ -546,6 +572,30 @@ export function HomePage() {
           <span className="text-[13px] font-medium">Cài đặt</span>
         </button>
       </div>
+
+      {/* Toast thông báo trượt xuống như noti hệ điều hành, sau chuyển tiền thành công */}
+      {notiToast && (
+        <motion.button
+          type="button"
+          initial={{ y: -80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+          onClick={() => {
+            clearNotiToast()
+            setNotiOpen(true)
+          }}
+          className="absolute inset-x-4 top-3 z-40 flex cursor-pointer items-start gap-3 rounded-card bg-surface p-3 text-left shadow-float"
+        >
+          <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
+            <Bell size={18} strokeWidth={1.7} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[12px] font-semibold uppercase tracking-[.04em] text-primary">MSB mBank</span>
+            <span className="block text-[13px] leading-[18px] text-ink">{notiToast.title}</span>
+            <span className="block text-[11px] leading-4 text-muted">{notiToast.timeLabel}</span>
+          </span>
+        </motion.button>
+      )}
 
       <SearchSheet open={searchOpen} onOpenChange={setSearchOpen} />
       <HotlineSheet open={hotlineOpen} onOpenChange={setHotlineOpen} />
