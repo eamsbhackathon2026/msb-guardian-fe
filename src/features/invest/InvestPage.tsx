@@ -25,6 +25,8 @@ interface Product {
   rate: string
   desc: string
   cta: string
+  /** Đường dẫn của luồng mở sản phẩm nếu đã có màn */
+  to?: string
 }
 
 const products: Product[] = [
@@ -51,6 +53,7 @@ const products: Product[] = [
     rate: '7.5%',
     desc: 'Ưu đãi lãi suất vượt trội cho khoản tiền gửi lớn, kỳ hạn linh hoạt theo nhu cầu.',
     cta: 'Gửi tiền ngay',
+    to: '/invest/open',
   },
 ]
 
@@ -111,7 +114,11 @@ export function InvestPage() {
                 {p.desc} <button type="button" className="cursor-pointer font-medium text-info">Xem chi tiết</button>
               </p>
               <div className="mx-4 h-px bg-divider" />
-              <button type="button" className="flex h-[52px] cursor-pointer items-center justify-center gap-2.5 text-primary">
+              <button
+                type="button"
+                onClick={() => p.to && navigate(p.to)}
+                className="flex h-[52px] cursor-pointer items-center justify-center gap-2.5 text-primary"
+              >
                 <CirclePlus size={21} strokeWidth={1.7} />
                 <span className="text-[15px] font-semibold">{p.cta}</span>
               </button>

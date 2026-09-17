@@ -7,6 +7,7 @@ import { SupportPage } from '@/features/support/SupportPage'
 import { HomePage } from '@/features/home/HomePage'
 import { PaymentsPage } from '@/features/payments/PaymentsPage'
 import { InvestPage } from '@/features/invest/InvestPage'
+import { OpenDepositPage } from '@/features/invest/OpenDepositPage'
 import { InvestRatesPage } from '@/features/invest/InvestRatesPage'
 import { LoansPage } from '@/features/loans/LoansPage'
 import { CardsPage } from '@/features/cards/CardsPage'
@@ -66,6 +67,7 @@ export const router = createBrowserRouter([
   { path: '/transfer/guardian', element: <RequireAuth><GuardianPage /></RequireAuth> },
   { path: '/chat-banking', element: <RequireAuth><ChatBankingPage /></RequireAuth> },
   { path: '/invest', element: <RequireAuth><InvestPage /></RequireAuth> },
+  { path: '/invest/open', element: <RequireAuth><OpenDepositPage /></RequireAuth> },
   { path: '/invest/rates', element: <RequireAuth><InvestRatesPage /></RequireAuth> },
   { path: '/copilot', element: <RequireAuth><CopilotOverviewPage /></RequireAuth> },
   { path: '/copilot/chat', element: <RequireAuth><CopilotChatPage /></RequireAuth> },
