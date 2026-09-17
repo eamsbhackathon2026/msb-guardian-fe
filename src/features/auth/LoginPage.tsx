@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, ChevronDown, Eye, EyeOff, Headphones, QrCode, ScanFace, ShieldCheck, UserRound } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 // MOCK CŨ: import { demoCustomer } from '@/data/demo-scenarios'
 import { getHomeContent, login as apiLogin } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
@@ -92,6 +92,7 @@ function LoginSplash() {
 export function LoginPage() {
   const navigate = useNavigate()
   const authLogin = useAuthStore((s) => s.login)
+  const queryClient = useQueryClient()
   const { data: home } = useQuery({ queryKey: ['home-content'], queryFn: getHomeContent })
 
   const [splash, setSplash] = useState(false)
@@ -136,6 +137,9 @@ export function LoginPage() {
     }
     setSplash(true)
     setTimeout(() => {
+      // Xoá cache truy vấn của phiên trước: đổi tài khoản mà giữ cache là danh
+      // bạ/số dư của khách cũ hiện lên trong 60s staleTime đầu tiên.
+      queryClient.clear()
       authLogin(null)
       navigate(to)
     }, SPLASH_MS)
@@ -164,6 +168,9 @@ export function LoginPage() {
       setSubmitting(false)
       setSplash(true)
       setTimeout(() => {
+        // Gateway giờ trả dữ liệu theo khách vừa đăng nhập — xoá cache để mọi
+        // màn (danh bạ, home, lịch sử...) refetch đúng khách mới.
+        queryClient.clear()
         authLogin(res.user ?? null)
         navigate('/')
       }, SPLASH_MS)
