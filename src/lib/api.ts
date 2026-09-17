@@ -264,6 +264,36 @@ export function postDecision(id: string, decision: OpsDecision, note: string): P
   })
 }
 
+/* ---- Chuyển tiền: ghi và truy vấn bảng transaction_history ---- */
+
+export interface TransferHistoryItem {
+  id: string
+  datetime: string
+  name: string
+  bank: string
+  account: string
+  amount: number
+  note?: string
+  status?: string
+}
+
+/** Gọi sau khi khách nhập đúng PIN — gateway ghi bản ghi OUT/POSTED vào
+ *  transaction_history để màn Lịch sử giao dịch truy vấn lại được. */
+export function executeTransfer(payload: {
+  bankCode: string
+  accountNo: string
+  holderName: string
+  amount: number
+  note?: string
+}): Promise<{ ok: boolean; transactionId?: number }> {
+  return fetchJson('/api/transfer/execute', { method: 'POST', body: JSON.stringify(payload) })
+}
+
+/** Lịch sử chuyển tiền (FT, chiều OUT) trong 3 tháng gần nhất */
+export function getTransferHistory(): Promise<TransferHistoryItem[]> {
+  return fetchJson<TransferHistoryItem[]>('/api/transfer/history')
+}
+
 /* ---- Nội dung màn Home ---- */
 
 export function getHomeContent(): Promise<HomeContent> {

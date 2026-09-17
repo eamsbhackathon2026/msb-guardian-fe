@@ -1,12 +1,23 @@
+import { useQuery } from '@tanstack/react-query'
 import { ReceiptText } from 'lucide-react'
+import { getTransferHistory } from '@/lib/api'
 import { formatDateTime, formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
 
-/** Bảng lịch sử giao dịch — các lệnh chuyển thành công trong phiên, mới nhất trước */
+/** Bảng lịch sử giao dịch chuyển tiền — đọc từ transaction_history (3 tháng
+ *  gần nhất) qua gateway; gateway lỗi thì rơi về các giao dịch trong phiên. */
 export function TransferHistoryPage() {
-  const transactions = useGuardianStore((s) => s.transactions)
+  const localTransactions = useGuardianStore((s) => s.transactions)
+  const { data: serverTransactions } = useQuery({
+    queryKey: ['transfer-history'],
+    queryFn: getTransferHistory,
+    // Giao dịch vừa thực hiện phải hiện ngay khi mở màn này
+    staleTime: 0,
+    refetchOnMount: 'always',
+  })
+  const transactions = serverTransactions && serverTransactions.length > 0 ? serverTransactions : localTransactions
 
   return (
     <MobileFrame statusBar="dark">

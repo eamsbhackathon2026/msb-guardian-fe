@@ -446,16 +446,17 @@ export function HomePage() {
 
         {/* Card tài khoản M-FIRST GOLD */}
         <motion.div custom={0} variants={blockVariants} initial="hidden" animate="show" className="flex flex-col rounded-card bg-surface shadow-raised">
-          <div className="flex items-center gap-3 px-4 py-3.5">
+          {/* Bấm vào tài khoản thanh toán → bảng lịch sử giao dịch chuyển tiền */}
+          <button type="button" onClick={() => navigate('/transactions')} className="flex cursor-pointer items-center gap-3 px-4 py-3.5 text-left">
             <span className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
               <Sun size={18} strokeWidth={1.5} />
             </span>
             <span className="flex-1 text-[15px] font-semibold tracking-[.01em] text-primary">{home?.productTier ?? ''}</span>
             <ChevronRight size={20} strokeWidth={1.6} className="text-muted" />
-          </div>
+          </button>
           <div className="mx-0 h-px bg-divider" />
           <div className="flex items-end justify-between px-4 pb-4 pt-3">
-            <span className="flex flex-col gap-0.5">
+            <button type="button" onClick={() => navigate('/transactions')} className="flex cursor-pointer flex-col gap-0.5 text-left">
               <span className="text-[13px] font-semibold leading-[18px] tracking-[.04em] text-ink">{fullAccountNumber(customer?.maskedAccount)}</span>
               <span className="flex items-baseline gap-2">
                 <span className="text-[26px] font-bold leading-8 tracking-[.02em]">
@@ -463,7 +464,7 @@ export function HomePage() {
                 </span>
                 <span className="text-[17px] font-medium text-muted">VND</span>
               </span>
-            </span>
+            </button>
             <button type="button" aria-label="Ẩn/hiện số dư" onClick={toggleBalance} className="flex h-10 w-10 cursor-pointer items-center justify-center text-ink">
               {balanceHidden ? <EyeOff size={22} strokeWidth={1.5} /> : <Eye size={22} strokeWidth={1.5} />}
             </button>

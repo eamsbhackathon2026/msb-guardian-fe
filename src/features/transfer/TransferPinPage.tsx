@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { CheckCircle2, Delete, Lock } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { executeTransfer } from '@/lib/api'
 import { formatTime, formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -51,6 +52,15 @@ export function TransferPinPage() {
       title: `Biến động số dư: -${formatVnd(amount)} đến ${b?.name ?? 'người nhận'}`,
       timeLabel: `Hôm nay · ${formatTime(iso)}`,
     })
+    // Ghi về backend (bảng transaction_history) để lịch sử truy vấn lại được;
+    // gateway lỗi thì giao dịch trong phiên vẫn còn ở store nên không chặn UI.
+    void executeTransfer({
+      bankCode: b?.bank ?? '',
+      accountNo: b?.account ?? '',
+      holderName: b?.name ?? '',
+      amount,
+      note: state.note,
+    }).catch(() => {})
     setPhase('done')
   }
 
