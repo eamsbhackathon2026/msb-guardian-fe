@@ -17,12 +17,14 @@ interface BankingMessage {
   role: 'user' | 'assistant'
   content: string
   transfer?: DraftTransfer
+  /** Danh bạ bot liệt kê để khách bấm chọn — tên + số tài khoản đầy đủ, không che */
+  beneficiaries?: Beneficiary[]
 }
 
 let nextId = 0
-function makeMsg(role: BankingMessage['role'], content: string, transfer?: DraftTransfer): BankingMessage {
+function makeMsg(role: BankingMessage['role'], content: string, extra?: { transfer?: DraftTransfer; beneficiaries?: Beneficiary[] }): BankingMessage {
   nextId += 1
-  return { id: `cb-${nextId}`, role, content, transfer }
+  return { id: `cb-${nextId}`, role, content, ...extra }
 }
 
 // Dải U+0300–U+036F (dấu thanh/mũ sau NFD) nhúng trực tiếp trong regex
@@ -145,7 +147,7 @@ export function ChatBankingPage() {
       return makeMsg(
         'assistant',
         `Em đã soạn lệnh chuyển ${formatVnd(amount)} tới ${beneficiary.name}. Anh kiểm tra rồi bấm xác nhận nhé — giao dịch vẫn được Scam Shield kiểm tra như thường.`,
-        { beneficiary, amount },
+        { transfer: { beneficiary, amount } },
       )
     }
     if (beneficiary) {
@@ -154,8 +156,10 @@ export function ChatBankingPage() {
     }
     if (amount) {
       setPending({ amount })
-      const names = favoriteBeneficiaries.map((b) => b.name).join(', ')
-      return makeMsg('assistant', `${formatVnd(amount)} — anh muốn chuyển cho ai ạ? Danh bạ của anh đang có: ${names}.`)
+      return makeMsg('assistant', `${formatVnd(amount)} — anh muốn chuyển cho ai ạ? Anh bấm chọn trong danh bạ nhé:`, { beneficiaries: favoriteBeneficiaries })
+    }
+    if (/danh bạ|danh ba|người thụ hưởng|nguoi thu huong|người nhận|nguoi nhan/i.test(text)) {
+      return makeMsg('assistant', 'Danh bạ thụ hưởng của anh đây ạ, bấm chọn là em soạn lệnh luôn:', { beneficiaries: favoriteBeneficiaries })
     }
     if (/chi tiêu|chi tieu|tài chính|tai chinh|phân tích|phan tich|ngân sách|ngan sach/i.test(text)) {
       return makeMsg('assistant', 'Câu hỏi về chi tiêu, tài chính anh hỏi Trợ lý AI Financial Copilot sẽ chuẩn hơn ạ — anh bấm vào bạn bot ở trang chủ nhé. Ở đây em lo phần chuyển tiền cho anh.')
@@ -212,6 +216,28 @@ export function ChatBankingPage() {
               <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 text-[15px] leading-[22px] shadow-card">
                 {m.content}
                 {m.transfer && <TransferCard transfer={m.transfer} />}
+                {m.beneficiaries && (
+                  <div className="mt-1.5 flex flex-col overflow-hidden rounded-xl bg-app">
+                    {m.beneficiaries.map((b, i) => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => send(`Chuyển cho ${b.name}`)}
+                        className={`flex cursor-pointer items-center gap-2.5 px-3 py-2.5 text-left hover:bg-black/[.03] ${i > 0 ? 'border-t border-line' : ''}`}
+                      >
+                        <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-line bg-surface">
+                          <img src="/assets/icon-logo-msb.png" alt={b.bank} className="h-3 w-auto" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[14px] font-semibold leading-5 text-ink">{b.name}</span>
+                          <span className="block text-[12px] leading-4 text-muted">
+                            {b.bank} · {b.account}
+                          </span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ),

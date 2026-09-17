@@ -45,7 +45,7 @@ function BudgetDonut({ overview }: { overview: CopilotOverview }) {
           </Pie>
         </PieChart>
         <span className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl font-bold leading-7">{pct}%</span>
+          <span className="text-2xl font-bold leading-7 text-danger">{pct}%</span>
           <span className="text-[11px] text-muted">ngân sách</span>
         </span>
       </div>
