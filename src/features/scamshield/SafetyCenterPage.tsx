@@ -21,7 +21,15 @@ const historyStatusMeta: Record<SafetyHistoryItem['status'], { label: string; va
 
 const RING = 2 * Math.PI * 33
 
+/** Màu của vòng + số điểm đổi theo mức: xanh an toàn, vàng lưu ý, đỏ rủi ro */
+function scoreTone(score: number): { stroke: string; text: string } {
+  if (score < 50) return { stroke: 'var(--msb-danger)', text: 'text-danger' }
+  if (score < 70) return { stroke: 'var(--msb-warning)', text: 'text-warning' }
+  return { stroke: 'var(--msb-primary)', text: 'text-primary' }
+}
+
 function SafetyScoreRing({ score }: { score: number }) {
+  const tone = scoreTone(score)
   return (
     <div className="relative h-[84px] w-[84px] flex-none">
       <svg width="84" height="84" viewBox="0 0 84 84">
@@ -31,19 +39,29 @@ function SafetyScoreRing({ score }: { score: number }) {
           cy="42"
           r="33"
           fill="none"
-          stroke="var(--msb-primary)"
+          stroke={tone.stroke}
           strokeWidth="8"
           strokeLinecap="round"
           transform="rotate(-90 42 42)"
           strokeDasharray={RING}
           initial={{ strokeDashoffset: RING }}
           animate={{ strokeDashoffset: RING * (1 - score / 100) }}
-          transition={{ duration: 1, ease: 'easeOut' }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-[28px] font-bold text-primary">{score}</span>
+      <span className={`absolute inset-0 flex items-center justify-center text-[28px] font-bold ${tone.text}`}>{score}</span>
     </div>
   )
+}
+
+/** Mỗi lớp bảo vệ đáng giá chừng này điểm an toàn khi bật/tắt khác mặc định */
+const PROTECTION_WEIGHT = 8
+
+function labelForScore(score: number): string {
+  if (score >= 85) return 'Rất tốt'
+  if (score >= 70) return 'Tốt'
+  if (score >= 50) return 'Trung bình'
+  return 'Cần cải thiện'
 }
 
 export function SafetyCenterPage() {
@@ -94,17 +112,29 @@ function SafetyCenterInner() {
     { label: 'Đã báo cáo', value: data.reportedCount, tone: 'text-info' },
   ]
 
+  // Điểm gốc do gateway chấm ứng với trạng thái MẶC ĐỊNH của các lớp bảo vệ.
+  // Khách bật/tắt khác mặc định thì cộng/trừ điểm tương ứng ngay tại chỗ,
+  // kẹp trong 0–100; nhãn đánh giá và màu vòng điểm đổi theo.
+  const delta = data.protections.reduce((sum, p) => {
+    const current = protections[p.key] ?? p.enabled
+    if (current === p.enabled) return sum
+    return sum + (current ? PROTECTION_WEIGHT : -PROTECTION_WEIGHT)
+  }, 0)
+  const liveScore = Math.max(0, Math.min(100, data.safetyScore + delta))
+  const liveLabel = delta === 0 ? data.scoreLabel : labelForScore(liveScore)
+  const badgeVariant = liveScore >= 70 ? 'success' : liveScore >= 50 ? 'warning' : 'danger'
+
   return (
     <>
       <MobileHeader title="Trung tâm an toàn" backTo="/" />
       <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-4 pt-1">
         {/* Điểm an toàn */}
         <div className="flex items-center gap-4 rounded-card bg-surface p-5 shadow-card">
-          <SafetyScoreRing score={data.safetyScore} />
+          <SafetyScoreRing score={liveScore} />
           <span className="flex min-w-0 flex-1 flex-col gap-1">
             <span className="text-[13px] text-muted">Điểm an toàn tài khoản</span>
-            <Badge variant="success" size="md" className="w-fit">
-              {data.scoreLabel}
+            <Badge variant={badgeVariant} size="md" className="w-fit">
+              {liveLabel}
             </Badge>
             <span className="text-xs font-medium leading-4 text-success">
               {data.updatedLabel} · Scam Shield {data.shieldEnabled ? 'đang bật' : 'đang tắt'}
