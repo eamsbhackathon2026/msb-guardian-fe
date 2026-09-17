@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, ChevronDown, Landmark } from 'lucide-react'
+import { Check, ChevronDown, Landmark, Loader2, UserRound } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
+import { lookupAccountHolder } from '@/lib/mock-account-lookup'
 
 /** Ngân hàng phổ biến — value là mã ngân hàng dùng cho precheck. */
 const BANKS: { code: string; label: string }[] = [
@@ -28,19 +29,47 @@ export function NewAccountPage() {
   const [bank, setBank] = useState(BANKS[0])
   const [pickerOpen, setPickerOpen] = useState(false)
   const [account, setAccount] = useState('')
+  // Tên chủ tài khoản do GIẢ LẬP tra cứu trả về (xem lib/mock-account-lookup).
+  const [holderName, setHolderName] = useState('')
+  const [looking, setLooking] = useState(false)
 
-  const canContinue = account.replace(/\D/g, '').length >= 6
+  const accountDigits = account.replace(/\D/g, '')
+  const canLookup = accountDigits.length >= 6
+
+  // Đủ 6 số là tra cứu tên như inquiry Napas: đợi 400ms cho khách gõ xong,
+  // đổi ngân hàng hoặc sửa số thì huỷ kết quả cũ và tra lại.
+  useEffect(() => {
+    setHolderName('')
+    if (!canLookup) {
+      setLooking(false)
+      return
+    }
+    setLooking(true)
+    let cancelled = false
+    const timer = setTimeout(() => {
+      lookupAccountHolder(bank.code, accountDigits).then((name) => {
+        if (cancelled) return
+        setHolderName(name)
+        setLooking(false)
+      })
+    }, 400)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [bank.code, accountDigits, canLookup])
+
+  const canContinue = canLookup && holderName !== ''
 
   function onContinue() {
     if (!canContinue) return
-    const acc = account.replace(/\s/g, '')
     navigate('/transfer/new', {
       state: {
         beneficiary: {
-          id: `new-${acc}`,
-          name: 'Người nhận mới',
+          id: `new-${accountDigits}`,
+          name: holderName,
           bank: bank.code,
-          account: acc,
+          account: accountDigits,
           bankCode: bank.code,
           trusted: false,
         },
@@ -105,6 +134,28 @@ export function NewAccountPage() {
               className="rounded-btn border border-line bg-app px-3.5 py-3 text-[16px] font-semibold tracking-wide text-ink outline-none placeholder:font-normal placeholder:text-muted focus:border-primary"
             />
           </div>
+
+          {/* Tên người thụ hưởng — giả lập tra cứu tự động theo ngân hàng + stk */}
+          {(looking || holderName) && (
+            <div className="flex flex-col gap-2">
+              <span className="text-[15px] font-semibold text-ink">Tên người thụ hưởng</span>
+              {looking ? (
+                <div className="flex items-center gap-2.5 rounded-btn border border-line bg-app px-3.5 py-3 text-[14px] text-muted">
+                  <Loader2 size={18} strokeWidth={1.8} className="animate-spin text-primary" />
+                  Đang tra cứu tên chủ tài khoản...
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2.5 rounded-btn border border-primary/40 bg-orange-soft px-3.5 py-3"
+                >
+                  <UserRound size={18} strokeWidth={1.8} className="flex-none text-primary" />
+                  <span className="text-[16px] font-bold uppercase tracking-wide text-ink">{holderName}</span>
+                </motion.div>
+              )}
+            </div>
+          )}
         </motion.div>
       </div>
 
