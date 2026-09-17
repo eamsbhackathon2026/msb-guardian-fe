@@ -18,6 +18,7 @@ import type {
   CopilotIntro,
   CustomerAction,
   HomeContent,
+  Operator,
   OpsSession,
   QuarterlyReport,
   TransferActionResult,
@@ -27,8 +28,13 @@ import type {
   CopilotOverview,
   Customer,
   InvestRates,
+  OpsAuditLog,
+  OpsCase,
+  OpsCaseStatus,
   OpsDashboard,
   OpsDecision,
+  OpsModelConfig,
+  OpsScenario,
   OpsMetrics,
   PendingTransfer,
   RiskAssessment,
@@ -332,6 +338,28 @@ export function getInvestRates(): Promise<InvestRates> {
   return fetchJson<InvestRates>('/api/invest/rates')
 }
 
+/* ---- Ops: bốn màn vận hành phụ ---- */
+
+export function getOpsCases(status?: OpsCaseStatus): Promise<OpsCase[]> {
+  const query = status ? `?status=${status}` : ''
+  return fetchJson<OpsCase[]>(`/api/ops/cases${query}`)
+}
+
+export function getOpsScenarios(): Promise<OpsScenario[]> {
+  return fetchJson<OpsScenario[]>('/api/ops/scenarios')
+}
+
+export function getOpsModel(): Promise<OpsModelConfig> {
+  return fetchJson<OpsModelConfig>('/api/ops/model')
+}
+
+export function getOpsAudit(params: { agent?: string; status?: string } = {}): Promise<OpsAuditLog> {
+  const query = new URLSearchParams(
+    Object.entries(params).filter((entry): entry is [string, string] => Boolean(entry[1])),
+  ).toString()
+  return fetchJson<OpsAuditLog>(`/api/ops/audit${query ? `?${query}` : ''}`)
+}
+
 /* ---- Nội dung màn Home ---- */
 
 export function getHomeContent(): Promise<HomeContent> {
@@ -359,10 +387,40 @@ export function patchProtection(key: string, enabled: boolean): Promise<{ ok: bo
   })
 }
 
+/* ---- Ops: đăng nhập nội bộ ---- */
+
+export interface OpsLoginResult {
+  authenticated: boolean
+  operator?: Operator
+  /** Khi authenticated=false: not_backoffice | invalid_credentials | disabled | locked */
+  reason?: string
+}
+
+/**
+ * POST /api/ops/login — đăng nhập nội bộ cho `/ops`.
+ *
+ * Khác `login()` của khách: không có nhánh dự phòng khi gateway/identity-service
+ * hỏng — lời gọi sẽ ném lỗi qua `fetchJson` (HTTP 503), và `OpsLoginPage` tự bắt
+ * để hiện "chưa kết nối được hệ thống danh tính". Tài khoản đúng mật khẩu nhưng
+ * không có quyền vận hành bị từ chối với `reason="not_backoffice"`.
+ */
+export function opsLogin(username: string, password: string): Promise<OpsLoginResult> {
+  return fetchJson<OpsLoginResult>('/api/ops/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  })
+}
+
 /* ---- Ops: phiên làm việc và chi tiết case ---- */
 
-export function getOpsSession(): Promise<OpsSession> {
-  return fetchJson<OpsSession>('/api/ops/session')
+/**
+ * `username` đến từ phiên Ops đã đăng nhập (`useOpsAuthStore`). Có thì gateway
+ * tra identity-service để trả đúng chuyên viên đang trực; không có thì gateway
+ * giữ hằng số catalog như trước phase đăng nhập nội bộ.
+ */
+export function getOpsSession(username?: string): Promise<OpsSession> {
+  const query = username ? `?username=${encodeURIComponent(username)}` : ''
+  return fetchJson<OpsSession>(`/api/ops/session${query}`)
 }
 
 export function getCaseDetail(id: string): Promise<CaseDetail> {

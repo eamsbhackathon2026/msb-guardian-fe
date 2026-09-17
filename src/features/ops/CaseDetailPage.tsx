@@ -169,7 +169,13 @@ export function CaseDetailPage() {
                   <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-divider">
                     <span className="block h-full rounded-full bg-ink" style={{ width: `${detail?.model.confidencePct ?? 0}%` }} />
                   </span>
-                  <span className="mt-1 block text-xs text-muted">Ngưỡng can thiệp ≥ 75 · Cảnh báo mềm 40–74</span>
+                  {/* Ngưỡng do risk-scoring giữ và gateway trả về; chép tay ở đây
+                      thì có ngày màn hình nói một đằng, engine chấm một nẻo. */}
+                  <span className="mt-1 block text-xs text-muted">
+                    {detail
+                      ? `Ngưỡng can thiệp ≥ ${detail.model.interveneThreshold} · Cảnh báo mềm ${detail.model.softWarnMin}–${detail.model.softWarnMax}`
+                      : ''}
+                  </span>
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3">

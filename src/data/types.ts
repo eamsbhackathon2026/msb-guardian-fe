@@ -307,6 +307,77 @@ export interface OpsSession {
   nowLabel: string
 }
 
+/* ---- Bốn màn vận hành phụ trong sidebar Ops ---- */
+
+export type OpsCaseStatus = 'open' | 'callbackDone' | 'closedFraud' | 'closedLegit'
+
+export interface OpsCase {
+  id: string
+  decisionId: string
+  customer: string
+  scenarioName: string
+  status: OpsCaseStatus
+  statusLabel: string
+  narrative: string
+  openedAt: string
+  closedAt?: string
+}
+
+export interface OpsScenario {
+  id: string
+  name: string
+  groupLabel: string
+  patternLabel: string
+  actionLabel: string
+  canAsk: boolean
+  adviceTitle: string
+  adviceBody: string
+  priority: number
+  alertsToday: number
+}
+
+export interface OpsModelFactor {
+  key: string
+  label: string
+  maxScore: number
+}
+
+export interface OpsModelConfig {
+  softWarnMin: number
+  interveneMin: number
+  maxScore: number
+  factors: OpsModelFactor[]
+  inputs: string[]
+}
+
+export type AuditTraceStatus = 'ok' | 'cache' | 'timeout' | 'error'
+
+export interface AuditTrace {
+  id: string
+  time: string
+  agentLabel: string
+  model: string
+  status: AuditTraceStatus
+  statusLabel: string
+  latencyMs?: number
+  decisionId?: string
+}
+
+export interface AuditAgentStat {
+  agentLabel: string
+  calls: number
+  fallbackCalls: number
+  avgLatencyMs: number
+}
+
+export interface OpsAuditLog {
+  totalCalls: number
+  fallbackRatePct: number
+  avgLatencyMs: number
+  perAgent: AuditAgentStat[]
+  traces: AuditTrace[]
+}
+
 /* ---- Thao tác ghi ---- */
 
 // 'held' và 'contacted' thêm cho màn Guardian (bốn nút: khóa tạm · huỷ ·

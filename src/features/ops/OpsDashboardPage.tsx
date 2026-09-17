@@ -23,6 +23,7 @@ import { getOpsAlerts, getOpsDashboard, getOpsMetrics } from '@/lib/api'
 import { formatTime, formatVnd, formatVndCompact } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { DesktopShell } from '@/shell/DesktopShell'
+import { downloadAlertsCsv } from './ops-export'
 
 const barShades = ['var(--msb-primary)', 'var(--msb-orange-300)', 'var(--msb-orange-200)', 'var(--msb-orange-border)', 'var(--msb-border)']
 
@@ -76,6 +77,15 @@ export function OpsDashboardPage() {
     [dashboard],
   )
 
+  // Đỉnh của biểu đồ theo giờ phải đọc từ chính dữ liệu; chép tay một con số
+  // vào phụ đề thì có ngày biểu đồ vẽ một đằng, chữ nói một nẻo.
+  const peakLabel = useMemo(() => {
+    const points = dashboard?.hourlyAlerts ?? []
+    if (points.length === 0) return '24 giờ theo khung giờ trong ngày'
+    const peak = points.reduce((best, p) => (p.count > best.count ? p : best), points[0])
+    return `24 giờ theo khung giờ · đỉnh ${peak.count} cảnh báo lúc ${peak.hour}`
+  }, [dashboard])
+
   return (
     <DesktopShell>
       <div className="flex flex-col gap-4">
@@ -83,9 +93,10 @@ export function OpsDashboardPage() {
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-2xl font-semibold leading-8">Giám sát Scam Shield</h1>
-            <p className="text-[13px] text-muted">Hôm nay · Toàn bộ kênh Mobile Banking</p>
+            <p className="text-[13px] text-muted">Toàn hệ thống · Toàn bộ kênh Mobile Banking</p>
           </div>
-          <Button size="sm">
+          {/* Xuất đúng những dòng đang hiện, tức là đã qua bộ lọc và ô tìm kiếm. */}
+          <Button size="sm" disabled={rows.length === 0} onClick={() => downloadAlertsCsv(rows)}>
             <Download size={15} strokeWidth={1.8} />
             Xuất báo cáo
           </Button>
@@ -93,7 +104,7 @@ export function OpsDashboardPage() {
 
         {/* 4 KPI */}
         <div className="grid grid-cols-4 gap-4">
-          <KpiTile label="Giao dịch đã quét hôm nay" value={metrics?.scannedToday ?? 0} format={(n) => n.toLocaleString('vi-VN')} deltaKey="scannedToday" metrics={!!metrics} />
+          <KpiTile label="Giao dịch đã quét" value={metrics?.scannedToday ?? 0} format={(n) => n.toLocaleString('vi-VN')} deltaKey="scannedToday" metrics={!!metrics} />
           <KpiTile label="Cảnh báo đã bắn" value={metrics?.alertsFired ?? 0} format={(n) => n.toLocaleString('vi-VN')} deltaKey="alertsFired" metrics={!!metrics} />
           <KpiTile label="Tỷ lệ khách huỷ giao dịch" value={metrics?.cancelRatePct ?? 0} format={(n) => `${n}%`} deltaKey="cancelRatePct" metrics={!!metrics} />
           <KpiTile label="Giá trị đã bảo vệ" value={metrics?.protectedValueVnd ?? 0} format={formatVndCompact} deltaKey="protectedValueVnd" metrics={!!metrics} />
@@ -103,7 +114,7 @@ export function OpsDashboardPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-2 rounded-card bg-surface p-5 shadow-card">
             <span className="text-[15px] font-semibold">Cảnh báo theo giờ</span>
-            <span className="text-xs text-muted">24 giờ qua · đỉnh 16 cảnh báo lúc 09h</span>
+            <span className="text-xs text-muted">{peakLabel}</span>
             <ResponsiveContainer width="100%" height={190}>
               <AreaChart data={dashboard?.hourlyAlerts ?? []} margin={{ top: 8, right: 8, bottom: 0, left: -8 }}>
                 <defs>
@@ -127,7 +138,7 @@ export function OpsDashboardPage() {
 
           <div className="flex flex-col gap-2 rounded-card bg-surface p-5 shadow-card">
             <span className="text-[15px] font-semibold">Theo kịch bản lừa đảo</span>
-            <span className="text-xs text-muted">142 cảnh báo hôm nay</span>
+            <span className="text-xs text-muted">{scenarioData.reduce((sum, s) => sum + s.count, 0)} cảnh báo đã gắn kịch bản</span>
             <ResponsiveContainer width="100%" height={190}>
               <BarChart data={scenarioData} layout="vertical" margin={{ top: 4, right: 28, bottom: 0, left: 0 }}>
                 <XAxis type="number" hide />

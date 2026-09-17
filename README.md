@@ -24,10 +24,38 @@ npm run preview  # chạy bản build
 | `/transfer/review` | Scam Shield — Cảnh báo chặn giao dịch ⭐ | Điện thoại |
 | `/transfer/review/why` | Giải thích rủi ro (explainability) | Điện thoại |
 | `/safety-center` | Trung tâm an toàn | Điện thoại |
+| `/ops/login` | Đăng nhập nội bộ Ops (tài khoản vận hành, không phải tài khoản khách) | Desktop |
 | `/ops` | Ops Dashboard — Giám sát Scam Shield | Desktop |
 | `/ops/alerts/ALT-4092` | Chi tiết case | Desktop |
+| `/ops/cases` | Case vận hành — danh sách, lọc theo trạng thái | Desktop |
+| `/ops/scenarios` | Kịch bản lừa đảo — playbook đang áp dụng | Desktop |
+| `/ops/model` | Mô hình & ngưỡng — cấu hình engine, chỉ đọc | Desktop |
+| `/ops/audit` | Nhật ký quyết định AI — mọi lượt gọi mô hình | Desktop |
 
-**Đăng nhập/đăng xuất:** các màn khách hàng yêu cầu đăng nhập — chưa có phiên sẽ tự chuyển về `/login`; phiên giữ qua reload (localStorage); Đăng xuất nằm trong pill nav **Cài đặt** trên Home. Riêng `/ops` là màn nội bộ, không qua đăng nhập khách hàng.
+Sáu mục trong sidebar Ops trỏ tới sáu màn thật; ô tìm kiếm trên thanh đầu trang
+lọc ngay trên danh sách cảnh báo đã tải và nhảy thẳng tới case, còn "Xuất báo
+cáo" tải về CSV đúng những dòng đang hiện (đã qua bộ lọc và ô tìm kiếm).
+
+**Đăng nhập/đăng xuất (khách hàng):** các màn khách hàng yêu cầu đăng nhập — chưa có phiên sẽ tự chuyển về `/login`; phiên giữ qua reload (localStorage); Đăng xuất nằm trong pill nav **Cài đặt** trên Home.
+
+**Đăng nhập/đăng xuất (Ops):** sáu màn `/ops`, `/ops/alerts/:id`, `/ops/cases`,
+`/ops/scenarios`, `/ops/model`, `/ops/audit` yêu cầu phiên nội bộ riêng
+(`src/lib/ops-auth.ts`, key localStorage `msb-guardian-ops-auth`) — **tách hẳn**
+phiên khách hàng ở trên: đăng xuất bên khách không đá chuyên viên ra khỏi Ops và
+ngược lại. Chưa đăng nhập thì tự chuyển về `/ops/login`, đăng nhập xong quay lại
+đúng trang vừa định mở. Đăng xuất nằm cạnh tên chuyên viên ở chân sidebar Ops.
+
+Đăng nhập Ops gọi `POST /api/ops/login`: gateway xác thực qua identity-service
+rồi từ chối mọi tài khoản không có quyền vận hành (`ops.dashboard.read`), kể cả
+đúng mật khẩu — tài khoản khách hàng không vào được `/ops`.
+
+> **Giới hạn đã biết, không phải bug:** hệ thống hiện không có token phiên ở
+> tầng API. Đăng nhập Ops chỉ chặn được người đi qua giao diện — ai biết thẳng
+> URL `/api/ops/*` vẫn gọi được mà không cần đăng nhập trước. Sửa việc này cần
+> thêm cơ chế xác thực request (token/session) ở gateway, nằm ngoài phạm vi bản
+> demo này. Tương tự, dữ liệu hiện có chỉ phân biệt được một vai trò nội bộ
+> (BACKOFFICE) nên không tách được analyst/manager/auditor — mọi tài khoản vận
+> hành đăng nhập đều hiện cùng một nhãn vai trò "Fraud Ops".
 
 **Luồng demo chính:** `/login` → "Đăng nhập" → Home → bấm "Chuyển tiền" → màn phân tích ~2s → Cảnh báo 87/100 → "Vì sao chúng tôi cảnh báo?" → quay lại → "Huỷ giao dịch" → màn đã bảo vệ → Trung tâm an toàn. Bot AI nổi trên Home dẫn sang Financial Copilot. Sau đó mở `/ops` cho phần vận hành.
 

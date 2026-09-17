@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react'
-import { Briefcase, FileText, History, LayoutGrid, LineChart, Search, TriangleAlert } from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import { Briefcase, FileText, History, LayoutGrid, LineChart, LogOut, TriangleAlert } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoOpsAlerts } from '@/data/demo-scenarios'
 import { getOpsAlerts, getOpsSession } from '@/lib/api'
+import { useOpsAuthStore } from '@/lib/ops-auth'
 import { cn } from '@/lib/utils'
+import { OpsSearch } from './OpsSearch'
 
 /**
  * Menu phải dựng trong component vì mục "Cảnh báo" cần id của cảnh báo đầu tiên
@@ -14,11 +16,22 @@ function buildMenu(firstAlertId: string | undefined, alertCount: number) {
   return [
   { key: 'overview', label: 'Tổng quan', icon: LayoutGrid, to: '/ops' },
   { key: 'alerts', label: 'Cảnh báo', icon: TriangleAlert, to: firstAlertId ? `/ops/alerts/${firstAlertId}` : '/ops', badge: alertCount ? String(alertCount) : undefined },
-  { key: 'cases', label: 'Case', icon: Briefcase, to: '/ops' },
-  { key: 'scenarios', label: 'Kịch bản lừa đảo', icon: FileText, to: '/ops' },
-  { key: 'models', label: 'Mô hình & ngưỡng', icon: LineChart, to: '/ops' },
-  { key: 'audit', label: 'Nhật ký quyết định AI', icon: History, to: '/ops' },
+  { key: 'cases', label: 'Case', icon: Briefcase, to: '/ops/cases' },
+  { key: 'scenarios', label: 'Kịch bản lừa đảo', icon: FileText, to: '/ops/scenarios' },
+  { key: 'models', label: 'Mô hình & ngưỡng', icon: LineChart, to: '/ops/model' },
+  { key: 'audit', label: 'Nhật ký quyết định AI', icon: History, to: '/ops/audit' },
   ]
+}
+
+/** Đường dẫn hiện tại thuộc mục nào trong sidebar. Thứ tự có ý nghĩa: /ops khớp
+ *  mọi thứ nên phải xét cuối cùng. */
+function activeMenuKey(pathname: string): string {
+  if (pathname.startsWith('/ops/alerts')) return 'alerts'
+  if (pathname.startsWith('/ops/cases')) return 'cases'
+  if (pathname.startsWith('/ops/scenarios')) return 'scenarios'
+  if (pathname.startsWith('/ops/model')) return 'models'
+  if (pathname.startsWith('/ops/audit')) return 'audit'
+  return 'overview'
 }
 
 /** Gateway gửi tone dạng ngữ nghĩa; màu là quyết định của giao diện. */
@@ -29,7 +42,11 @@ const toneVar: Record<'ok' | 'warn' | 'danger', string> = {
 }
 
 function SystemStatus() {
-  const { data: session } = useQuery({ queryKey: ['ops-session'], queryFn: getOpsSession })
+  const opsUsername = useOpsAuthStore((s) => s.user?.username)
+  const { data: session } = useQuery({
+    queryKey: ['ops-session', opsUsername],
+    queryFn: () => getOpsSession(opsUsername),
+  })
   const rows = (session?.systemStatus ?? []).map((r) => ({ ...r, tone: toneVar[r.tone] }))
   return (
     <div className="mt-auto flex flex-col gap-2 rounded-xl bg-sidebar-soft p-3">
@@ -49,12 +66,26 @@ function SystemStatus() {
 
 export function DesktopShell({ children, breadcrumb }: { children: ReactNode; breadcrumb?: ReactNode }) {
   const location = useLocation()
-  const activeKey = location.pathname.startsWith('/ops/alerts') ? 'alerts' : 'overview'
+  const navigate = useNavigate()
+  const activeKey = activeMenuKey(location.pathname)
+  const opsUser = useOpsAuthStore((s) => s.user)
+  const opsLogout = useOpsAuthStore((s) => s.logout)
   // Dùng chung queryKey với OpsDashboardPage nên react-query trả cache, không gọi thêm lần nào.
   const { data: alerts } = useQuery({ queryKey: ['ops-alerts'], queryFn: getOpsAlerts })
-  const { data: session } = useQuery({ queryKey: ['ops-session'], queryFn: getOpsSession })
-  const operator = session?.operator
+  const { data: session } = useQuery({
+    queryKey: ['ops-session', opsUser?.username],
+    queryFn: () => getOpsSession(opsUser?.username),
+  })
+  // Ưu tiên phiên đăng nhập nội bộ đang có (tên đúng người vừa đăng nhập, có
+  // ngay cả khi lời gọi gateway chưa xong hoặc tạm hỏng); getOpsSession chỉ để
+  // đồng bộ lại role/shift/initials từ identity-service khi gọi được.
+  const operator = session?.operator ?? opsUser?.operator
   const menu = buildMenu(alerts?.[0]?.id, alerts?.length ?? 0)
+
+  function handleLogout() {
+    opsLogout()
+    navigate('/ops/login', { replace: true })
+  }
   return (
     <div className="flex min-h-screen bg-app">
       {/* Sidebar tối màu */}
@@ -83,26 +114,27 @@ export function DesktopShell({ children, breadcrumb }: { children: ReactNode; br
         })}
         <SystemStatus />
         <div className="mt-3 flex items-center gap-2.5 px-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-soft text-[13px] font-semibold">{operator?.initials ?? ''}</span>
-          <span>
-            <span className="block text-[13px] font-medium">{operator?.name ?? ''}</span>
-            <span className="block text-[11px] text-muted">{operator ? `${operator.role} · ${operator.shift}` : ''}</span>
+          <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-sidebar-soft text-[13px] font-semibold">{operator?.initials ?? ''}</span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[13px] font-medium">{operator?.name ?? ''}</span>
+            <span className="block truncate text-[11px] text-muted">{operator ? `${operator.role} · ${operator.shift}` : ''}</span>
           </span>
+          <button
+            type="button"
+            onClick={handleLogout}
+            aria-label="Đăng xuất"
+            title="Đăng xuất"
+            className="flex h-8 w-8 flex-none cursor-pointer items-center justify-center rounded-full text-sidebar-text hover:bg-white/10 hover:text-white"
+          >
+            <LogOut size={16} strokeWidth={1.8} />
+          </button>
         </div>
       </aside>
 
       {/* Vùng nội dung */}
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-16 flex-none items-center justify-between border-b border-line bg-surface px-6">
-          {breadcrumb ?? (
-            <label className="flex h-10 w-[380px] items-center gap-2.5 rounded-[10px] bg-app px-3.5 text-sm text-muted">
-              <Search size={18} strokeWidth={1.6} />
-              <input
-                className="w-full bg-transparent outline-none placeholder:text-muted"
-                placeholder="Tìm khách hàng, số tài khoản, case…"
-              />
-            </label>
-          )}
+          {breadcrumb ?? <OpsSearch />}
           <div className="flex items-center gap-4">
             <span className="text-[13px] text-muted">{session?.nowLabel ?? ''}</span>
             <span className="flex items-center gap-1.5 rounded-full bg-success-soft px-2.5 py-1.5 text-xs font-semibold text-success-deep">
