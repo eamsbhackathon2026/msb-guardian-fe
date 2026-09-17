@@ -399,8 +399,17 @@ export function HomePage() {
   const { data: home } = useQuery({ queryKey: ['home-content'], queryFn: getHomeContent })
   // Cùng queryKey với màn Copilot nên không tốn thêm lời gọi khi đã mở màn đó.
   const { data: overview } = useQuery({ queryKey: ['copilot-overview'], queryFn: getCopilotOverview })
-  // Tỷ trọng đã chi của ngân sách tháng — Trợ lý AI cảnh báo ngay trên trang chủ
+  // Card cảnh báo ngân sách của Trợ lý AI — theo design aibot.PNG: % đã chi
+  // đóng khung đỏ bên trái, tiêu đề tình trạng + số còn lại/số ngày bên phải.
   const spentPct = overview ? Math.round((overview.budget.spentVnd / overview.budget.budgetVnd) * 100) : null
+  const now = new Date()
+  const daysLeft = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - now.getDate()
+  const remainingVnd = overview ? Math.max(0, overview.budget.budgetVnd - overview.budget.spentVnd) : 0
+  const remainingLabel =
+    remainingVnd >= 1_000_000
+      ? `${(remainingVnd / 1_000_000).toFixed(1).replace(/\.0$/, '').replace('.', ',')} triệu`
+      : formatVnd(remainingVnd)
+  const budgetState = spentPct === null ? '' : spentPct >= 75 ? 'gần cạn' : spentPct >= 50 ? 'đang ở mức cao' : 'trong tầm kiểm soát'
   const { balanceHidden, toggleBalance } = useGuardianStore()
   const sessionNotis = useGuardianStore((s) => s.notifications)
   const notiToast = useGuardianStore((s) => s.notiToast)
@@ -538,16 +547,30 @@ export function HomePage() {
             initial={{ opacity: 0, scale: 0.85, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.3 }}
-            className="relative max-w-[196px] cursor-pointer rounded-[16px_16px_4px_16px] bg-surface p-3 shadow-float"
+            className="relative max-w-[262px] cursor-pointer rounded-[16px_16px_4px_16px] bg-surface p-3 shadow-float"
             onClick={() => navigate('/copilot')}
           >
-            <span className="block text-xs font-semibold text-primary">Trợ lý AI Guardian</span>
             {spentPct !== null ? (
-              <span className="block text-[13px] leading-[18px]">
-                ⚠️ Đã chi <span className="font-bold text-danger">{spentPct}%</span> ngân sách tháng này. Bấm xem chi tiết.
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="flex h-[62px] w-[62px] flex-none flex-col items-center justify-center gap-0.5 rounded-[14px] bg-danger/10">
+                  <span className="text-[19px] font-extrabold leading-5 text-danger">{spentPct}%</span>
+                  <span className="text-[9px] font-bold tracking-[.06em] text-danger">ĐÃ CHI</span>
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[11px] font-semibold leading-4 text-muted">Trợ lý AI Guardian</span>
+                  <span className="block text-[14px] font-bold leading-[19px] text-ink">
+                    Ngân sách tháng {now.getMonth() + 1} {budgetState}
+                  </span>
+                  <span className="block text-[12px] leading-[17px] text-muted">
+                    Còn {remainingLabel} cho {daysLeft} ngày · <span className="font-bold text-danger">Xem chi tiết</span>
+                  </span>
+                </span>
+              </div>
             ) : (
-              <span className="block text-[13px] leading-[18px]">{home?.assistantHint ?? ''}</span>
+              <>
+                <span className="block text-xs font-semibold text-primary">Trợ lý AI Guardian</span>
+                <span className="block text-[13px] leading-[18px]">{home?.assistantHint ?? ''}</span>
+              </>
             )}
             <button
               type="button"
