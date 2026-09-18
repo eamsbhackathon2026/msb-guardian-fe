@@ -121,7 +121,7 @@ export function SupportPage() {
 
         {/* Hotline nhanh */}
         <motion.div custom={6} variants={rowVariants} initial="hidden" animate="show" className="px-1 text-center text-xs leading-[17px] text-white/80">
-          Hotline 24/7 <span className="font-semibold text-gold">1800 6083</span> · miễn phí cước gọi
+          Hotline 24/7 <span className="font-semibold text-gold">1900 6083</span> · miễn phí cước gọi
         </motion.div>
 
         {/* Logo MSB dưới cùng */}

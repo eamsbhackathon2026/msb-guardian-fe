@@ -116,7 +116,7 @@ export function TransferFormPage() {
         }
       />
 
-      <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6 pt-2">
+      <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-8 pt-2">
         {/* Người nhận */}
         <motion.div custom={0} variants={blockVariants} initial="hidden" animate="show" className="flex flex-col gap-2.5 rounded-card bg-surface p-4 shadow-card">
           <span className="text-[13px] leading-[18px] text-muted">Người nhận</span>

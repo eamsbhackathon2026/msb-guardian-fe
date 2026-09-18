@@ -140,7 +140,7 @@ export const demoRiskAssessment: RiskAssessment = {
     },
   ],
   recommendations: [
-    'Gọi tổng đài MSB 1800 6083 để xác minh trước khi thực hiện bất kỳ giao dịch nào.',
+    'Gọi tổng đài MSB 1900 6083 để xác minh trước khi thực hiện bất kỳ giao dịch nào.',
     'Cơ quan công an không bao giờ yêu cầu chuyển tiền qua điện thoại. Hãy đến trực tiếp công an phường nơi cư trú để xác nhận.',
   ],
 }

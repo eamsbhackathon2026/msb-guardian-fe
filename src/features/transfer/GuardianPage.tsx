@@ -150,7 +150,7 @@ export function GuardianPage() {
   return (
     <MobileFrame statusBar="dark" screenClassName="bg-danger-soft">
       <MobileHeader title="Xác nhận chuyển tiền" backTo="/transfer" />
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6 pt-2">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-8 pt-2">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

@@ -381,7 +381,7 @@ export function LoginPage() {
         </div>
 
         <div className="text-center text-xs leading-[17px] text-white/75">
-          Hotline 24/7 <span className="font-semibold text-gold">1800 6083</span> · Phiên bản 9.2.1
+          Hotline 24/7 <span className="font-semibold text-gold">1900 6083</span> · Phiên bản 9.2.1
         </div>
       </motion.div>
 

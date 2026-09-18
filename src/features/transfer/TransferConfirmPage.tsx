@@ -69,7 +69,8 @@ export function TransferConfirmPage() {
         </div>
       </div>
 
-      <div className="flex-none border-t border-line bg-surface px-4 py-3">
+      {/* pb-8 như các màn khác để nút không bị home indicator của khung đè lên */}
+      <div className="flex-none border-t border-line bg-surface px-4 pb-8 pt-3">
         <Button className="w-full" onClick={() => navigate('/transfer/pin', { state: { beneficiary: b, amount, note: state.note, from: state.from } })}>
           Xác nhận chuyển
         </Button>

@@ -162,7 +162,7 @@ function SearchSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (ope
   )
 }
 
-/** Sheet Tổng đài — mock cuộc gọi 1800 6083 với trạng thái đang kết nối/đã kết nối */
+/** Sheet Tổng đài — mock cuộc gọi 1900 6083 với trạng thái đang kết nối/đã kết nối */
 function HotlineSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const container = usePhoneContainer()
   const [calling, setCalling] = useState(false)
@@ -200,7 +200,7 @@ function HotlineSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (op
               </span>
             </span>
             <span className="flex flex-col items-center gap-1">
-              <span className="text-[17px] font-semibold">Tổng đài MSB · 1800 6083</span>
+              <span className="text-[17px] font-semibold">Tổng đài MSB · 1900 6083</span>
               <span className="text-[13px] text-muted">{connected ? `Đã kết nối tổng đài viên · ${timer}` : 'Đang kết nối…'}</span>
             </span>
             <Button variant="outline" className="w-full font-semibold text-danger" onClick={() => onOpenChange(false)}>
@@ -217,7 +217,7 @@ function HotlineSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (op
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold">Tổng đài 24/7</span>
-                <span className="block text-[20px] font-bold tracking-[.02em] text-primary">1800 6083</span>
+                <span className="block text-[20px] font-bold tracking-[.02em] text-primary">1900 6083</span>
               </span>
             </div>
             <Button className="w-full font-semibold" onClick={() => setCalling(true)}>
