@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
 import { CreditCard, PiggyBank, ReceiptText, Send, Sparkles, X } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
-import { ChatSteps } from '@/components/chat-steps'
+import { ChatSteps, ChatThinkingLine } from '@/components/chat-steps'
 import type { ChatChart, ChatGrid, ChatMessage, ChatStep, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
 import { FPT_BILL, billPeriod } from '@/features/payments/PayBillPage'
@@ -144,20 +143,6 @@ function AgentGrid({ grid }: { grid: ChatGrid }) {
   )
 }
 
-function TypingDots() {
-  return (
-    <div className="flex w-fit items-center gap-1.5 rounded-[16px_16px_16px_4px] bg-surface px-4 py-3.5 shadow-card">
-      {[0, 1, 2].map((i) => (
-        <motion.span
-          key={i}
-          className="block h-[7px] w-[7px] rounded-full bg-muted"
-          animate={{ y: [0, -5, 0] }}
-          transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-        />
-      ))}
-    </div>
-  )
-}
 
 /** Gateway trả lời chào soạn sẵn với khung giờ cố định; thay bằng khung giờ
  *  thực của thiết bị để vào buổi tối không bị "Chào buổi sáng". */
@@ -240,6 +225,9 @@ export function CopilotChatPage() {
   // Bước của lượt ĐANG chạy. Xong lượt thì chúng đi vào tin nhắn và chỗ này trống lại.
   const [liveSteps, setLiveSteps] = useState<ChatStep[]>([])
   const [showChips, setShowChips] = useState(true)
+  // Chỉ giữ dòng suy nghĩ khi thật sự đang chờ: lúc chữ đã chảy mà không công cụ
+  // nào chạy, nó chỉ lặp lại thứ sắp gấp vào chính câu trả lời.
+  const dangCho = waitingFirstToken || liveSteps.some((s) => s.status === 'running')
   const scrollRef = useRef<HTMLDivElement>(null)
 
   // Câu hỏi mang theo từ ô chat ở màn tổng quan Copilot — tự gửi đúng một lần
@@ -383,7 +371,7 @@ export function CopilotChatPage() {
               <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 text-[15px] leading-[22px] shadow-card">
                 {m.content}
                 {m.table && <SpendingTable table={m.table} />}
-                {m.steps?.length ? <ChatSteps steps={m.steps} collapsed /> : null}
+                {m.steps?.length ? <ChatSteps steps={m.steps} /> : null}
                 {m.grids?.map((g, i) => <AgentGrid key={i} grid={g} />)}
                 {m.chart && <MiniBarChart chart={m.chart} />}
                 {m.cta === 'open-deposit' && (
@@ -422,20 +410,16 @@ export function CopilotChatPage() {
         )}
         {/* Bước sống suốt lượt, không chỉ lúc chờ token đầu: trợ lý có thể nói
             vài chữ rồi mới gọi công cụ, lúc đó danh sách vẫn phải còn đó. */}
-        {(waitingFirstToken || (streaming && liveSteps.length > 0)) && (
+        {streaming && dangCho && (
           <div className="flex items-end gap-2 self-start">
             <span className="mb-1 flex h-7 w-7 flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
               <Sparkles size={14} strokeWidth={1.8} />
             </span>
-            {/* Có bước thì kể ra, chưa có thì giữ nguyên ba chấm: khung rỗng còn
-                khó hiểu hơn dấu hiệu "đang nghĩ" mà khách đã quen. */}
-            {liveSteps.length ? (
-              <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 shadow-card">
-                <ChatSteps steps={liveSteps} />
-              </div>
-            ) : (
-              <TypingDots />
-            )}
+            {/* Thay ba chấm bằng lời: "Đang suy nghĩ" nói đúng việc máy đang làm,
+                và khi công cụ chạy thì nó nối tiếp ngay dưới cùng một khung. */}
+            <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 shadow-card">
+              <ChatThinkingLine steps={liveSteps} waiting={waitingFirstToken} />
+            </div>
           </div>
         )}
         {showChips && (

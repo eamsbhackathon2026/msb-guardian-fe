@@ -235,7 +235,7 @@ export function GuardianPage() {
                 <b className="mb-1 block font-semibold">{advice.adviceTitle}</b>
                 {advice.adviceBody}
               </div>
-              {advice.steps?.length ? <ChatSteps steps={advice.steps} collapsed /> : null}
+              {advice.steps?.length ? <ChatSteps steps={advice.steps} /> : null}
               <div className="flex items-start gap-2 text-[12px] leading-[17px] text-muted">
                 <ShieldAlert size={14} strokeWidth={1.8} className="mt-0.5 flex-none text-danger" />
                 Guardian khuyên:{' '}
