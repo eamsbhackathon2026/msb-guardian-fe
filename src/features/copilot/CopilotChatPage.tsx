@@ -151,14 +151,24 @@ function liveGreeting(raw: string): string {
   return out === raw ? `${timeGreeting()}! ${raw}` : out
 }
 
-/** Câu cuối cùng trong một đoạn đang chảy dở.
+/** Câu cuối cùng trong một đoạn đang chảy dở, đã gỡ dấu markdown.
  *
  *  Mô hình kể suy nghĩ thành nhiều câu; dòng trên màn hình chỉ cao một dòng nên
  *  nối dồn sẽ thành một đoạn văn trườn ngang. Lấy câu cuối là thứ nó đang cân
- *  nhắc lúc này; câu chưa kết thúc thì hiện dở, đúng nhịp nó đang nghĩ. */
+ *  nhắc lúc này; câu chưa kết thúc thì hiện dở, đúng nhịp nó đang nghĩ.
+ *
+ *  Chuỗi suy luận thô không phải văn xuôi: đo trên GLM thì nó ra dạng dàn bài
+ *  ("1.  **Analyze the Request:**", gạch đầu dòng bằng `*`). Để nguyên thì khách
+ *  đọc thấy dấu sao và dấu chấm số, nên gỡ hết ký hiệu và chỉ giữ chữ. */
 function cauCuoi(doan: string): string {
-  const cau = doan.split(/(?<=[.!?…])\s+/u)
-  return (cau[cau.length - 1] ?? doan).trim().slice(0, 120)
+  const cau = doan.split(/(?<=[.!?…])\s+|\n+/u).filter((phan) => phan.trim())
+  return (cau[cau.length - 1] ?? doan)
+    .replace(/[*_`#]+/gu, '')
+    .replace(/^\s*\d+[.)]\s*/u, '')
+    .replace(/^\s*[-–—•]\s*/u, '')
+    .replace(/\s+/gu, ' ')
+    .trim()
+    .slice(0, 120)
 }
 
 let nextId = 0
