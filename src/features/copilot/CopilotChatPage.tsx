@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Send, Sparkles, X } from 'lucide-react'
+import { PiggyBank, Send, Sparkles, X } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
@@ -169,6 +169,34 @@ function makeMessage(role: ChatMessage['role'], content: string, chart?: ChatCha
   return { id: `msg-${nextId}`, role, content, chart, timestamp: new Date().toISOString() }
 }
 
+/** Bỏ dấu tiếng Việt + thường hoá để so khớp từ khoá — khách gõ "lai suat"
+ *  hay "Lãi Suất" đều nhận ra như nhau. NFD không tách được "đ" nên thay riêng. */
+function boDau(raw: string): string {
+  return raw
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/đ/g, 'd')
+}
+
+/** Khách RA LỆNH mở tiết kiệm ("mở tiết kiệm cho tôi", "tôi muốn mở sổ tiết
+ *  kiệm") → chuyển thẳng sang màn mở tiết kiệm, không cần hỏi agent. Câu có
+ *  dạng câu hỏi ("mở tiết kiệm lãi bao nhiêu?") thì KHÔNG phải lệnh — để agent
+ *  tư vấn rồi hiện nút bên dưới. */
+function laLenhMoTietKiem(question: string): boolean {
+  const q = boDau(question)
+  const laCauHoi = /bao nhieu|the nao|nhu the nao|la gi|\?/.test(q)
+  if (laCauHoi) return false
+  return /\b(mo|tao)\s+(so\s+|tai khoan\s+)?(tiet kiem|tien gui)/.test(q)
+}
+
+/** Câu hỏi thuộc chủ đề lãi suất / sản phẩm tiết kiệm → sau khi tư vấn xong
+ *  gắn nút "Mở tiết kiệm ngay" dưới câu trả lời. */
+function laCauHoiTietKiem(question: string): boolean {
+  const q = boDau(question)
+  return /lai suat|tiet kiem|tien gui|bieu lai/.test(q)
+}
+
 export function CopilotChatPage() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -213,6 +241,19 @@ export function CopilotChatPage() {
     if (!trimmed || streaming) return
     setShowChips(false)
     setInput('')
+
+    // Khách ra lệnh "mở tiết kiệm cho tôi" → xác nhận ngắn rồi link thẳng sang
+    // màn mở tiết kiệm, không đi qua agent (agent không mở sổ được).
+    if (laLenhMoTietKiem(trimmed)) {
+      setMessages((prev) => [
+        ...prev,
+        makeMessage('user', trimmed),
+        makeMessage('assistant', 'Dạ vâng, em chuyển anh/chị sang màn hình mở tiết kiệm ngay ạ…'),
+      ])
+      setTimeout(() => navigate('/invest/open'), 1_000)
+      return
+    }
+
     setStreaming(true)
     setWaitingFirstToken(true)
     setMessages((prev) => [...prev, makeMessage('user', trimmed)])
@@ -227,9 +268,20 @@ export function CopilotChatPage() {
       }
       setMessages((prev) => prev.map((m) => (m.id === draft.id ? { ...m, content: m.content + token } : m)))
     })
+    // Hỏi về lãi suất / sản phẩm tiết kiệm → sau câu tư vấn gắn nút mở tiết
+    // kiệm. Nhận diện theo CÂU HỎI của khách (chắc chắn), thêm vế "lãi suất"
+    // trong câu trả lời để đỡ sót khi khách hỏi vòng ("gửi 12 tháng được bao nhiêu?").
+    const goiYMoTietKiem = laCauHoiTietKiem(trimmed) || /lai suat/.test(boDau(result.content))
     setMessages((prev) => {
       const exists = prev.some((m) => m.id === draft.id)
-      const finalMsg = { ...draft, content: result.content, chart: result.chart, table: result.table, grids: result.grids }
+      const finalMsg: ChatMessage = {
+        ...draft,
+        content: result.content,
+        chart: result.chart,
+        table: result.table,
+        grids: result.grids,
+        cta: goiYMoTietKiem ? 'open-deposit' : undefined,
+      }
       return exists ? prev.map((m) => (m.id === draft.id ? finalMsg : m)) : [...prev, finalMsg]
     })
     setWaitingFirstToken(false)
@@ -273,6 +325,16 @@ export function CopilotChatPage() {
                 {m.table && <SpendingTable table={m.table} />}
                 {m.grids?.map((g, i) => <AgentGrid key={i} grid={g} />)}
                 {m.chart && <MiniBarChart chart={m.chart} />}
+                {m.cta === 'open-deposit' && (
+                  <button
+                    type="button"
+                    onClick={() => navigate('/invest/open')}
+                    className="mt-2.5 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                  >
+                    <PiggyBank size={16} strokeWidth={1.8} />
+                    Mở tiết kiệm ngay
+                  </button>
+                )}
               </div>
             </div>
           ),
