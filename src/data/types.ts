@@ -119,6 +119,17 @@ export interface ChatGrid {
   rows: string[][]
 }
 
+/** Một lần trợ lý dùng công cụ, kể cho khách nghe.
+ *
+ *  `label` do Agent Platform gửi xuống và FE hiển thị NGUYÊN VĂN: nhãn được đặt
+ *  ở màn công cụ bên đó, nên mọi câu chữ phải sửa được ở đúng chỗ ấy. */
+export interface ChatStep {
+  callId: string
+  label: string
+  status: 'running' | 'done' | 'error'
+  durationMs?: number | null
+}
+
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
@@ -131,6 +142,8 @@ export interface ChatMessage {
    *  thanh toán → "Thanh toán hóa đơn" link /payments/bill; hỏi/nhờ thanh toán
    *  nợ thẻ → "Thanh toán thẻ" link /cards/pay). */
   cta?: 'open-deposit' | 'pay-bill' | 'pay-card'
+  /** Các bước trợ lý đã đi qua để trả lời câu này. */
+  steps?: ChatStep[]
   timestamp: string
 }
 
@@ -465,6 +478,7 @@ export interface ScamShieldVerdict {
   recommendation: string
   /** "agent" = do agent Scam Shield (LLM) kết luận; "fallback" = suy từ tín hiệu khi agent lỗi. */
   source: 'agent' | 'fallback'
+  steps?: ChatStep[]
 }
 
 export interface TransferPrecheckResult {
@@ -501,6 +515,7 @@ export interface ChatBankingDraft {
   matches: TransferBeneficiary[]
   /** 'fallback' → agent lỗi/chậm, FE tự dùng bộ luật regex. */
   source: 'agent' | 'fallback'
+  steps?: ChatStep[]
 }
 
 export type GuardianLevel = 'pass' | 'soft_warn' | 'intervene'
@@ -535,6 +550,7 @@ export interface InterveneAdvice {
   recommendedAction: GuardianActionKey
   actions: GuardianAction[]
   source: 'agent' | 'playbook'
+  steps?: ChatStep[]
 }
 
 

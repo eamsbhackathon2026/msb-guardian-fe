@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import { Lock, MessageSquarePlus, PhoneCall, ShieldAlert } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { ChatSteps } from '@/components/chat-steps'
 import { Button } from '@/components/ui/button'
 import type { CustomerAction, GuardianAction, GuardianActionKey, InterveneAdvice } from '@/data/types'
 import { getInterveneDetail, postIntervene, postTransferAction } from '@/lib/api'
@@ -234,6 +235,7 @@ export function GuardianPage() {
                 <b className="mb-1 block font-semibold">{advice.adviceTitle}</b>
                 {advice.adviceBody}
               </div>
+              {advice.steps?.length ? <ChatSteps steps={advice.steps} collapsed /> : null}
               <div className="flex items-start gap-2 text-[12px] leading-[17px] text-muted">
                 <ShieldAlert size={14} strokeWidth={1.8} className="mt-0.5 flex-none text-danger" />
                 Guardian khuyên:{' '}

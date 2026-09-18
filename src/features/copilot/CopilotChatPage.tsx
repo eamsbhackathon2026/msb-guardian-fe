@@ -5,7 +5,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
-import type { ChatChart, ChatGrid, ChatMessage, ChatTable } from '@/data/types'
+import { ChatSteps } from '@/components/chat-steps'
+import type { ChatChart, ChatGrid, ChatMessage, ChatStep, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
 import { FPT_BILL, billPeriod } from '@/features/payments/PayBillPage'
 import { CARD } from '@/features/cards/CardPayPage'
@@ -236,6 +237,8 @@ export function CopilotChatPage() {
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
   const [waitingFirstToken, setWaitingFirstToken] = useState(false)
+  // Bước của lượt ĐANG chạy. Xong lượt thì chúng đi vào tin nhắn và chỗ này trống lại.
+  const [liveSteps, setLiveSteps] = useState<ChatStep[]>([])
   const [showChips, setShowChips] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -253,7 +256,7 @@ export function CopilotChatPage() {
   // Tự cuộn xuống cuối khi có tin nhắn mới
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, waitingFirstToken])
+  }, [messages, waitingFirstToken, liveSteps])
 
   async function send(question: string) {
     const trimmed = question.trim()
@@ -306,18 +309,23 @@ export function CopilotChatPage() {
 
     setStreaming(true)
     setWaitingFirstToken(true)
+    setLiveSteps([])
     setMessages((prev) => [...prev, makeMessage('user', trimmed)])
 
     const draft = makeMessage('assistant', '')
     let started = false
-    const result = await streamChat(trimmed, (token) => {
-      if (!started) {
-        started = true
-        setWaitingFirstToken(false)
-        setMessages((prev) => [...prev, draft])
-      }
-      setMessages((prev) => prev.map((m) => (m.id === draft.id ? { ...m, content: m.content + token } : m)))
-    })
+    const result = await streamChat(
+      trimmed,
+      (token) => {
+        if (!started) {
+          started = true
+          setWaitingFirstToken(false)
+          setMessages((prev) => [...prev, draft])
+        }
+        setMessages((prev) => prev.map((m) => (m.id === draft.id ? { ...m, content: m.content + token } : m)))
+      },
+      setLiveSteps,
+    )
     // Hỏi về lãi suất / sản phẩm tiết kiệm → sau câu tư vấn gắn nút mở tiết
     // kiệm. Nhận diện theo CÂU HỎI của khách (chắc chắn), thêm vế "lãi suất"
     // trong câu trả lời để đỡ sót khi khách hỏi vòng ("gửi 12 tháng được bao nhiêu?").
@@ -330,11 +338,13 @@ export function CopilotChatPage() {
         chart: result.chart,
         table: result.table,
         grids: result.grids,
+        steps: result.steps,
         cta: goiYMoTietKiem ? 'open-deposit' : undefined,
       }
       return exists ? prev.map((m) => (m.id === draft.id ? finalMsg : m)) : [...prev, finalMsg]
     })
     setWaitingFirstToken(false)
+    setLiveSteps([])
     setStreaming(false)
   }
 
@@ -373,6 +383,7 @@ export function CopilotChatPage() {
               <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 text-[15px] leading-[22px] shadow-card">
                 {m.content}
                 {m.table && <SpendingTable table={m.table} />}
+                {m.steps?.length ? <ChatSteps steps={m.steps} collapsed /> : null}
                 {m.grids?.map((g, i) => <AgentGrid key={i} grid={g} />)}
                 {m.chart && <MiniBarChart chart={m.chart} />}
                 {m.cta === 'open-deposit' && (
@@ -409,12 +420,22 @@ export function CopilotChatPage() {
             </div>
           ),
         )}
-        {waitingFirstToken && (
+        {/* Bước sống suốt lượt, không chỉ lúc chờ token đầu: trợ lý có thể nói
+            vài chữ rồi mới gọi công cụ, lúc đó danh sách vẫn phải còn đó. */}
+        {(waitingFirstToken || (streaming && liveSteps.length > 0)) && (
           <div className="flex items-end gap-2 self-start">
             <span className="mb-1 flex h-7 w-7 flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
               <Sparkles size={14} strokeWidth={1.8} />
             </span>
-            <TypingDots />
+            {/* Có bước thì kể ra, chưa có thì giữ nguyên ba chấm: khung rỗng còn
+                khó hiểu hơn dấu hiệu "đang nghĩ" mà khách đã quen. */}
+            {liveSteps.length ? (
+              <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 shadow-card">
+                <ChatSteps steps={liveSteps} />
+              </div>
+            ) : (
+              <TypingDots />
+            )}
           </div>
         )}
         {showChips && (

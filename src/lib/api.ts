@@ -25,6 +25,7 @@ import type {
   TransferActionResult,
   ChatChart,
   ChatGrid,
+  ChatStep,
   ChatTable,
   CopilotOverview,
   Customer,
@@ -152,6 +153,7 @@ export interface ChatStreamResult {
   chart?: ChatChart
   table?: ChatTable
   grids: ChatGrid[]
+  steps: ChatStep[]
 }
 
 /**
@@ -161,7 +163,11 @@ export interface ChatStreamResult {
  * tối đa một `{"chart": {...}}` phát sau đó. Bản trước chỉ đọc `token` nên biểu
  * đồ cột bị mất khi chạy live — đây là chỗ sửa.
  */
-export async function streamChat(question: string, onToken: (token: string) => void): Promise<ChatStreamResult> {
+export async function streamChat(
+  question: string,
+  onToken: (token: string) => void,
+  onSteps?: (steps: ChatStep[]) => void,
+): Promise<ChatStreamResult> {
   const res = await fetch('/api/copilot/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -175,6 +181,9 @@ export async function streamChat(question: string, onToken: (token: string) => v
   let chart: ChatChart | undefined
   let table: ChatTable | undefined
   const grids: ChatGrid[] = []
+  // Một lần gọi công cụ phát hai sự kiện — bắt đầu rồi kết thúc — nên gộp theo
+  // callId: bước chạy xong thay chỗ chính nó, không xếp thành hai dòng.
+  const steps: ChatStep[] = []
   let buffer = ''
 
   for (;;) {
@@ -189,10 +198,15 @@ export async function streamChat(question: string, onToken: (token: string) => v
       const payload = line.slice(5).trim()
       if (payload === '[DONE]') continue
       try {
-        const parsed = JSON.parse(payload) as { token?: string; chart?: ChatChart; table?: ChatTable; grid?: ChatGrid }
+        const parsed = JSON.parse(payload) as { token?: string; chart?: ChatChart; table?: ChatTable; grid?: ChatGrid; step?: ChatStep }
         if (parsed.token) {
           full += parsed.token
           onToken(parsed.token)
+        } else if (parsed.step?.callId) {
+          const at = steps.findIndex((s) => s.callId === parsed.step!.callId)
+          if (at >= 0) steps[at] = parsed.step
+          else steps.push(parsed.step)
+          onSteps?.([...steps])
         } else if (parsed.table) {
           table = parsed.table
         } else if (parsed.grid) {
@@ -208,7 +222,7 @@ export async function streamChat(question: string, onToken: (token: string) => v
     }
   }
 
-  return { content: full, chart, table, grids }
+  return { content: full, chart, table, grids, steps }
 }
 
 // MOCK CŨ của streamChat: phát lại câu trả lời ghi sẵn ~25ms/token.
