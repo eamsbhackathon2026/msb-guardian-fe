@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeftRight, ChevronRight, CirclePlus, CreditCard, Lock } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
 
@@ -42,6 +43,7 @@ function CardVisual() {
 
 /** Màn Thẻ — theo bố cục the.jpg, tone sáng đồng bộ app */
 export function CardsPage() {
+  const navigate = useNavigate()
   const [tab, setTab] = useState<TabKey>('credit')
   const cards = cardsByTab[tab]
   const card = cards[0]
@@ -128,12 +130,12 @@ export function CardsPage() {
             <div className="grid grid-cols-3">
               {[
                 { icon: Lock, label: 'Khoá thẻ' },
-                { icon: ArrowLeftRight, label: 'Thanh toán thẻ' },
+                { icon: ArrowLeftRight, label: 'Thanh toán thẻ', to: '/cards/pay' },
                 { icon: CreditCard, label: 'Xem thông tin thẻ' },
               ].map((a) => {
                 const Icon = a.icon
                 return (
-                  <button key={a.label} type="button" className="flex cursor-pointer flex-col items-center gap-2 px-1 py-1.5">
+                  <button key={a.label} type="button" onClick={() => a.to && navigate(a.to)} className="flex cursor-pointer flex-col items-center gap-2 px-1 py-1.5">
                     <span className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-orange-soft text-primary">
                       <Icon size={21} strokeWidth={1.6} />
                     </span>

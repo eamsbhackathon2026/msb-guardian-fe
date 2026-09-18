@@ -12,6 +12,7 @@ import { OpenDepositPage } from '@/features/invest/OpenDepositPage'
 import { InvestRatesPage } from '@/features/invest/InvestRatesPage'
 import { LoansPage } from '@/features/loans/LoansPage'
 import { CardsPage } from '@/features/cards/CardsPage'
+import { CardPayPage } from '@/features/cards/CardPayPage'
 import { BeneficiariesPage } from '@/features/transfer/BeneficiariesPage'
 import { TransferFormPage } from '@/features/transfer/TransferFormPage'
 import { TransferConfirmPage } from '@/features/transfer/TransferConfirmPage'
@@ -59,6 +60,7 @@ export const router = createBrowserRouter([
   { path: '/payments/bill', element: <RequireAuth><PayBillPage /></RequireAuth> },
   { path: '/loans', element: <RequireAuth><LoansPage /></RequireAuth> },
   { path: '/cards', element: <RequireAuth><CardsPage /></RequireAuth> },
+  { path: '/cards/pay', element: <RequireAuth><CardPayPage /></RequireAuth> },
   { path: '/transfer', element: <RequireAuth><BeneficiariesPage /></RequireAuth> },
   { path: '/transfer/new', element: <RequireAuth><TransferFormPage /></RequireAuth> },
   { path: '/transfer/account', element: <RequireAuth><NewAccountPage /></RequireAuth> },
