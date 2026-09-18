@@ -56,6 +56,9 @@ function BudgetDonut({ overview }: { overview: CopilotOverview }) {
         <span className="text-[13px] text-muted">Còn lại · 15 ngày</span>
         <span className="text-[17px] font-medium text-success">{formatVnd(remaining)}</span>
         <span className="text-xs text-muted">Ngân sách {formatVnd(budgetVnd)}</span>
+        {/* Số này là chi tiêu thật, không gồm tiền chuyển đi cho người khác —
+            nói rõ để khách không đối chiếu với sao kê rồi tưởng thiếu tiền. */}
+        <span className="text-xs text-muted">Chưa tính chuyển khoản đi</span>
       </div>
     </div>
   )
