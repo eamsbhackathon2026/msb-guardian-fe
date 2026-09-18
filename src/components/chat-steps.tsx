@@ -58,13 +58,26 @@ function useDongChay(muon: string | null, nhipMs = NHIP_TOI_THIEU_MS): string | 
  *  còn làm việc thì màn hình chỉ kể việc đang làm. Toàn bộ dấu vết được gấp vào
  *  tin nhắn khi câu trả lời xong.
  */
-export function ChatThinkingLine({ steps, waiting }: { steps: ChatStep[]; waiting: boolean }) {
+export function ChatThinkingLine({
+  steps,
+  waiting,
+  reasoning,
+}: {
+  steps: ChatStep[]
+  waiting: boolean
+  /** Tóm tắt suy nghĩ do mô hình tự kể, khi trợ lý được bật cờ bên Agent Platform. */
+  reasoning?: string
+}) {
   const dangChay = steps.find((s) => s.status === 'running')
   const vuaXong = [...steps].reverse().find((s) => s.status !== 'running')
   let muon: string | null = null
   if (dangChay) muon = `Em đang ${dangChay.label}…`
   else if (vuaXong?.durationMs != null && vuaXong.durationMs >= NGUONG_NEU_THOI_GIAN_MS) {
     muon = `Em ${vuaXong.status === 'error' ? 'chưa' : 'đã'} ${vuaXong.label} (${giay(vuaXong.durationMs)})`
+  } else if (reasoning) {
+    // Mô hình tự kể thì để nó kể: câu của nó nói đúng việc nó đang cân nhắc, còn
+    // "Em đang suy nghĩ…" chỉ là câu chống trống của giao diện.
+    muon = reasoning
   } else if (waiting) muon = 'Em đang suy nghĩ…'
 
   const hien = useDongChay(muon)

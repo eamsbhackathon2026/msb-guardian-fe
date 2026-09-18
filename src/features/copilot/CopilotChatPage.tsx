@@ -151,6 +151,16 @@ function liveGreeting(raw: string): string {
   return out === raw ? `${timeGreeting()}! ${raw}` : out
 }
 
+/** Câu cuối cùng trong một đoạn đang chảy dở.
+ *
+ *  Mô hình kể suy nghĩ thành nhiều câu; dòng trên màn hình chỉ cao một dòng nên
+ *  nối dồn sẽ thành một đoạn văn trườn ngang. Lấy câu cuối là thứ nó đang cân
+ *  nhắc lúc này; câu chưa kết thúc thì hiện dở, đúng nhịp nó đang nghĩ. */
+function cauCuoi(doan: string): string {
+  const cau = doan.split(/(?<=[.!?…])\s+/u)
+  return (cau[cau.length - 1] ?? doan).trim().slice(0, 120)
+}
+
 let nextId = 0
 function makeMessage(role: ChatMessage['role'], content: string, chart?: ChatChart): ChatMessage {
   nextId += 1
@@ -224,6 +234,9 @@ export function CopilotChatPage() {
   const [waitingFirstToken, setWaitingFirstToken] = useState(false)
   // Bước của lượt ĐANG chạy. Xong lượt thì chúng đi vào tin nhắn và chỗ này trống lại.
   const [liveSteps, setLiveSteps] = useState<ChatStep[]>([])
+  // Câu suy nghĩ gần nhất của mô hình. Chỉ giữ CÂU CUỐI chứ không nối dồn: dòng
+  // này cao một dòng, và thứ khách cần biết là trợ lý đang cân nhắc gì lúc này.
+  const [liveReasoning, setLiveReasoning] = useState('')
   const [showChips, setShowChips] = useState(true)
   // Chỉ giữ dòng suy nghĩ khi thật sự đang chờ: lúc chữ đã chảy mà không công cụ
   // nào chạy, nó chỉ lặp lại thứ sắp gấp vào chính câu trả lời.
@@ -298,6 +311,7 @@ export function CopilotChatPage() {
     setStreaming(true)
     setWaitingFirstToken(true)
     setLiveSteps([])
+    setLiveReasoning('')
     setMessages((prev) => [...prev, makeMessage('user', trimmed)])
 
     const draft = makeMessage('assistant', '')
@@ -313,6 +327,7 @@ export function CopilotChatPage() {
         setMessages((prev) => prev.map((m) => (m.id === draft.id ? { ...m, content: m.content + token } : m)))
       },
       setLiveSteps,
+      (text) => setLiveReasoning((truoc) => cauCuoi(truoc + text)),
     )
     // Hỏi về lãi suất / sản phẩm tiết kiệm → sau câu tư vấn gắn nút mở tiết
     // kiệm. Nhận diện theo CÂU HỎI của khách (chắc chắn), thêm vế "lãi suất"
@@ -333,6 +348,7 @@ export function CopilotChatPage() {
     })
     setWaitingFirstToken(false)
     setLiveSteps([])
+    setLiveReasoning('')
     setStreaming(false)
   }
 
@@ -418,7 +434,7 @@ export function CopilotChatPage() {
             {/* Thay ba chấm bằng lời: "Đang suy nghĩ" nói đúng việc máy đang làm,
                 và khi công cụ chạy thì nó nối tiếp ngay dưới cùng một khung. */}
             <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 shadow-card">
-              <ChatThinkingLine steps={liveSteps} waiting={waitingFirstToken} />
+              <ChatThinkingLine steps={liveSteps} waiting={waitingFirstToken} reasoning={liveReasoning} />
             </div>
           </div>
         )}

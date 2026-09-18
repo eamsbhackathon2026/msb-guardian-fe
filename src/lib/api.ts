@@ -167,6 +167,7 @@ export async function streamChat(
   question: string,
   onToken: (token: string) => void,
   onSteps?: (steps: ChatStep[]) => void,
+  onReasoning?: (text: string) => void,
 ): Promise<ChatStreamResult> {
   const res = await fetch('/api/copilot/chat', {
     method: 'POST',
@@ -198,10 +199,14 @@ export async function streamChat(
       const payload = line.slice(5).trim()
       if (payload === '[DONE]') continue
       try {
-        const parsed = JSON.parse(payload) as { token?: string; chart?: ChatChart; table?: ChatTable; grid?: ChatGrid; step?: ChatStep }
+        const parsed = JSON.parse(payload) as { token?: string; chart?: ChatChart; table?: ChatTable; grid?: ChatGrid; step?: ChatStep; reasoning?: string }
         if (parsed.token) {
           full += parsed.token
           onToken(parsed.token)
+        } else if (parsed.reasoning) {
+          // Tóm tắt suy nghĩ KHÔNG cộng vào `full`: nó không phải câu trả lời,
+          // chỉ là lời kể trong lúc chờ.
+          onReasoning?.(parsed.reasoning)
         } else if (parsed.step?.callId) {
           const at = steps.findIndex((s) => s.callId === parsed.step!.callId)
           if (at >= 0) steps[at] = parsed.step
