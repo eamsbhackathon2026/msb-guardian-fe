@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { AlarmClock, ChevronRight, Droplet, Globe, Phone, Search, Smartphone, Tv, X, Zap } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
 
@@ -38,8 +39,14 @@ const recentBillers: Biller[] = [
 ]
 
 export function PaymentsPage() {
+  const navigate = useNavigate()
   const [tab, setTab] = useState<'saved' | 'recent'>('saved')
   const [query, setQuery] = useState('')
+
+  /** Demo mới nối luồng Internet (hóa đơn FPT giả lập) — dịch vụ khác chưa có màn. */
+  function openService(label: string) {
+    if (label === 'Internet') navigate('/payments/bill')
+  }
 
   const list = (tab === 'saved' ? savedBillers : recentBillers).filter((b) => {
     const q = query.trim().toLowerCase()
@@ -58,7 +65,7 @@ export function PaymentsPage() {
             {services.map((s) => {
               const Icon = s.icon
               return (
-                <button key={s.label} type="button" className="flex cursor-pointer flex-col items-center gap-2 px-1 py-2.5 text-primary">
+                <button key={s.label} type="button" onClick={() => openService(s.label)} className="flex cursor-pointer flex-col items-center gap-2 px-1 py-2.5 text-primary">
                   <Icon size={26} strokeWidth={1.5} />
                   <span className="text-center text-[13px] font-medium leading-[17px] text-ink">{s.label}</span>
                 </button>
@@ -119,7 +126,7 @@ export function PaymentsPage() {
               </span>
             )}
             {list.map((b) => (
-              <button key={b.id} type="button" className="flex cursor-pointer items-center gap-3 rounded-card px-2 py-3 text-left hover:bg-app">
+              <button key={b.id} type="button" onClick={() => openService(b.service)} className="flex cursor-pointer items-center gap-3 rounded-card px-2 py-3 text-left hover:bg-app">
                 <span className={`flex h-10 w-10 flex-none items-center justify-center rounded-full text-[11px] font-bold ${b.tone}`}>{b.provider}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[15px] font-semibold leading-5">{b.name}</span>

@@ -6,6 +6,7 @@ import { LoginPage } from '@/features/auth/LoginPage'
 import { SupportPage } from '@/features/support/SupportPage'
 import { HomePage } from '@/features/home/HomePage'
 import { PaymentsPage } from '@/features/payments/PaymentsPage'
+import { PayBillPage } from '@/features/payments/PayBillPage'
 import { InvestPage } from '@/features/invest/InvestPage'
 import { OpenDepositPage } from '@/features/invest/OpenDepositPage'
 import { InvestRatesPage } from '@/features/invest/InvestRatesPage'
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
   { path: '/support', element: <SupportPage /> },
   { path: '/', element: <RequireAuth><HomePage /></RequireAuth> },
   { path: '/payments', element: <RequireAuth><PaymentsPage /></RequireAuth> },
+  { path: '/payments/bill', element: <RequireAuth><PayBillPage /></RequireAuth> },
   { path: '/loans', element: <RequireAuth><LoansPage /></RequireAuth> },
   { path: '/cards', element: <RequireAuth><CardsPage /></RequireAuth> },
   { path: '/transfer', element: <RequireAuth><BeneficiariesPage /></RequireAuth> },
