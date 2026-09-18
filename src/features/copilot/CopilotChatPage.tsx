@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { PiggyBank, Send, Sparkles, X } from 'lucide-react'
+import { PiggyBank, ReceiptText, Send, Sparkles, X } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
 import type { ChatChart, ChatGrid, ChatMessage, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
+import { FPT_BILL, billPeriod } from '@/features/payments/PayBillPage'
 import { formatDate, formatVnd, timeGreeting, formatVndWithSign } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 
@@ -197,6 +198,14 @@ function laCauHoiTietKiem(question: string): boolean {
   return /lai suat|tiet kiem|tien gui|bieu lai/.test(q)
 }
 
+/** Hỏi còn hóa đơn nào chưa thanh toán không → trả lời cục bộ về hóa đơn
+ *  Internet FPT giả lập (agent phía gateway không biết hóa đơn demo này). */
+function laCauHoiHoaDon(question: string): boolean {
+  const q = boDau(question)
+  if (!/hoa don/.test(q)) return false
+  return /chua (duoc )?(thanh toan|tra)|con no|no hoa don|can thanh toan|con hoa don/.test(q)
+}
+
 export function CopilotChatPage() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -251,6 +260,21 @@ export function CopilotChatPage() {
         makeMessage('assistant', 'Dạ vâng, em chuyển anh/chị sang màn hình mở tiết kiệm ngay ạ…'),
       ])
       setTimeout(() => navigate('/invest/open'), 1_000)
+      return
+    }
+
+    // Hỏi hóa đơn chưa thanh toán → thông báo còn nợ hóa đơn Internet FPT
+    // (giả lập, cùng dữ liệu với màn /payments/bill) kèm nút thanh toán ngay.
+    if (laCauHoiHoaDon(trimmed)) {
+      const traLoi =
+        `Dạ, anh/chị còn 1 hóa đơn chưa thanh toán ạ: Internet ${FPT_BILL.provider} — kỳ cước ${billPeriod()}, ` +
+        `số tiền ${formatVnd(FPT_BILL.amount)} (mã khách hàng ${FPT_BILL.customerCode}, chủ hợp đồng ${FPT_BILL.holderName}). ` +
+        'Anh/chị bấm nút bên dưới để thanh toán ngay ạ.'
+      setMessages((prev) => [
+        ...prev,
+        makeMessage('user', trimmed),
+        { ...makeMessage('assistant', traLoi), cta: 'pay-bill' as const },
+      ])
       return
     }
 
@@ -333,6 +357,16 @@ export function CopilotChatPage() {
                   >
                     <PiggyBank size={16} strokeWidth={1.8} />
                     Mở tiết kiệm ngay
+                  </button>
+                )}
+                {m.cta === 'pay-bill' && (
+                  <button
+                    type="button"
+                    onClick={() => navigate('/payments/bill')}
+                    className="mt-2.5 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                  >
+                    <ReceiptText size={16} strokeWidth={1.8} />
+                    Thanh toán hóa đơn
                   </button>
                 )}
               </div>

@@ -126,9 +126,10 @@ export interface ChatMessage {
   chart?: ChatChart
   table?: ChatTable
   grids?: ChatGrid[]
-  /** Nút hành động dưới câu trả lời — FE tự gắn khi nhận ra ý định (ví dụ hỏi
-   *  lãi suất/tiết kiệm → nút "Mở tiết kiệm ngay" link sang /invest/open). */
-  cta?: 'open-deposit'
+  /** Nút hành động dưới câu trả lời — FE tự gắn khi nhận ra ý định (hỏi lãi
+   *  suất/tiết kiệm → "Mở tiết kiệm ngay" link /invest/open; hỏi hóa đơn chưa
+   *  thanh toán → "Thanh toán hóa đơn" link /payments/bill). */
+  cta?: 'open-deposit' | 'pay-bill'
   timestamp: string
 }
 

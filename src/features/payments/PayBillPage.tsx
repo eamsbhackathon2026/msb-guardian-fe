@@ -13,8 +13,9 @@ import { MobileHeader } from '@/shell/MobileHeader'
 const vnd = new Intl.NumberFormat('en-US')
 
 /** Hóa đơn Internet FPT GIẢ LẬP — màn thanh toán demo, không gọi backend.
- *  Mã khách hàng và chủ hợp đồng khớp với biller FPT đã lưu ở màn Thanh toán. */
-const FPT_BILL = {
+ *  Mã khách hàng và chủ hợp đồng khớp với biller FPT đã lưu ở màn Thanh toán.
+ *  Export cho Copilot chat nhắc "còn nợ hóa đơn Internet" với đúng con số. */
+export const FPT_BILL = {
   provider: 'FPT Telecom',
   service: 'Internet',
   customerCode: 'HNH787748',
@@ -24,7 +25,7 @@ const FPT_BILL = {
 }
 
 /** Kỳ cước là tháng hiện tại — hóa đơn giả lập luôn "vừa phát hành". */
-function billPeriod(): string {
+export function billPeriod(): string {
   const now = new Date()
   return `Tháng ${now.getMonth() + 1}/${now.getFullYear()}`
 }
