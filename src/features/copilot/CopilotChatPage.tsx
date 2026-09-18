@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { PiggyBank, ReceiptText, Send, Sparkles, X } from 'lucide-react'
+import { CreditCard, PiggyBank, ReceiptText, Send, Sparkles, X } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import type { ChatChart, ChatGrid, ChatMessage, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
 import { FPT_BILL, billPeriod } from '@/features/payments/PayBillPage'
+import { CARD } from '@/features/cards/CardPayPage'
 import { formatDate, formatVnd, timeGreeting, formatVndWithSign } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 
@@ -207,6 +208,14 @@ function laCauHoiHoaDon(question: string): boolean {
   return /hoa don/.test(q) && !/la gi/.test(q)
 }
 
+/** Hỏi/nhờ thanh toán nợ thẻ → báo dư nợ thẻ M-First Green World (giả lập,
+ *  cùng dữ liệu với màn /cards/pay) kèm nút thanh toán ngay. Chú ý "thẻ" mất
+ *  dấu trùng "thế" nên chặn cụm "the nao" để "thanh toán thế nào" không lọt. */
+function laCauHoiNoThe(question: string): boolean {
+  const q = boDau(question)
+  return /the tin dung/.test(q) || /\b(du no|no|thanh toan|tra no|sao ke)\s+(no\s+)?the\b(?!\s*nao)/.test(q)
+}
+
 export function CopilotChatPage() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -261,6 +270,22 @@ export function CopilotChatPage() {
         makeMessage('assistant', 'Dạ vâng, em chuyển anh/chị sang màn hình mở tiết kiệm ngay ạ…'),
       ])
       setTimeout(() => navigate('/invest/open'), 1_000)
+      return
+    }
+
+    // Hỏi/nhờ thanh toán nợ thẻ → báo dư nợ thẻ M-First Green World (giả lập,
+    // cùng dữ liệu với màn /cards/pay) kèm nút thanh toán ngay. Xét TRƯỚC hóa
+    // đơn để "hóa đơn thẻ tín dụng" ra thẻ chứ không ra hóa đơn Internet.
+    if (laCauHoiNoThe(trimmed)) {
+      const traLoi =
+        `Dạ, thẻ ${CARD.name} (•••• ${CARD.last4}) của anh/chị đang có dư nợ ${formatVnd(CARD.totalDue)}, ` +
+        `số tiền thanh toán tối thiểu là ${formatVnd(CARD.minDue)} ạ. ` +
+        'Anh/chị bấm nút bên dưới để thanh toán ngay ạ.'
+      setMessages((prev) => [
+        ...prev,
+        makeMessage('user', trimmed),
+        { ...makeMessage('assistant', traLoi), cta: 'pay-card' as const },
+      ])
       return
     }
 
@@ -368,6 +393,16 @@ export function CopilotChatPage() {
                   >
                     <ReceiptText size={16} strokeWidth={1.8} />
                     Thanh toán hóa đơn
+                  </button>
+                )}
+                {m.cta === 'pay-card' && (
+                  <button
+                    type="button"
+                    onClick={() => navigate('/cards/pay')}
+                    className="mt-2.5 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                  >
+                    <CreditCard size={16} strokeWidth={1.8} />
+                    Thanh toán thẻ
                   </button>
                 )}
               </div>

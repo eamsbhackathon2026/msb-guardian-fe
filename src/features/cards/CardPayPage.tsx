@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { CheckCircle2, ChevronDown, House, Wifi } from 'lucide-react'
+import { CheckCircle2, ChevronDown, House } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
@@ -12,10 +12,11 @@ import { MobileHeader } from '@/shell/MobileHeader'
 
 const vnd = new Intl.NumberFormat('en-US')
 
-/** Dư nợ thẻ GIẢ LẬP theo bố cục ttt.jpg — thẻ trùng số cuối 7042 với màn Thẻ.
- *  Tối thiểu = 5% dư nợ sao kê, làm tròn nghìn như sao kê thật. */
-const CARD = {
-  name: 'MSB Visa Online',
+/** Dư nợ thẻ GIẢ LẬP theo bố cục ttt.jpg — đúng thẻ M-First Green World •••• 7042
+ *  của khách ở màn Thẻ. Tối thiểu = 5% dư nợ sao kê, làm tròn nghìn như sao kê thật.
+ *  Export cho Copilot chat báo dư nợ thẻ với đúng con số. */
+export const CARD = {
+  name: 'M-First Green World',
   last4: '7042',
   minDue: 243_000,
   totalDue: 4_860_000,
@@ -39,20 +40,9 @@ interface PaidCard {
   option: PayOption
 }
 
-/** Mặt thẻ thu nhỏ trong ô chọn thẻ — vẽ CSS theo thẻ cam MSB Visa Online của ảnh mẫu */
+/** Mặt thẻ thu nhỏ trong ô chọn thẻ — dùng thẳng ảnh thẻ M-First Green World như màn Thẻ */
 function CardThumb() {
-  return (
-    <span
-      className="relative flex h-11 w-[68px] flex-none flex-col justify-between overflow-hidden rounded-[7px] p-1.5 shadow-card"
-      style={{ background: 'var(--msb-gradient-balance)' }}
-    >
-      <span className="flex items-center justify-between">
-        <span className="text-[7px] font-bold leading-none text-white">MSB</span>
-        <Wifi size={8} strokeWidth={2.5} className="rotate-90 text-white/80" />
-      </span>
-      <span className="self-end text-[8px] font-bold italic leading-none tracking-wide text-white">VISA</span>
-    </span>
-  )
+  return <img src="/assets/card-green-world.png" alt="Thẻ M-First Green World" className="w-[68px] flex-none rounded-[7px] shadow-card" />
 }
 
 export function CardPayPage() {
