@@ -366,13 +366,25 @@ export interface AuditTrace {
   statusLabel: string
   latencyMs?: number
   decisionId?: string
+  customerId?: number
+  /** Tên đã che, ví dụ 'NGUYEN THI B***'. Vắng khi chưa tra được bảng tên. */
+  customerLabel?: string
 }
 
 export interface AuditAgentStat {
+  /** Khoá agent — thứ endpoint nhận để lọc; nhãn chỉ để đọc. */
+  agentKey: string
   agentLabel: string
   calls: number
   fallbackCalls: number
   avgLatencyMs: number
+}
+
+export interface AuditCustomer {
+  id: number
+  /** Tên đã che; vắng khi chưa tra được bảng tên. */
+  label?: string
+  calls: number
 }
 
 export interface OpsAuditLog {
@@ -381,6 +393,10 @@ export interface OpsAuditLog {
   avgLatencyMs: number
   perAgent: AuditAgentStat[]
   traces: AuditTrace[]
+  /** Khách có mặt trong TOÀN BỘ nhật ký — không co lại theo bộ lọc. */
+  customers: AuditCustomer[]
+  /** Lượt gọi mới nhất của toàn bộ nhật ký; mốc neo cho các khoảng nhanh. */
+  latestTraceAt?: string
 }
 
 /* ---- Thao tác ghi ---- */

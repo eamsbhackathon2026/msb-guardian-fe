@@ -43,19 +43,29 @@ export function OpsPage({
  * "Không có dữ liệu" để chuyên viên đứng im; câu giải thích kèm một lối đi tiếp
  * mới giúp họ biết mình cần làm gì hoặc chờ điều gì.
  */
-export function OpsEmpty({ title, hint, actionLabel = 'Về Tổng quan', to = '/ops' }: {
+export function OpsEmpty({ title, hint, actionLabel = 'Về Tổng quan', to = '/ops', onAction }: {
   title: string
   hint: string
   actionLabel?: string
   to?: string
+  /** Khi việc tiếp theo nằm ngay trên màn này (ví dụ xoá bộ lọc) thì lối đi tiếp
+   *  là một nút, không phải đường dẫn sang màn khác. */
+  onAction?: () => void
 }) {
+  const actionClass = 'mt-2 text-[13px] font-semibold text-primary hover:text-primary-pressed'
   return (
     <div className="flex flex-col items-center gap-2 rounded-card bg-surface px-6 py-14 text-center shadow-card">
       <span className="text-[15px] font-semibold">{title}</span>
       <span className="max-w-[420px] text-[13px] leading-5 text-muted">{hint}</span>
-      <Link to={to} className="mt-2 text-[13px] font-semibold text-primary hover:text-primary-pressed">
-        {actionLabel} →
-      </Link>
+      {onAction ? (
+        <button type="button" onClick={onAction} className={`cursor-pointer ${actionClass}`}>
+          {actionLabel}
+        </button>
+      ) : (
+        <Link to={to} className={actionClass}>
+          {actionLabel} →
+        </Link>
+      )}
     </div>
   )
 }
