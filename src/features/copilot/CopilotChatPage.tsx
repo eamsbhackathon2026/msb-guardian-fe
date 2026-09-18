@@ -198,12 +198,13 @@ function laCauHoiTietKiem(question: string): boolean {
   return /lai suat|tiet kiem|tien gui|bieu lai/.test(q)
 }
 
-/** Hỏi còn hóa đơn nào chưa thanh toán không → trả lời cục bộ về hóa đơn
- *  Internet FPT giả lập (agent phía gateway không biết hóa đơn demo này). */
+/** Hỏi về hóa đơn → trả lời cục bộ về hóa đơn Internet FPT giả lập (agent
+ *  phía gateway không biết hóa đơn demo này nên sẽ đáp "không có" — sai).
+ *  Bắt RỘNG: cứ nhắc "hóa đơn" là báo nợ, chỉ trừ câu hỏi định nghĩa "là gì";
+ *  bản trước đòi đúng cụm "chưa thanh toán / còn nợ" nên "nợ hóa đơn" trượt. */
 function laCauHoiHoaDon(question: string): boolean {
   const q = boDau(question)
-  if (!/hoa don/.test(q)) return false
-  return /chua (duoc )?(thanh toan|tra)|con no|no hoa don|can thanh toan|con hoa don/.test(q)
+  return /hoa don/.test(q) && !/la gi/.test(q)
 }
 
 export function CopilotChatPage() {
