@@ -395,7 +395,14 @@ export function getOpsModel(): Promise<OpsModelConfig> {
   return fetchJson<OpsModelConfig>('/api/ops/model')
 }
 
-export function getOpsAudit(params: { agent?: string; status?: string } = {}): Promise<OpsAuditLog> {
+/**
+ * `since`/`until` là mốc tuyệt đối (ISO kèm offset), khoảng nửa mở [since, until).
+ * Màn hình đổi ngày người dùng chọn sang mốc tuyệt đối trước khi gọi — gửi ngày
+ * trần thì server phải đoán múi giờ và sẽ cắt nhầm mọi lượt gọi rạng sáng.
+ */
+export function getOpsAudit(
+  params: { agent?: string; status?: string; customer_id?: string; since?: string; until?: string } = {},
+): Promise<OpsAuditLog> {
   const query = new URLSearchParams(
     Object.entries(params).filter((entry): entry is [string, string] => Boolean(entry[1])),
   ).toString()
