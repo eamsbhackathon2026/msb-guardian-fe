@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { CreditCard, PiggyBank, ReceiptText, Send, Sparkles, X } from 'lucide-react'
+import { CreditCard, PiggyBank, ReceiptText, Send, ShieldAlert, Sparkles, X } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
 import { ChatSteps, ChatThinkingLine } from '@/components/chat-steps'
-import type { ChatChart, ChatGrid, ChatMessage, ChatStep, ChatTable } from '@/data/types'
+import type { ChatChart, ChatGrid, ChatMessage, ChatNotice, ChatStep, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
 import { FPT_BILL, billPeriod } from '@/features/payments/PayBillPage'
 import { CARD } from '@/features/cards/CardPayPage'
@@ -13,6 +13,23 @@ import { formatDate, formatVnd, timeGreeting, formatVndWithSign } from '@/lib/fo
 import { MobileFrame } from '@/shell/MobileFrame'
 
 const chartShades = ['var(--msb-primary)', 'var(--msb-orange-300)', 'var(--msb-orange-200)', 'var(--msb-orange-border)', 'var(--msb-border)']
+
+/** Cảnh báo tin nhắn vừa gửi mang chỉ dẫn mạo danh hệ thống.
+ *
+ *  Đặt TRÊN câu trả lời chứ không thay nó: trợ lý vẫn trả lời điều khách hỏi,
+ *  còn đây là chỗ Guardian nói ra điều nó vừa nhận thấy. Kịch bản lừa đảo ở đây
+ *  là kẻ gian đọc cho khách gõ, nên câu cuối phải là một việc khách làm được ngay. */
+function InjectionNotice({ notice }: { notice: ChatNotice }) {
+  return (
+    <div className="mb-2.5 flex gap-2 rounded-xl bg-danger/10 px-3 py-2.5 text-[13px] leading-[18px] text-danger">
+      <ShieldAlert size={16} strokeWidth={1.8} className="mt-0.5 flex-none" />
+      <span className="min-w-0">
+        <span className="block font-semibold">{notice.title}</span>
+        <span className="block text-danger/90">{notice.detail}</span>
+      </span>
+    </div>
+  )
+}
 
 function MiniBarChart({ chart }: { chart: ChatChart }) {
   // Cột cao nhất phải TÌM ra, không lấy cột đầu: bảng chi tiêu xếp giảm dần nên
@@ -247,6 +264,9 @@ export function CopilotChatPage() {
   // Câu suy nghĩ gần nhất của mô hình. Chỉ giữ CÂU CUỐI chứ không nối dồn: dòng
   // này cao một dòng, và thứ khách cần biết là trợ lý đang cân nhắc gì lúc này.
   const [liveReasoning, setLiveReasoning] = useState('')
+  // Cảnh báo chỉ dẫn lạ về TRƯỚC câu trả lời, nên hiện ngay trong lúc chờ rồi
+  // mới theo câu trả lời vào lịch sử hội thoại.
+  const [liveNotice, setLiveNotice] = useState<ChatNotice | undefined>(undefined)
   const [showChips, setShowChips] = useState(true)
   // Chỉ giữ dòng suy nghĩ khi thật sự đang chờ: lúc chữ đã chảy mà không công cụ
   // nào chạy, nó chỉ lặp lại thứ sắp gấp vào chính câu trả lời.
@@ -322,6 +342,7 @@ export function CopilotChatPage() {
     setWaitingFirstToken(true)
     setLiveSteps([])
     setLiveReasoning('')
+    setLiveNotice(undefined)
     setMessages((prev) => [...prev, makeMessage('user', trimmed)])
 
     const draft = makeMessage('assistant', '')
@@ -338,6 +359,7 @@ export function CopilotChatPage() {
       },
       setLiveSteps,
       (text) => setLiveReasoning((truoc) => cauCuoi(truoc + text)),
+      setLiveNotice,
     )
     // Hỏi về lãi suất / sản phẩm tiết kiệm → sau câu tư vấn gắn nút mở tiết
     // kiệm. Nhận diện theo CÂU HỎI của khách (chắc chắn), thêm vế "lãi suất"
@@ -352,6 +374,7 @@ export function CopilotChatPage() {
         table: result.table,
         grids: result.grids,
         steps: result.steps,
+        notice: result.notice,
         cta: goiYMoTietKiem ? 'open-deposit' : undefined,
       }
       return exists ? prev.map((m) => (m.id === draft.id ? finalMsg : m)) : [...prev, finalMsg]
@@ -359,6 +382,7 @@ export function CopilotChatPage() {
     setWaitingFirstToken(false)
     setLiveSteps([])
     setLiveReasoning('')
+    setLiveNotice(undefined)
     setStreaming(false)
   }
 
@@ -395,6 +419,7 @@ export function CopilotChatPage() {
                 <Sparkles size={14} strokeWidth={1.8} />
               </span>
               <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 text-[15px] leading-[22px] shadow-card">
+                {m.notice && <InjectionNotice notice={m.notice} />}
                 {m.content}
                 {m.table && <SpendingTable table={m.table} />}
                 {m.steps?.length ? <ChatSteps steps={m.steps} /> : null}
@@ -444,6 +469,7 @@ export function CopilotChatPage() {
             {/* Thay ba chấm bằng lời: "Đang suy nghĩ" nói đúng việc máy đang làm,
                 và khi công cụ chạy thì nó nối tiếp ngay dưới cùng một khung. */}
             <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 shadow-card">
+              {liveNotice && <InjectionNotice notice={liveNotice} />}
               <ChatThinkingLine steps={liveSteps} waiting={waitingFirstToken} reasoning={liveReasoning} />
             </div>
           </div>

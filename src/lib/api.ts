@@ -25,6 +25,7 @@ import type {
   TransferActionResult,
   ChatChart,
   ChatGrid,
+  ChatNotice,
   ChatStep,
   ChatTable,
   CopilotOverview,
@@ -154,6 +155,7 @@ export interface ChatStreamResult {
   table?: ChatTable
   grids: ChatGrid[]
   steps: ChatStep[]
+  notice?: ChatNotice
 }
 
 /**
@@ -168,6 +170,7 @@ export async function streamChat(
   onToken: (token: string) => void,
   onSteps?: (steps: ChatStep[]) => void,
   onReasoning?: (text: string) => void,
+  onNotice?: (notice: ChatNotice) => void,
 ): Promise<ChatStreamResult> {
   const res = await fetch('/api/copilot/chat', {
     method: 'POST',
@@ -185,6 +188,7 @@ export async function streamChat(
   // Một lần gọi công cụ phát hai sự kiện — bắt đầu rồi kết thúc — nên gộp theo
   // callId: bước chạy xong thay chỗ chính nó, không xếp thành hai dòng.
   const steps: ChatStep[] = []
+  let notice: ChatNotice | undefined
   let buffer = ''
 
   for (;;) {
@@ -199,7 +203,7 @@ export async function streamChat(
       const payload = line.slice(5).trim()
       if (payload === '[DONE]') continue
       try {
-        const parsed = JSON.parse(payload) as { token?: string; chart?: ChatChart; table?: ChatTable; grid?: ChatGrid; step?: ChatStep; reasoning?: string }
+        const parsed = JSON.parse(payload) as { token?: string; chart?: ChatChart; table?: ChatTable; grid?: ChatGrid; step?: ChatStep; reasoning?: string; notice?: ChatNotice }
         if (parsed.token) {
           full += parsed.token
           onToken(parsed.token)
@@ -218,6 +222,10 @@ export async function streamChat(
           grids.push(parsed.grid)
         } else if (parsed.chart) {
           chart = parsed.chart
+        } else if (parsed.notice) {
+          // Cảnh báo tới TRƯỚC token đầu tiên: hiện ngay, đừng đợi câu trả lời xong.
+          notice = parsed.notice
+          onNotice?.(parsed.notice)
         }
       } catch {
         // Payload không phải JSON: coi như văn bản thuần để không mất nội dung.
@@ -227,7 +235,7 @@ export async function streamChat(
     }
   }
 
-  return { content: full, chart, table, grids, steps }
+  return { content: full, chart, table, grids, steps, notice }
 }
 
 // MOCK CŨ của streamChat: phát lại câu trả lời ghi sẵn ~25ms/token.

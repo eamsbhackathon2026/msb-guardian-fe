@@ -130,6 +130,14 @@ export interface ChatStep {
   durationMs?: number | null
 }
 
+/** Cảnh báo gateway gắn vào một lượt chat: tin nhắn khách mang chỉ dẫn mạo danh.
+ *  Trợ lý vẫn trả lời — cảnh báo nằm cạnh câu trả lời, không thay thế nó. */
+export interface ChatNotice {
+  kind: 'prompt_injection'
+  title: string
+  detail: string
+}
+
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
@@ -144,6 +152,8 @@ export interface ChatMessage {
   cta?: 'open-deposit' | 'pay-bill' | 'pay-card'
   /** Các bước trợ lý đã đi qua để trả lời câu này. */
   steps?: ChatStep[]
+  /** Cảnh báo Guardian gắn cho lượt này (chỉ dẫn lạ trong tin nhắn khách). */
+  notice?: ChatNotice
   timestamp: string
 }
 
