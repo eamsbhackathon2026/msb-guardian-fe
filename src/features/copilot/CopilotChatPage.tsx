@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
+import { ChatMarkdown } from '@/components/chat-markdown'
 import { ChatSteps, ChatThinkingLine } from '@/components/chat-steps'
 import type { ChatChart, ChatGrid, ChatMessage, ChatNotice, ChatStep, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
@@ -410,7 +411,7 @@ export function CopilotChatPage() {
         <span className="text-center text-xs text-muted">Hôm nay · {formatDate(new Date().toISOString())}</span>
         {messages.map((m) =>
           m.role === 'user' ? (
-            <div key={m.id} className="max-w-[280px] self-end rounded-[16px_16px_4px_16px] bg-primary px-3.5 py-3 text-[15px] leading-[22px] text-white">
+            <div key={m.id} className="max-w-[280px] self-end whitespace-pre-wrap rounded-[16px_16px_4px_16px] bg-primary px-3.5 py-3 text-[15px] leading-[22px] text-white">
               {m.content}
             </div>
           ) : (
@@ -420,7 +421,7 @@ export function CopilotChatPage() {
               </span>
               <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 text-[15px] leading-[22px] shadow-card">
                 {m.notice && <InjectionNotice notice={m.notice} />}
-                {m.content}
+                <ChatMarkdown text={m.content} />
                 {m.table && <SpendingTable table={m.table} />}
                 {m.steps?.length ? <ChatSteps steps={m.steps} /> : null}
                 {m.grids?.map((g, i) => <AgentGrid key={i} grid={g} />)}

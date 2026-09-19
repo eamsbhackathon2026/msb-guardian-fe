@@ -1,3 +1,4 @@
+import { ChatMarkdown } from '@/components/chat-markdown'
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, MessageSquareText, Send, X } from 'lucide-react'
@@ -369,7 +370,7 @@ export function ChatBankingPage() {
         <span className="text-center text-xs text-muted">Hôm nay · {formatDate(new Date().toISOString())}</span>
         {messages.map((m) =>
           m.role === 'user' ? (
-            <div key={m.id} className="max-w-[280px] self-end rounded-[16px_16px_4px_16px] bg-primary px-3.5 py-3 text-[15px] leading-[22px] text-white">
+            <div key={m.id} className="max-w-[280px] self-end whitespace-pre-wrap rounded-[16px_16px_4px_16px] bg-primary px-3.5 py-3 text-[15px] leading-[22px] text-white">
               {m.content}
             </div>
           ) : (
@@ -378,7 +379,7 @@ export function ChatBankingPage() {
                 <MessageSquareText size={14} strokeWidth={1.8} />
               </span>
               <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 text-[15px] leading-[22px] shadow-card">
-                {m.content}
+                <ChatMarkdown text={m.content} />
                 {m.transfer && <TransferCard transfer={m.transfer} />}
                 {m.action && (
                   <button
