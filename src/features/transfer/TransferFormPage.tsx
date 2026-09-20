@@ -4,9 +4,9 @@ import { ChevronDown, House, Info, X } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Switch } from '@/components/ui/switch'
-import { getSessionCustomer, precheckTransfer } from '@/lib/api'
+import { getSafetyCenter, getSessionCustomer, precheckTransfer } from '@/lib/api'
 import type { TransferPrecheckResult } from '@/data/types'
-import { fullAccountNumber } from '@/lib/format'
+import { formatVnd, fullAccountNumber } from '@/lib/format'
 import { MobileFrame } from '@/shell/MobileFrame'
 import { MobileHeader } from '@/shell/MobileHeader'
 import { favoriteBeneficiaries, type Beneficiary } from './BeneficiariesPage'
@@ -29,6 +29,13 @@ export function TransferFormPage() {
   const beneficiary: Beneficiary = state.beneficiary ?? favoriteBeneficiaries[0]
 
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
+  // Hạn mức chi an toàn khách tự đặt trong Trung tâm an toàn (lớp spending_warn).
+  // Chỉ cảnh báo khi lớp đang bật và có ngưỡng.
+  const { data: safety } = useQuery({ queryKey: ['safety-center'], queryFn: getSafetyCenter })
+  const spendingLimit = (() => {
+    const layer = safety?.protections.find((p) => p.key === 'spending_warn')
+    return layer?.enabled ? (layer.threshold ?? 0) : 0
+  })()
 
   const [amountDigits, setAmountDigits] = useState(state.amount && state.amount > 0 ? String(Math.floor(state.amount)) : '')
   // Từ Chat Banking: nội dung là nguyên câu khách gõ, để Guardian bắt được
@@ -208,6 +215,21 @@ export function TransferFormPage() {
               </div>
             )}
           </div>
+
+          {/* Cảnh báo HẠN MỨC CHI khách tự đặt — độc lập với engine Guardian.
+              Đây là lớp khách chủ động bật trong Trung tâm an toàn, nhắc chính
+              khách khi một giao dịch vượt ngưỡng mình đã định. */}
+          {spendingLimit > 0 && amountValue > spendingLimit && (
+            <div className="flex items-start gap-2.5 rounded-btn border border-warning bg-warning-soft px-3 py-2.5">
+              <span className="mt-0.5 flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full border-[1.5px] border-warning text-[11px] font-bold text-warning">
+                !
+              </span>
+              <div className="min-w-0 flex-1 text-[12.5px] leading-[18px] text-ink">
+                Giao dịch này vượt <span className="font-semibold">hạn mức chi an toàn</span> bạn đặt
+                ({formatVnd(spendingLimit)}). Hãy kiểm tra kỹ trước khi chuyển.
+              </div>
+            </div>
+          )}
 
           {/* Cảnh báo mức soft-warn: hiện ngay tại chỗ, KHÔNG thêm bước nào.
               Chữ là template rule-based của engine nên hiện tức thì, không chờ

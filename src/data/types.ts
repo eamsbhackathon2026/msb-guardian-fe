@@ -198,6 +198,10 @@ export interface ProtectionLayer {
   label: string
   description: string
   enabled: boolean
+  /** Lớp cho khách tự đặt ngưỡng (vd hạn mức chi cảnh báo). */
+  editable?: boolean
+  /** Ngưỡng hiện tại (VND) của lớp editable. */
+  threshold?: number | null
 }
 
 export interface SafetyCenter {

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { Pencil } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Switch } from '@/components/ui/switch'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoSafetyCenter } from '@/data/demo-scenarios'
 import type { SafetyHistoryItem } from '@/data/types'
-import { getSafetyCenter, patchProtection } from '@/lib/api'
+import { getSafetyCenter, patchProtection, setProtectionThreshold } from '@/lib/api'
 import { formatDate, formatVnd } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { BottomNav } from '@/shell/BottomNav'
@@ -91,6 +92,26 @@ function SafetyCenterInner() {
   }
   const [selected, setSelected] = useState<SafetyHistoryItem | null>(null)
   const { data } = useQuery({ queryKey: ['safety-center'], queryFn: getSafetyCenter })
+
+  // Ngưỡng khách đặt cho lớp editable (vd hạn mức chi an toàn). Giữ local để
+  // công tắc/ô nhập phản hồi ngay; giá trị đầu lấy từ gateway.
+  const [thresholds, setThresholds] = useState<Record<string, number>>({})
+  const [editingKey, setEditingKey] = useState<string | null>(null)
+  const [draftAmount, setDraftAmount] = useState('')
+
+  async function onSaveThreshold(key: string) {
+    const value = Number(draftAmount.replace(/\D/g, ''))
+    if (!value || value <= 0) { setEditingKey(null); return }
+    const prev = thresholds[key]
+    setThresholds((m) => ({ ...m, [key]: value }))   // hiện ngay
+    setEditingKey(null)
+    try {
+      await setProtectionThreshold(key, value)
+    } catch {
+      // Lỗi mạng: trả về giá trị cũ thay vì để màn nói một đằng backend một nẻo.
+      setThresholds((m) => ({ ...m, [key]: prev ?? 0 }))
+    }
+  }
 
   // Store giữ trạng thái bật/tắt trong phiên; giá trị ban đầu do gateway quyết định.
   useEffect(() => {
@@ -184,15 +205,51 @@ function SafetyCenterInner() {
         {/* Lớp bảo vệ */}
         <div className="flex flex-col rounded-card bg-surface p-4 pb-1 shadow-card">
           <span className="pb-1 text-[15px] font-semibold">Lớp bảo vệ</span>
-          {data.protections.map((p) => (
-            <span key={p.key} className="flex items-center gap-3 border-b border-divider py-3 last:border-0">
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-medium leading-5">{p.label}</span>
-                <span className="block text-xs text-muted">{p.description}</span>
-              </span>
-              <Switch checked={protections[p.key] ?? false} onCheckedChange={(next) => void onToggleProtection(p.key, next)} />
-            </span>
-          ))}
+          {data.protections.map((p) => {
+            const on = protections[p.key] ?? false
+            const nguong = thresholds[p.key] ?? p.threshold ?? 0
+            return (
+              <div key={p.key} className="flex flex-col border-b border-divider py-3 last:border-0">
+                <span className="flex items-center gap-3">
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium leading-5">{p.label}</span>
+                    <span className="block text-xs text-muted">{p.description}</span>
+                  </span>
+                  <Switch checked={on} onCheckedChange={(next) => void onToggleProtection(p.key, next)} />
+                </span>
+
+                {/* Lớp cho khách tự đặt ngưỡng — hiện khi bật */}
+                {p.editable && on && (
+                  editingKey === p.key ? (
+                    <span className="mt-2.5 flex items-center gap-2 rounded-btn bg-app px-3 py-2">
+                      <input
+                        autoFocus
+                        inputMode="numeric"
+                        value={draftAmount}
+                        onChange={(e) => setDraftAmount(e.target.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.'))}
+                        placeholder="Nhập số tiền"
+                        aria-label="Ngưỡng cảnh báo"
+                        className="min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-ink outline-none placeholder:text-muted placeholder:font-normal"
+                      />
+                      <span className="text-[13px] text-muted">₫</span>
+                      <button type="button" onClick={() => void onSaveThreshold(p.key)}
+                        className="rounded-btn bg-primary px-3 py-1.5 text-[13px] font-semibold text-white active:scale-[.98]">Lưu</button>
+                    </span>
+                  ) : (
+                    <button type="button"
+                      onClick={() => { setEditingKey(p.key); setDraftAmount(nguong ? nguong.toLocaleString('vi-VN') : '') }}
+                      className="mt-2.5 flex items-center justify-between rounded-btn bg-app px-3 py-2 text-left active:scale-[.99]">
+                      <span className="text-[13px] text-muted">Cảnh báo khi một giao dịch vượt</span>
+                      <span className="flex items-center gap-1.5 text-[15px] font-semibold text-primary">
+                        {formatVnd(nguong)}
+                        <Pencil size={13} strokeWidth={2} />
+                      </span>
+                    </button>
+                  )
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
       <BottomNav active="safety" />

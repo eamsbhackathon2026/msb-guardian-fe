@@ -463,6 +463,14 @@ export function patchProtection(key: string, enabled: boolean): Promise<{ ok: bo
   })
 }
 
+/** Đặt ngưỡng (VND) cho một lớp bảo vệ cho phép chỉnh, vd hạn mức chi an toàn. */
+export function setProtectionThreshold(key: string, threshold: number): Promise<{ ok: boolean }> {
+  return fetchJson<{ ok: boolean }>(`/api/safety-center/protections/${key}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ threshold }),
+  })
+}
+
 /* ---- Ops: đăng nhập nội bộ ---- */
 
 export interface OpsLoginResult {
