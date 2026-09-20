@@ -13,6 +13,9 @@ import { favoriteBeneficiaries, type Beneficiary } from './BeneficiariesPage'
 interface DraftTransfer {
   beneficiary: Beneficiary
   amount: number
+  /** Nội dung chuyển khoản = câu khách gõ, mang sang màn chuyển tiền để Guardian
+   *  bắt kịch bản lừa đảo. Chỉ có khi khách gõ nguyên câu (không phải bấm chọn). */
+  note?: string
 }
 
 interface BankingMessage {
@@ -141,7 +144,7 @@ function TransferCard({ transfer }: { transfer: DraftTransfer }) {
       </span>
       <button
         type="button"
-        onClick={() => navigate('/transfer/new', { state: { beneficiary: transfer.beneficiary, amount: transfer.amount, from: 'chat-banking' } })}
+        onClick={() => navigate('/transfer/new', { state: { beneficiary: transfer.beneficiary, amount: transfer.amount, note: transfer.note, from: 'chat-banking' } })}
         className="flex h-10 cursor-pointer items-center justify-center gap-1.5 rounded-btn bg-primary text-[14px] font-semibold text-white active:scale-[.99]"
       >
         Tạo lệnh chuyển
@@ -286,7 +289,7 @@ export function ChatBankingPage() {
       return makeMsg(
         'assistant',
         `Em đã soạn lệnh chuyển ${formatVnd(amount)} tới ${beneficiary.name}. Anh kiểm tra rồi bấm xác nhận nhé — giao dịch vẫn được Scam Shield kiểm tra như thường.`,
-        { transfer: { beneficiary, amount } },
+        { transfer: { beneficiary, amount, note: ai?.note ?? text } },
       )
     }
     if (beneficiary) {

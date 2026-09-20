@@ -523,6 +523,9 @@ export interface ChatBankingDraft {
   amount?: number | null
   recipient?: string | null
   matches: TransferBeneficiary[]
+  /** Nội dung chuyển khoản = nguyên câu khách gõ, để Guardian đọc được ngữ cảnh
+   *  và bắt kịch bản lừa đảo (vd "công an bảo chuyển gấp"). */
+  note?: string | null
   /** 'fallback' → agent lỗi/chậm, FE tự dùng bộ luật regex. */
   source: 'agent' | 'fallback'
   steps?: ChatStep[]
