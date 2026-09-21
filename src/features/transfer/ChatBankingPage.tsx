@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowUpRight, MessageSquareText, Send, ShieldAlert, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { getTransferBeneficiaries, parseChatBanking } from '@/lib/api'
-import type { ChatScamWarning } from '@/data/types'
+import type { ChatGuardianHandoff, ChatScamWarning } from '@/data/types'
 import { formatDate, formatVnd, timeGreeting } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -257,9 +257,30 @@ export function ChatBankingPage() {
       return makeMsg('assistant', 'Danh bạ thụ hưởng của anh đây ạ, bấm chọn là em soạn lệnh luôn:', { beneficiaries: book })
     }
 
-    // CẢNH BÁO LỪA ĐẢO ngay tại câu nói — ưu tiên trước mọi nhánh soạn lệnh.
-    // Bắt được cả khi người nhận KHÔNG có trong danh bạ (giả danh công an luôn
-    // dùng tài khoản lạ), vì gateway đối chiếu playbook trên NỘI DUNG câu.
+    // GIẢ DANH LỪA ĐẢO mức nặng → dẫn thẳng vào MÀN GUARDIAN đầy đủ (lý do +
+    // câu hỏi + Scam Shield lượt 2 + 4 nút: khóa tạm / hủy / gọi MSB / vẫn tiếp
+    // tục). Bắt cả khi người nhận KHÔNG có trong danh bạ.
+    if (byAgent && ai?.guardian) {
+      const g: ChatGuardianHandoff = ai.guardian
+      setPending({})
+      navigate('/transfer/guardian', {
+        state: {
+          beneficiary: { name: g.beneficiaryName, bank: g.bank, account: g.account || '(tài khoản mới)' },
+          amount: g.amount,
+          note: g.note,
+          from: 'chat-banking',
+          decisionId: g.decisionId,
+          score: g.score,
+          reasons: g.reasons,
+          question: g.question,
+          options: g.options,
+        },
+      })
+      return makeMsg('assistant', 'Guardian đang kiểm tra giao dịch này…')
+    }
+
+    // Dấu hiệu lừa đảo nhưng chưa đủ dựng quyết định (thiếu số tiền…) → thẻ cảnh
+    // báo tĩnh ngay trong chat, vẫn bắt được bất kể người nhận có trong danh bạ.
     if (byAgent && ai?.scamWarning) {
       setPending({})
       return makeMsg('assistant',

@@ -533,6 +533,8 @@ export interface ChatBankingDraft {
   /** Cảnh báo lừa đảo nếu nội dung câu khớp playbook — hiện ngay trong chat,
    *  bắt được cả khi người nhận không có trong danh bạ. */
   scamWarning?: ChatScamWarning | null
+  /** Khi mức intervene: đủ dữ liệu để dẫn vào màn Guardian đầy đủ (4 nút + agent). */
+  guardian?: ChatGuardianHandoff | null
   /** 'fallback' → agent lỗi/chậm, FE tự dùng bộ luật regex. */
   source: 'agent' | 'fallback'
   steps?: ChatStep[]
@@ -543,6 +545,19 @@ export interface ChatScamWarning {
   body: string
   scenarioId: string
   recommendedAction: string
+}
+
+export interface ChatGuardianHandoff {
+  decisionId: string
+  score: number
+  reasons: string[]
+  question: string
+  options: string[]
+  beneficiaryName: string
+  bank: string
+  account: string
+  amount: number
+  note: string
 }
 
 export type GuardianLevel = 'pass' | 'soft_warn' | 'intervene'
