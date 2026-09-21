@@ -1,9 +1,10 @@
 import { ChatMarkdown } from '@/components/chat-markdown'
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowUpRight, MessageSquareText, Send, X } from 'lucide-react'
+import { ArrowUpRight, MessageSquareText, Send, ShieldAlert, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { getTransferBeneficiaries, parseChatBanking } from '@/lib/api'
+import type { ChatScamWarning } from '@/data/types'
 import { formatDate, formatVnd, timeGreeting } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -27,13 +28,15 @@ interface BankingMessage {
   beneficiaries?: Beneficiary[]
   /** Nút hành động dưới tin nhắn (mở màn chuyển thường, xem lịch sử…) */
   action?: { label: string; to: string }
+  /** Cảnh báo lừa đảo (giả danh công an, đầu tư…) — hiện thẻ đỏ trong chat */
+  scamWarning?: ChatScamWarning
 }
 
 let nextId = 0
 function makeMsg(
   role: BankingMessage['role'],
   content: string,
-  extra?: { transfer?: DraftTransfer; beneficiaries?: Beneficiary[]; action?: { label: string; to: string } },
+  extra?: { transfer?: DraftTransfer; beneficiaries?: Beneficiary[]; action?: { label: string; to: string }; scamWarning?: ChatScamWarning },
 ): BankingMessage {
   nextId += 1
   return { id: `cb-${nextId}`, role, content, ...extra }
@@ -254,6 +257,16 @@ export function ChatBankingPage() {
       return makeMsg('assistant', 'Danh bạ thụ hưởng của anh đây ạ, bấm chọn là em soạn lệnh luôn:', { beneficiaries: book })
     }
 
+    // CẢNH BÁO LỪA ĐẢO ngay tại câu nói — ưu tiên trước mọi nhánh soạn lệnh.
+    // Bắt được cả khi người nhận KHÔNG có trong danh bạ (giả danh công an luôn
+    // dùng tài khoản lạ), vì gateway đối chiếu playbook trên NỘI DUNG câu.
+    if (byAgent && ai?.scamWarning) {
+      setPending({})
+      return makeMsg('assistant',
+        'Khoan đã anh/chị ơi — giao dịch này có dấu hiệu lừa đảo, em tạm dừng để cảnh báo:',
+        { scamWarning: ai.scamWarning })
+    }
+
     // Tên người nhận KHÔNG đủ thông tin để chỉ đích danh → lọc danh bạ theo
     // tên: trùng nhiều người thì trả danh sách cho khách bấm chọn, đúng một
     // người thì dùng luôn.
@@ -383,6 +396,18 @@ export function ChatBankingPage() {
               </span>
               <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 text-[15px] leading-[22px] shadow-card">
                 <ChatMarkdown text={m.content} />
+                {m.scamWarning && (
+                  <div className="mt-2 flex flex-col gap-1.5 rounded-xl border-[1.5px] border-danger-300 bg-danger-soft p-3">
+                    <span className="flex items-center gap-1.5 text-[13px] font-semibold text-danger">
+                      <ShieldAlert size={15} strokeWidth={2} />
+                      {m.scamWarning.title}
+                    </span>
+                    <span className="text-[13px] leading-[19px] text-ink">{m.scamWarning.body}</span>
+                    <span className="mt-0.5 text-[12px] font-medium text-danger">
+                      Guardian khuyên: không chuyển, hãy gọi 1900 6083 để xác minh.
+                    </span>
+                  </div>
+                )}
                 {m.transfer && <TransferCard transfer={m.transfer} />}
                 {m.action && (
                   <button

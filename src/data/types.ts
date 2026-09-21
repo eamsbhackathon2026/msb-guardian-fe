@@ -530,9 +530,19 @@ export interface ChatBankingDraft {
   /** Nội dung chuyển khoản = nguyên câu khách gõ, để Guardian đọc được ngữ cảnh
    *  và bắt kịch bản lừa đảo (vd "công an bảo chuyển gấp"). */
   note?: string | null
+  /** Cảnh báo lừa đảo nếu nội dung câu khớp playbook — hiện ngay trong chat,
+   *  bắt được cả khi người nhận không có trong danh bạ. */
+  scamWarning?: ChatScamWarning | null
   /** 'fallback' → agent lỗi/chậm, FE tự dùng bộ luật regex. */
   source: 'agent' | 'fallback'
   steps?: ChatStep[]
+}
+
+export interface ChatScamWarning {
+  title: string
+  body: string
+  scenarioId: string
+  recommendedAction: string
 }
 
 export type GuardianLevel = 'pass' | 'soft_warn' | 'intervene'
