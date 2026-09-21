@@ -52,6 +52,26 @@ function useDongChay(muon: string | null, nhipMs = NHIP_TOI_THIEU_MS): string | 
   return hien
 }
 
+/** Câu cuối cùng trong một đoạn đang chảy dở, đã gỡ dấu markdown.
+ *
+ *  Mô hình kể suy nghĩ thành nhiều câu; dòng trên màn hình chỉ cao một dòng nên
+ *  nối dồn sẽ thành một đoạn văn trườn ngang. Lấy câu cuối là thứ nó đang cân
+ *  nhắc lúc này; câu chưa kết thúc thì hiện dở, đúng nhịp nó đang nghĩ.
+ *
+ *  Chuỗi suy luận thô không phải văn xuôi: đo trên GLM thì nó ra dạng dàn bài
+ *  ("1.  **Analyze the Request:**", gạch đầu dòng bằng `*`). Để nguyên thì khách
+ *  đọc thấy dấu sao và dấu chấm số, nên gỡ hết ký hiệu và chỉ giữ chữ. */
+export function cauCuoi(doan: string): string {
+  const cau = doan.split(/(?<=[.!?…])\s+|\n+/u).filter((phan) => phan.trim())
+  return (cau[cau.length - 1] ?? doan)
+    .replace(/[*_`#]+/gu, '')
+    .replace(/^\s*\d+[.)]\s*/u, '')
+    .replace(/^\s*[-–—•]\s*/u, '')
+    .replace(/\s+/gu, ' ')
+    .trim()
+    .slice(0, 120)
+}
+
 /** Dòng suy nghĩ đang chạy: đúng MỘT dòng, dòng sau thay chỗ dòng trước.
  *
  *  Người ta nghĩ tuần tự chứ không nghĩ ra một bảng kiểm, nên trong lúc trợ lý
@@ -72,8 +92,14 @@ export function ChatThinkingLine({
   const vuaXong = [...steps].reverse().find((s) => s.status !== 'running')
   let muon: string | null = null
   if (dangChay) muon = `Em đang ${dangChay.label}…`
-  else if (vuaXong?.durationMs != null && vuaXong.durationMs >= NGUONG_NEU_THOI_GIAN_MS) {
-    muon = `Em ${vuaXong.status === 'error' ? 'chưa' : 'đã'} ${vuaXong.label} (${giay(vuaXong.durationMs)})`
+  else if (vuaXong) {
+    // Công cụ xong rồi thì kể việc vừa xong, KHÔNG lùi về "Em đang suy nghĩ…".
+    // Trước đây dòng này chỉ giữ việc đã xong khi nó tốn trên 1,5 giây, nên
+    // công cụ chạy nhanh vừa xong là chữ quay về câu chống trống — nhìn như trợ
+    // lý quên mất mình vừa làm gì. Ngưỡng 1,5 giây nay chỉ quyết định có NÊU
+    // THỜI GIAN hay không.
+    const lau = vuaXong.durationMs != null && vuaXong.durationMs >= NGUONG_NEU_THOI_GIAN_MS
+    muon = `Em ${vuaXong.status === 'error' ? 'chưa' : 'đã'} ${vuaXong.label}${lau ? ` (${giay(vuaXong.durationMs!)})` : ''}`
   } else if (reasoning) {
     // Mô hình tự kể thì để nó kể: câu của nó nói đúng việc nó đang cân nhắc, còn
     // "Em đang suy nghĩ…" chỉ là câu chống trống của giao diện.
@@ -113,14 +139,6 @@ function StepRow({ step }: { step: ChatStep }) {
   )
 }
 
-/** Câu kể lại, ghép từ chính các nhãn — không thêm chữ nào không có thật. */
-function cauTongKet(steps: ChatStep[]): string {
-  const nhan = steps.map((s) => (s.status === 'error' ? `${s.label} (chưa xong)` : s.label))
-  if (nhan.length === 1) return `Em đã ${nhan[0]}`
-  const dau = nhan.slice(0, -1).join(', ')
-  return `Em đã ${dau} và ${nhan[nhan.length - 1]}`
-}
-
 /** Dấu vết sau khi trả lời xong: một câu, bấm vào mở ra từng bước. */
 export function ChatSteps({ steps }: { steps: ChatStep[] }) {
   const [open, setOpen] = useState(false)
@@ -133,7 +151,9 @@ export function ChatSteps({ steps }: { steps: ChatStep[] }) {
         aria-expanded={open}
         className="flex w-full cursor-pointer items-start gap-1 text-left text-[13px] leading-[18px] text-muted hover:text-primary"
       >
-        <span className="min-w-0 flex-1">{cauTongKet(steps)}</span>
+        {/* Nhãn ngắn thay cho câu kể ghép từ mọi nhãn: câu ấy dài bằng cả đoạn
+            văn và lặp lại đúng những dòng nằm ngay bên dưới khi mở ra. */}
+        <span className="min-w-0 flex-1">Thinking step</span>
         <ChevronDown size={14} strokeWidth={1.8} className={`mt-0.5 flex-none transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (

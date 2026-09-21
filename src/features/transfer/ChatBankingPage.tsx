@@ -1,10 +1,10 @@
 import { ChatMarkdown } from '@/components/chat-markdown'
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
 import { ArrowUpRight, MessageSquareText, Send, ShieldAlert, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { getTransferBeneficiaries, parseChatBanking } from '@/lib/api'
-import type { ChatGuardianHandoff, ChatScamWarning } from '@/data/types'
+import { ChatSteps, ChatThinkingLine, cauCuoi } from '@/components/chat-steps'
+import { getTransferBeneficiaries, parseChatBanking, streamChatBanking } from '@/lib/api'
+import type { ChatBankingDraft, ChatGuardianHandoff, ChatScamWarning, ChatStep } from '@/data/types'
 import { formatDate, formatVnd, timeGreeting } from '@/lib/format'
 import { useGuardianStore } from '@/lib/store'
 import { MobileFrame } from '@/shell/MobileFrame'
@@ -30,6 +30,8 @@ interface BankingMessage {
   action?: { label: string; to: string }
   /** Cảnh báo lừa đảo (giả danh công an, đầu tư…) — hiện thẻ đỏ trong chat */
   scamWarning?: ChatScamWarning
+  /** Những việc gateway đã làm để dựng câu trả lời này, gấp lại dưới bong bóng */
+  steps?: ChatStep[]
 }
 
 let nextId = 0
@@ -110,21 +112,6 @@ function findBeneficiaries(text: string, book: Beneficiary[]): Beneficiary[] {
 
 const fallbackChips = ['Chuyển 500k cho anh Khánh', 'Chuyển 2 triệu cho MSB Thái', 'Chuyển 1,5 triệu cho My Account']
 
-function TypingDots() {
-  return (
-    <div className="flex w-fit items-center gap-1.5 rounded-[16px_16px_16px_4px] bg-surface px-4 py-3.5 shadow-card">
-      {[0, 1, 2].map((i) => (
-        <motion.span
-          key={i}
-          className="block h-[7px] w-[7px] rounded-full bg-muted"
-          animate={{ y: [0, -5, 0] }}
-          transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-        />
-      ))}
-    </div>
-  )
-}
-
 /** Card xác nhận lệnh chuyển trong hội thoại — bấm là sang form đã điền sẵn */
 function TransferCard({ transfer }: { transfer: DraftTransfer }) {
   const navigate = useNavigate()
@@ -180,6 +167,39 @@ export function ChatBankingPage() {
   // để bot liệt kê và khớp tên. Danh bạ demo chỉ dùng khi gateway chết.
   const bookRef = useRef<Beneficiary[] | null>(null)
   const [chips, setChips] = useState<string[]>(fallbackChips)
+  // Việc của lượt ĐANG chạy. Xong lượt thì chúng đi vào tin nhắn và chỗ này trống lại.
+  const [liveSteps, setLiveSteps] = useState<ChatStep[]>([])
+  // Ref song song với state: lúc gấp dấu vết vào tin nhắn, đọc state sẽ ra giá trị cũ.
+  const stepsRef = useRef<ChatStep[]>([])
+  // Câu suy nghĩ gần nhất của mô hình. Chỉ giữ CÂU CUỐI chứ không nối dồn: dòng
+  // này cao một dòng, và thứ khách cần biết là trợ lý đang cân nhắc gì lúc này.
+  const [liveReasoning, setLiveReasoning] = useState('')
+
+  /** Hỏi gateway về câu vừa gõ, ưu tiên đường kể được việc đang làm.
+   *
+   *  Stream hỏng thì rơi về đường JSON một nhịp: dòng suy nghĩ chỉ là chỗ dựa
+   *  cho mắt khách trong lúc chờ, không đáng để màn chuyển tiền đứng hình.
+   */
+  async function askGateway(text: string): Promise<ChatBankingDraft | null> {
+    try {
+      return await streamChatBanking(
+        text,
+        (buoc) => {
+          stepsRef.current = buoc
+          setLiveSteps(buoc)
+        },
+        (mau) => setLiveReasoning((truoc) => cauCuoi(truoc + mau)),
+      )
+    } catch {
+      // Stream đứt giữa chừng để lại những bước chưa đóng. Dọn sạch trước khi
+      // đi đường JSON: giữ lại thì cuối lượt chúng được gấp vào tin nhắn và
+      // hiện thành dấu tích "Em đã…" cho việc chưa bao giờ xong.
+      stepsRef.current = []
+      setLiveSteps([])
+      setLiveReasoning('')
+      return await parseChatBanking(text).catch(() => null)
+    }
+  }
 
   async function loadBook(): Promise<Beneficiary[]> {
     if (bookRef.current) return bookRef.current
@@ -242,7 +262,7 @@ export function ChatBankingPage() {
     // Agent bóc số tiền và tên người nhận. Bộ luật regex bên dưới GIỮ NGUYÊN
     // làm đường lui: agent lỗi hoặc quá chậm thì màn chuyển tiền vẫn chạy như
     // trước, thà kém thông minh còn hơn đứng hình giữa lúc khách đang gõ.
-    const ai = await parseChatBanking(text).catch(() => null)
+    const ai = await askGateway(text)
     const byAgent = ai?.source === 'agent'
     // SỐ TIỀN luôn ưu tiên của gateway, kể cả khi agent hỏng: phần đó do code
     // tất định tính, không phải mô hình đoán. parseAmount của FE chỉ dùng khi
@@ -353,13 +373,27 @@ export function ChatBankingPage() {
     setInput('')
     setMessages((prev) => [...prev, makeMsg('user', trimmed)])
     setTyping(true)
+    stepsRef.current = []
+    setLiveSteps([])
+    setLiveReasoning('')
     // Giữ nhịp gõ tối thiểu ~550ms cho tự nhiên; câu cần tra danh bạ thì reply
     // còn chờ thêm API thật nên Promise.all lấy mốc lâu hơn trong hai việc.
     const beat = new Promise((resolve) => setTimeout(resolve, 550))
-    Promise.all([reply(trimmed), beat]).then(([msg]) => {
-      setMessages((prev) => [...prev, msg])
-      setTyping(false)
-    })
+    Promise.all([reply(trimmed), beat])
+      .then(([msg]) => {
+        // Chỉ gấp việc ĐÃ XONG. Bước còn "running" là việc bị cắt ngang, kể nó
+        // ra thành dấu tích là nói sai.
+        const buoc = stepsRef.current.filter((b) => b.status !== 'running')
+        setMessages((prev) => [...prev, buoc.length ? { ...msg, steps: buoc } : msg])
+      })
+      .catch(() => {
+        setMessages((prev) => [...prev, makeMsg('assistant', 'Em chưa xử lý được câu này, anh/chị nhắn lại giúp em nhé.')])
+      })
+      .finally(() => {
+        setLiveSteps([])
+        setLiveReasoning('')
+        setTyping(false)
+      })
   }
 
   /** Khách bấm chọn một người trong danh sách bot liệt kê — ghép với số tiền
@@ -443,6 +477,7 @@ export function ChatBankingPage() {
                     <ArrowUpRight size={16} strokeWidth={2} />
                   </button>
                 )}
+                {m.steps?.length ? <ChatSteps steps={m.steps} /> : null}
                 {m.beneficiaries && (
                   <div className="mt-1.5 flex flex-col overflow-hidden rounded-xl bg-app">
                     {m.beneficiaries.map((b, i) => (
@@ -469,12 +504,17 @@ export function ChatBankingPage() {
             </div>
           ),
         )}
+        {/* Thay ba chấm bằng lời: agent Chat Banking cố ý không gắn công cụ nên
+            việc kể ra đây là việc của gateway — tra danh bạ, hiểu câu, đối chiếu
+            kịch bản lừa đảo, chấm điểm rủi ro. */}
         {typing && (
           <div className="flex items-end gap-2 self-start">
             <span className="mb-1 flex h-7 w-7 flex-none items-center justify-center rounded-full bg-orange-soft text-primary">
               <MessageSquareText size={14} strokeWidth={1.8} />
             </span>
-            <TypingDots />
+            <div className="min-w-0 rounded-[16px_16px_16px_4px] bg-surface px-3.5 py-3 shadow-card">
+              <ChatThinkingLine steps={liveSteps} waiting reasoning={liveReasoning} />
+            </div>
           </div>
         )}
         {showChips && (

@@ -5,7 +5,7 @@ import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 // MOCK CŨ: import { demoChatSuggestions } from '@/data/demo-scenarios'
 import { ChatMarkdown } from '@/components/chat-markdown'
-import { ChatSteps, ChatThinkingLine } from '@/components/chat-steps'
+import { ChatSteps, ChatThinkingLine, cauCuoi } from '@/components/chat-steps'
 import type { ChatChart, ChatGrid, ChatMessage, ChatNotice, ChatStep, ChatTable } from '@/data/types'
 import { getCopilotIntro, streamChat } from '@/lib/api'
 import { FPT_BILL, billPeriod } from '@/features/payments/PayBillPage'
@@ -167,26 +167,6 @@ function AgentGrid({ grid }: { grid: ChatGrid }) {
 function liveGreeting(raw: string): string {
   const out = raw.replace(/^(chào buổi (sáng|trưa|chiều|tối)|chúc ngủ ngon|xin chào|chào)/i, timeGreeting())
   return out === raw ? `${timeGreeting()}! ${raw}` : out
-}
-
-/** Câu cuối cùng trong một đoạn đang chảy dở, đã gỡ dấu markdown.
- *
- *  Mô hình kể suy nghĩ thành nhiều câu; dòng trên màn hình chỉ cao một dòng nên
- *  nối dồn sẽ thành một đoạn văn trườn ngang. Lấy câu cuối là thứ nó đang cân
- *  nhắc lúc này; câu chưa kết thúc thì hiện dở, đúng nhịp nó đang nghĩ.
- *
- *  Chuỗi suy luận thô không phải văn xuôi: đo trên GLM thì nó ra dạng dàn bài
- *  ("1.  **Analyze the Request:**", gạch đầu dòng bằng `*`). Để nguyên thì khách
- *  đọc thấy dấu sao và dấu chấm số, nên gỡ hết ký hiệu và chỉ giữ chữ. */
-function cauCuoi(doan: string): string {
-  const cau = doan.split(/(?<=[.!?…])\s+|\n+/u).filter((phan) => phan.trim())
-  return (cau[cau.length - 1] ?? doan)
-    .replace(/[*_`#]+/gu, '')
-    .replace(/^\s*\d+[.)]\s*/u, '')
-    .replace(/^\s*[-–—•]\s*/u, '')
-    .replace(/\s+/gu, ' ')
-    .trim()
-    .slice(0, 120)
 }
 
 let nextId = 0

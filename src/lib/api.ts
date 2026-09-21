@@ -165,6 +165,32 @@ export interface ChatStreamResult {
  * tối đa một `{"chart": {...}}` phát sau đó. Bản trước chỉ đọc `token` nên biểu
  * đồ cột bị mất khi chạy live — đây là chỗ sửa.
  */
+/** Đọc thân SSE thành từng payload nằm sau `data:`.
+ *
+ *  Chunk của mạng không cắt theo dòng: một dòng `data: {...}` có thể về làm hai
+ *  lần đọc. Phần đuôi dở được giữ lại chờ chunk sau, nếu không thì cứ vài chục
+ *  token lại mất một mẩu. Hai màn chat dùng chung đúng bộ đọc này để chúng không
+ *  trôi khỏi nhau.
+ */
+async function docSse(body: ReadableStream<Uint8Array>, nhan: (payload: string) => void): Promise<void> {
+  const reader = body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop() ?? ''
+    for (const line of lines) {
+      if (!line.startsWith('data:')) continue
+      const payload = line.slice(5).trim()
+      if (payload === '[DONE]') continue
+      nhan(payload)
+    }
+  }
+}
+
 export async function streamChat(
   question: string,
   onToken: (token: string) => void,
@@ -179,8 +205,6 @@ export async function streamChat(
   })
   if (!res.ok || !res.body) throw new Error(`chat → HTTP ${res.status}`)
 
-  const reader = res.body.getReader()
-  const decoder = new TextDecoder()
   let full = ''
   let chart: ChatChart | undefined
   let table: ChatTable | undefined
@@ -189,51 +213,39 @@ export async function streamChat(
   // callId: bước chạy xong thay chỗ chính nó, không xếp thành hai dòng.
   const steps: ChatStep[] = []
   let notice: ChatNotice | undefined
-  let buffer = ''
 
-  for (;;) {
-    const { done, value } = await reader.read()
-    if (done) break
-    buffer += decoder.decode(value, { stream: true })
-    const lines = buffer.split('\n')
-    // Dòng cuối có thể bị cắt giữa chừng: giữ lại chờ chunk sau.
-    buffer = lines.pop() ?? ''
-    for (const line of lines) {
-      if (!line.startsWith('data:')) continue
-      const payload = line.slice(5).trim()
-      if (payload === '[DONE]') continue
-      try {
-        const parsed = JSON.parse(payload) as { token?: string; chart?: ChatChart; table?: ChatTable; grid?: ChatGrid; step?: ChatStep; reasoning?: string; notice?: ChatNotice }
-        if (parsed.token) {
-          full += parsed.token
-          onToken(parsed.token)
-        } else if (parsed.reasoning) {
-          // Tóm tắt suy nghĩ KHÔNG cộng vào `full`: nó không phải câu trả lời,
-          // chỉ là lời kể trong lúc chờ.
-          onReasoning?.(parsed.reasoning)
-        } else if (parsed.step?.callId) {
-          const at = steps.findIndex((s) => s.callId === parsed.step!.callId)
-          if (at >= 0) steps[at] = parsed.step
-          else steps.push(parsed.step)
-          onSteps?.([...steps])
-        } else if (parsed.table) {
-          table = parsed.table
-        } else if (parsed.grid) {
-          grids.push(parsed.grid)
-        } else if (parsed.chart) {
-          chart = parsed.chart
-        } else if (parsed.notice) {
-          // Cảnh báo tới TRƯỚC token đầu tiên: hiện ngay, đừng đợi câu trả lời xong.
-          notice = parsed.notice
-          onNotice?.(parsed.notice)
-        }
-      } catch {
-        // Payload không phải JSON: coi như văn bản thuần để không mất nội dung.
-        full += payload
-        onToken(payload)
+  await docSse(res.body, (payload) => {
+    try {
+      const parsed = JSON.parse(payload) as { token?: string; chart?: ChatChart; table?: ChatTable; grid?: ChatGrid; step?: ChatStep; reasoning?: string; notice?: ChatNotice }
+      if (parsed.token) {
+        full += parsed.token
+        onToken(parsed.token)
+      } else if (parsed.reasoning) {
+        // Tóm tắt suy nghĩ KHÔNG cộng vào `full`: nó không phải câu trả lời,
+        // chỉ là lời kể trong lúc chờ.
+        onReasoning?.(parsed.reasoning)
+      } else if (parsed.step?.callId) {
+        const at = steps.findIndex((s) => s.callId === parsed.step!.callId)
+        if (at >= 0) steps[at] = parsed.step
+        else steps.push(parsed.step)
+        onSteps?.([...steps])
+      } else if (parsed.table) {
+        table = parsed.table
+      } else if (parsed.grid) {
+        grids.push(parsed.grid)
+      } else if (parsed.chart) {
+        chart = parsed.chart
+      } else if (parsed.notice) {
+        // Cảnh báo tới TRƯỚC token đầu tiên: hiện ngay, đừng đợi câu trả lời xong.
+        notice = parsed.notice
+        onNotice?.(parsed.notice)
       }
+    } catch {
+      // Payload không phải JSON: coi như văn bản thuần để không mất nội dung.
+      full += payload
+      onToken(payload)
     }
-  }
+  })
 
   return { content: full, chart, table, grids, steps, notice }
 }
@@ -262,6 +274,58 @@ export function parseChatBanking(message: string): Promise<ChatBankingDraft> {
     body: JSON.stringify({ message }),
   })
 }
+
+/** Như `parseChatBanking` nhưng kể việc gateway đang làm trong lúc còn làm.
+ *
+ *  Agent Chat Banking cố ý không gắn công cụ (một lượt chỉ 1–5 giây), nên bước
+ *  ở đây là việc CỦA GATEWAY — tra danh bạ, hiểu câu, đối chiếu kịch bản lừa
+ *  đảo, chấm điểm rủi ro — cộng suy nghĩ của mô hình nếu nhà cung cấp có phát.
+ *
+ *  Ném lỗi khi stream không dùng được, để bên gọi rơi về `parseChatBanking`:
+ *  màn chuyển tiền không được đứng vì một dòng chữ trang trí.
+ */
+export async function streamChatBanking(
+  message: string,
+  onSteps: (steps: ChatStep[]) => void,
+  onReasoning: (text: string) => void,
+): Promise<ChatBankingDraft> {
+  const res = await fetch('/api/chat-banking/parse/stream', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message }),
+    // Gateway đã có trần chờ riêng cho agent (9s) nhưng kết nối treo thì không
+    // ai cắt: thiếu cái này, một lượt treo là ô nhập khóa vĩnh viễn vì `typing`
+    // không bao giờ tắt. Hết hạn sẽ ném và bên gọi rơi về đường JSON.
+    signal: AbortSignal.timeout(30_000),
+  })
+  if (!res.ok || !res.body) throw new Error(`chat-banking stream → HTTP ${res.status}`)
+
+  // Một việc phát hai sự kiện — bắt đầu rồi kết thúc — nên gộp theo callId:
+  // bước xong thay chỗ chính nó, không xếp thành hai dòng.
+  const steps: ChatStep[] = []
+  let draft: ChatBankingDraft | undefined
+
+  await docSse(res.body, (payload) => {
+    try {
+      const parsed = JSON.parse(payload) as { step?: ChatStep; reasoning?: string; draft?: ChatBankingDraft }
+      if (parsed.step?.callId) {
+        const at = steps.findIndex((s) => s.callId === parsed.step!.callId)
+        if (at >= 0) steps[at] = parsed.step
+        else steps.push(parsed.step)
+        onSteps([...steps])
+      } else if (parsed.reasoning) {
+        onReasoning(parsed.reasoning)
+      } else if (parsed.draft) {
+        draft = parsed.draft
+      }
+    } catch {
+      // Dòng hỏng thì bỏ qua, đừng làm chết cả lượt vì một mẩu JSON lỗi.
+    }
+  })
+  if (!draft) throw new Error('chat-banking stream: không có draft')
+  return draft
+}
+
 
 /** Lượt 1 màn Guardian — đọc lại quyết định đã chấm, không chấm lại. */
 export function getInterveneDetail(decisionId: string): Promise<InterveneDetail> {
