@@ -173,11 +173,13 @@ export function GuardianPage() {
 
           {advice === null ? (
             <>
-              {/* Lượt 1 — lý do rule-based, hiện ngay không chờ LLM */}
+              {/* Lượt 1 — lý do rule-based, hiện ngay không chờ LLM. Chữ đỏ vì đây
+                  là cảnh báo rủi ro cao, không phải thông tin trung tính. */}
               {reasons.length > 0 && (
                 <div className="flex flex-col gap-1.5 border-t border-divider pt-3">
+                  <span className="text-[13px] font-semibold text-danger">Cảnh báo:</span>
                   {reasons.map((r, i) => (
-                    <div key={i} className="flex items-start gap-2 text-[13px] leading-[19px] text-ink">
+                    <div key={i} className="flex items-start gap-2 text-[13px] leading-[19px] text-danger">
                       <span className="mt-[7px] h-1.5 w-1.5 flex-none rounded-full bg-danger" />
                       {r}
                     </div>
@@ -224,6 +226,17 @@ export function GuardianPage() {
                   Nói thêm với Guardian…
                 </button>
               )}
+
+              {/* "Vẫn tiếp tục" hiện ngay ở lượt 1: khách luôn có quyền bỏ qua câu
+                  hỏi và tự chịu trách nhiệm. Cố ý nhạt và đặt cuối, không bao giờ ẩn. */}
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void hanhDong({ key: 'continue', label: 'Vẫn tiếp tục', recommended: false })}
+                className="w-full cursor-pointer border-t border-divider pt-3 text-center text-[13px] font-medium text-muted underline-offset-2 hover:underline disabled:opacity-50"
+              >
+                Vẫn tiếp tục
+              </button>
             </>
           ) : (
             <>
