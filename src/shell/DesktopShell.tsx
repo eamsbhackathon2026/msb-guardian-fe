@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { Briefcase, FileText, History, LayoutGrid, LineChart, LogOut, TriangleAlert } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -65,6 +66,11 @@ function SystemStatus() {
 }
 
 export function DesktopShell({ children, breadcrumb }: { children: ReactNode; breadcrumb?: ReactNode }) {
+  // Tab trình duyệt của khu vận hành mang tên sản phẩm; app khách vẫn giữ
+  // title chung trong index.html.
+  useEffect(() => {
+    document.title = 'Scam Shield'
+  }, [])
   const location = useLocation()
   const navigate = useNavigate()
   const activeKey = activeMenuKey(location.pathname)

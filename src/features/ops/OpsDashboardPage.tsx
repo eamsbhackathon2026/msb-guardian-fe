@@ -91,9 +91,12 @@ export function OpsDashboardPage() {
       <div className="flex flex-col gap-4">
         {/* Tiêu đề */}
         <div className="flex items-end justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold leading-8">Giám sát Scam Shield</h1>
-            <p className="text-[13px] text-muted">Toàn hệ thống · Toàn bộ kênh Mobile Banking</p>
+          <div className="flex items-center gap-3">
+            <img src="/assets/icon-logo-msb.jpg" alt="MSB" className="h-11 w-11 rounded-xl object-contain" />
+            <div>
+              <h1 className="text-2xl font-semibold leading-8">Scam Shield</h1>
+              <p className="text-[13px] text-muted">Toàn hệ thống · Toàn bộ kênh Mobile Banking</p>
+            </div>
           </div>
           {/* Xuất đúng những dòng đang hiện, tức là đã qua bộ lọc và ô tìm kiếm. */}
           <Button size="sm" disabled={rows.length === 0} onClick={() => downloadAlertsCsv(rows)}>
