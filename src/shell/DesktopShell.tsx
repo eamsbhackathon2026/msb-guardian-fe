@@ -96,12 +96,9 @@ export function DesktopShell({ children, breadcrumb }: { children: ReactNode; br
     <div className="flex min-h-screen bg-app">
       {/* Sidebar tối màu */}
       <aside className="sticky top-0 flex h-screen w-[240px] flex-none flex-col gap-1 overflow-y-auto bg-sidebar px-4 py-6 text-white">
-        <div className="flex items-center gap-2.5 px-2 pb-7">
-          <img src="/assets/icon-logo-msb.jpg" alt="MSB" className="h-10 w-10 flex-none rounded-xl object-contain" />
-          <div>
-            <div className="text-2xl font-bold tracking-[-.02em] text-primary">MSB</div>
-            <div className="text-[13px] font-medium text-muted">Scam Shield Ops</div>
-          </div>
+        <div className="px-2 pb-7">
+          <div className="text-2xl font-bold tracking-[-.02em] text-primary">MSB</div>
+          <div className="text-[13px] font-medium text-muted">Scam Shield Ops</div>
         </div>
         {menu.map((item) => {
           const isActive = item.key === activeKey
