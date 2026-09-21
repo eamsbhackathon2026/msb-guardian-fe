@@ -259,8 +259,10 @@ export function ChatBankingPage() {
 
     // GIẢ DANH LỪA ĐẢO mức nặng → dẫn thẳng vào MÀN GUARDIAN đầy đủ (lý do +
     // câu hỏi + Scam Shield lượt 2 + 4 nút: khóa tạm / hủy / gọi MSB / vẫn tiếp
-    // tục). Bắt cả khi người nhận KHÔNG có trong danh bạ.
-    if (byAgent && ai?.guardian) {
+    // tục). Bắt cả khi người nhận KHÔNG có trong danh bạ. KHÔNG gate theo
+    // byAgent: gateway chỉ set guardian khi playbook (rule/từ-khóa) khớp, nên
+    // dù agent hỏng (source="fallback") thì cảnh báo này vẫn phải hiện.
+    if (ai?.guardian) {
       const g: ChatGuardianHandoff = ai.guardian
       setPending({})
       navigate('/transfer/guardian', {
@@ -280,8 +282,9 @@ export function ChatBankingPage() {
     }
 
     // Dấu hiệu lừa đảo nhưng chưa đủ dựng quyết định (thiếu số tiền…) → thẻ cảnh
-    // báo tĩnh ngay trong chat, vẫn bắt được bất kể người nhận có trong danh bạ.
-    if (byAgent && ai?.scamWarning) {
+    // báo tĩnh ngay trong chat, vẫn bắt được bất kể người nhận có trong danh bạ
+    // và bất kể agent còn sống hay đã rơi về fallback.
+    if (ai?.scamWarning) {
       setPending({})
       return makeMsg('assistant',
         'Khoan đã anh/chị ơi — giao dịch này có dấu hiệu lừa đảo, em tạm dừng để cảnh báo:',
