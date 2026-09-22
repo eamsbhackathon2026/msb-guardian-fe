@@ -31,7 +31,9 @@ export function TransferFormPage() {
   const { data: customer } = useQuery({ queryKey: ['session-customer'], queryFn: getSessionCustomer })
   // Hạn mức chi an toàn khách tự đặt trong Trung tâm an toàn (lớp spending_warn).
   // Chỉ cảnh báo khi lớp đang bật và có ngưỡng.
-  const { data: safety } = useQuery({ queryKey: ['safety-center'], queryFn: getSafetyCenter })
+  // staleTime 0: luôn đọc ngưỡng mới nhất khi mở màn chuyển tiền, để khách vừa
+  // đổi hạn mức chi an toàn xong là banner cảnh báo theo đúng ngưỡng mới ngay.
+  const { data: safety } = useQuery({ queryKey: ['safety-center'], queryFn: getSafetyCenter, staleTime: 0 })
   const spendingLimit = (() => {
     const layer = safety?.protections.find((p) => p.key === 'spending_warn')
     return layer?.enabled ? (layer.threshold ?? 0) : 0

@@ -4,7 +4,7 @@ import { Pencil } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Switch } from '@/components/ui/switch'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 // MOCK CŨ: import { demoSafetyCenter } from '@/data/demo-scenarios'
 import type { SafetyHistoryItem } from '@/data/types'
 import { getSafetyCenter, patchProtection, setProtectionThreshold } from '@/lib/api'
@@ -76,6 +76,7 @@ export function SafetyCenterPage() {
 function SafetyCenterInner() {
   const container = usePhoneContainer()
   const { protections, toggleProtection, hydrateProtections } = useGuardianStore()
+  const queryClient = useQueryClient()
 
   /**
    * Bật/tắt lớp bảo vệ: đổi trạng thái tại chỗ cho công tắc phản hồi ngay, rồi
@@ -86,6 +87,9 @@ function SafetyCenterInner() {
     toggleProtection(key)
     try {
       await patchProtection(key, next)
+      // Làm mới cache dùng chung để màn Chuyển tiền đọc đúng trạng thái ngay,
+      // không phải đợi hết staleTime 60s.
+      await queryClient.invalidateQueries({ queryKey: ['safety-center'] })
     } catch {
       toggleProtection(key)
     }
@@ -107,6 +111,9 @@ function SafetyCenterInner() {
     setEditingKey(null)
     try {
       await setProtectionThreshold(key, value)
+      // Làm mới cache dùng chung: nếu không, đặt ngưỡng xong sang màn Chuyển tiền
+      // trong 60s staleTime vẫn thấy ngưỡng cũ nên không cảnh báo.
+      await queryClient.invalidateQueries({ queryKey: ['safety-center'] })
     } catch {
       // Lỗi mạng: trả về giá trị cũ thay vì để màn nói một đằng backend một nẻo.
       setThresholds((m) => ({ ...m, [key]: prev ?? 0 }))
